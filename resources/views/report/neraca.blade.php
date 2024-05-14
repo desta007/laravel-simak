@@ -89,15 +89,35 @@
                                                 @endforeach
                                             </select>&nbsp;&nbsp;&nbsp;
                                             <button type="submit" class="btn btn-primary">View</button>
-                                            {{-- </div> --}}
                                         </div>
+                                        {{-- </div> --}}
                                     </div>
                                 </div>
+
                             </form>
                         </div>
 
                         @if ($isView != '')
-                            {{-- <div class="card"> --}}
+                            {{-- <div class="col-md-3">
+                                <a class="btn btn-info" href="{{ route('exportNeraca') }}">Export Excel</a>
+                            </div> --}}
+                            <div class="card-footer">
+                                <form action="{{ route('neracaExport') }}" method="POST" target="_blank">
+                                    @csrf
+                                    <input type="hidden" name="id_cabang2" value="{{ $id_cabang }}">
+                                    <input type="hidden" name="id_proyek2" value="{{ $id_proyek }}">
+                                    <input type="hidden" name="bulan2" value="{{ $bulan }}">
+                                    <input type="hidden" name="tahun2" value="{{ $tahun }}">
+
+                                    <button type="submit" name="print" value="print"
+                                        class="btn btn-secondary">Print</button>&nbsp;
+                                    <button type="submit" name="pdf" value="pdf"
+                                        class="btn btn-secondary">PDF</button>&nbsp;
+                                    <button type="submit" name="excel" value="excel" class="btn btn-secondary">
+                                        Excel</button>
+                                </form>
+                            </div>
+
                             <div class="card-body table-responsive p-0">
                                 <table class="table table-hover text-nowrap">
                                     {{-- <thead> --}}
@@ -299,7 +319,8 @@
                                     </tr>
 
                                     <tr style="background-color: #EEEEEE">
-                                        <td colspan="4" style="text-align: center"><b>JUMLAH INVESTASI JANGKA PANJANG</b>
+                                        <td colspan="4" style="text-align: center"><b>JUMLAH INVESTASI JANGKA
+                                                PANJANG</b>
                                         </td>
                                         <td style="text-align: right">@php
                                             $subtotal_investasi_jangka_panjang = $subtotal17x;

@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\CatatanMutuController;
+use App\Http\Controllers\ExcelExportController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GroupAccountController;
 use App\Http\Controllers\KodeBuktiController;
 use App\Http\Controllers\KodePerkiraanController;
@@ -102,4 +104,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('generalLedgerSearch', [ReportController::class, 'generalLedgerSearch'])->name('generalLedgerSearch');
     Route::get('labaRugi', [ReportController::class, 'labaRugi'])->name('labaRugi');
     Route::post('labaRugiSearch', [ReportController::class, 'labaRugiSearch'])->name('labaRugiSearch');
+
+    Route::get('exportNeraca', [ExcelExportController::class, 'exportNeraca'])->name('exportNeraca');
+    Route::post('neracaExport', [ExportController::class, 'neracaExport'])->name('neracaExport');
+    // Route::get('labaRugiExport', [ExportController::class, 'labaRugiExport'])->name('labaRugiExport');
 });
