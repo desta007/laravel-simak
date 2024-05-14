@@ -107,5 +107,5 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('exportNeraca', [ExcelExportController::class, 'exportNeraca'])->name('exportNeraca');
     Route::post('neracaExport', [ExportController::class, 'neracaExport'])->name('neracaExport');
-    // Route::get('labaRugiExport', [ExportController::class, 'labaRugiExport'])->name('labaRugiExport');
+    Route::post('labaRugiExport', [ExportController::class, 'labaRugiExport'])->name('labaRugiExport');
 });

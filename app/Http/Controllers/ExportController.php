@@ -1988,4 +1988,588 @@ class ExportController extends Controller
 
         // ------------------------------------------------------------------------------------------------------
     }
+
+    // LABA RUGI
+    public function labaRugiExport(Request $request)
+    {
+        set_time_limit(300);
+        $bulan1 = $request->input('bulan12');
+        $bulan2 = $request->input('bulan22');
+        $tahun = $request->input('tahun2');
+
+        $id_cabang = $request->input('id_cabang2');
+        $id_proyek = $request->input('id_proyek2');
+
+        $print = $request->input('print');
+        $pdf = $request->input('pdf');
+        $excel = $request->input('excel');
+
+        if ($id_cabang != '') {
+            $cabang = Cabang::where('id', $id_cabang)->first();
+            $namaCabang = $cabang->nama;
+        } else {
+            $namaCabang = 'All';
+        }
+
+        if ($id_proyek != 0 && $id_proyek != 'all') {
+            $proyek = Proyek::where('id', $id_proyek)->first();
+            $namaProyek = $proyek->nama;
+        } else {
+            if ($id_proyek == 0)
+                $namaProyek = 'Non Proyek';
+            else
+                $namaProyek = 'All';
+        }
+
+        // ----------- START PERHITUNGAN, NANTI DITAMPUNG DI ARRAY GLOBAL UTK VIEW DI LAYAR/PDF/EXCEL ------------------
+        $dataExcel[] = [
+            'Judul' => 'Laporan Laba/Rugi ' . date('F', mktime(0, 0, 0, $bulan1, 1)) . ' s.d. ' . date('F', mktime(0, 0, 0, $bulan2, 1)) . ' ' . $tahun
+        ];
+
+        $dataExcel[] = [
+            'Judul' => 'Cabang: ' . $namaCabang
+        ];
+
+        $dataExcel[] = [
+            'Judul' => 'Proyek: ' . $namaProyek
+        ];
+
+        $dataExcel[] = [
+            'Judul' => ''
+        ];
+
+        $dataExcel[] = [
+            'Judul' => 'LAPORAN LABA/RUGI'
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '1',
+            'Judul' => 'HASIL PENJUALAN'
+        ];
+
+        $laba_rugi_penjualan = 0;
+
+        // 1. HASIL PENJUALAN (40x)
+        $listGroupAcc40x = GroupAccount::where('kode', 'like', '40%')->orderBy('kode', 'asc')->get();
+        $listData40x = array();
+        foreach ($listGroupAcc40x as $groupAcc40x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc40x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc40x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                }
+            }
+            $listData40x[] = array(
+                'kode' => $groupAcc40x->kode,
+                'nama' => $groupAcc40x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 2. BIAYA PENJUALAN/PROYEK (50X)
+        $listGroupAcc50x = GroupAccount::where('kode', 'like', '50%')->orderBy('kode', 'asc')->get();
+        $listData50x = array();
+        foreach ($listGroupAcc50x as $groupAcc50x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc50x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc50x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                }
+            }
+            $listData50x[] = array(
+                'kode' => $groupAcc50x->kode,
+                'nama' => $groupAcc50x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 4. HASIL JOINT OPERATION (41x)
+        $listGroupAcc41x = GroupAccount::where('kode', 'like', '41%')->orderBy('kode', 'asc')->get();
+        $listData41x = array();
+        foreach ($listGroupAcc41x as $groupAcc41x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc41x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc41x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                }
+            }
+            $listData41x[] = array(
+                'kode' => $groupAcc41x->kode,
+                'nama' => $groupAcc41x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 5. BIAYA JOINT OPERATION (51x)
+        $listGroupAcc51x = GroupAccount::where('kode', 'like', '51%')->orderBy('kode', 'asc')->get();
+        $listData51x = array();
+        foreach ($listGroupAcc51x as $groupAcc51x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc51x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc51x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                }
+            }
+            $listData51x[] = array(
+                'kode' => $groupAcc51x->kode,
+                'nama' => $groupAcc51x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 7. HASIL PENJUALAN PROPERTY (42x)
+        $listGroupAcc42x = GroupAccount::where('kode', 'like', '42%')->orderBy('kode', 'asc')->get();
+        $listData42x = array();
+        foreach ($listGroupAcc42x as $groupAcc42x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc42x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc42x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                }
+            }
+            $listData42x[] = array(
+                'kode' => $groupAcc42x->kode,
+                'nama' => $groupAcc42x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 8. HARGA POKOK PROPERTY (52x)
+        $listGroupAcc52x = GroupAccount::where('kode', 'like', '52%')->orderBy('kode', 'asc')->get();
+        $listData52x = array();
+        foreach ($listGroupAcc52x as $groupAcc52x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc52x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc52x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                }
+            }
+            $listData52x[] = array(
+                'kode' => $groupAcc52x->kode,
+                'nama' => $groupAcc52x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 10. HASIL PENJUALAN BRG/TRADING (43x)
+        $listGroupAcc43x = GroupAccount::where('kode', 'like', '43%')->orderBy('kode', 'asc')->get();
+        $listData43x = array();
+        foreach ($listGroupAcc43x as $groupAcc43x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc43x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc43x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                }
+            }
+            $listData43x[] = array(
+                'kode' => $groupAcc43x->kode,
+                'nama' => $groupAcc43x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 11. HARGA POKOK BRG/TRADING (53x)
+        $listGroupAcc53x = GroupAccount::where('kode', 'like', '53%')->orderBy('kode', 'asc')->get();
+        $listData53x = array();
+        foreach ($listGroupAcc53x as $groupAcc53x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc53x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc53x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                }
+            }
+            $listData53x[] = array(
+                'kode' => $groupAcc53x->kode,
+                'nama' => $groupAcc53x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 13. HASIL SEWA PROPERTY/PERALATAN (44x)
+        $listGroupAcc44x = GroupAccount::where('kode', 'like', '44%')->orderBy('kode', 'asc')->get();
+        $listData44x = array();
+        foreach ($listGroupAcc44x as $groupAcc44x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc44x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc44x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                }
+            }
+            $listData44x[] = array(
+                'kode' => $groupAcc44x->kode,
+                'nama' => $groupAcc44x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 14. BIAYA SEWA PROPERTY/PERALATAN (54x)
+        $listGroupAcc54x = GroupAccount::where('kode', 'like', '54%')->orderBy('kode', 'asc')->get();
+        $listData54x = array();
+        foreach ($listGroupAcc54x as $groupAcc54x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc54x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc54x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                }
+            }
+            $listData54x[] = array(
+                'kode' => $groupAcc54x->kode,
+                'nama' => $groupAcc54x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 17. BIAYA TIDAK LANGSUNG (60X)
+        $listGroupAcc60x = GroupAccount::where('kode', 'like', '60%')->orderBy('kode', 'asc')->get();
+        $listData60x = array();
+        foreach ($listGroupAcc60x as $groupAcc60x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc60x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc60x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                }
+            }
+            $listData60x[] = array(
+                'kode' => $groupAcc60x->kode,
+                'nama' => $groupAcc60x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 19. HASIL LAIN-LAIN (7xx)
+        $listGroupAcc7xx = GroupAccount::where('kode', 'like', '7%')->orderBy('kode', 'asc')->get();
+        $listData7xx = array();
+        foreach ($listGroupAcc7xx as $groupAcc7xx) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc7xx, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc7xx->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                }
+            }
+            $listData7xx[] = array(
+                'kode' => $groupAcc7xx->kode,
+                'nama' => $groupAcc7xx->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 20. BIAYA LAIN-LAIN (80x)
+        $listGroupAcc80x = GroupAccount::where('kode', 'like', '80%')->orderBy('kode', 'asc')->get();
+        $listData80x = array();
+        foreach ($listGroupAcc80x as $groupAcc80x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc80x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc80x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                }
+            }
+            $listData80x[] = array(
+                'kode' => $groupAcc80x->kode,
+                'nama' => $groupAcc80x->nama,
+                'saldo' => $jumlah
+            );
+        }
+        // ------------------------------------------------------------------------
+
+        // 23. PAJAK FINAL (83x)
+        $listGroupAcc83x = GroupAccount::where('kode', 'like', '83%')->orderBy('kode', 'asc')->get();
+        $listData83x = array();
+        foreach ($listGroupAcc83x as $groupAcc83x) {
+
+            // get saldo tiap bulan
+            $jumlah = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($groupAcc83x, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $groupAcc83x->kode . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                }
+            }
+            $listData83x[] = array(
+                'kode' => $groupAcc83x->kode,
+                'nama' => $groupAcc83x->nama,
+                'saldo' => $jumlah
+            );
+        }
+
+        if ($print != '') {
+            return view('report.labaRugiPrint', compact(
+                'bulan1',
+                'bulan2',
+                'tahun',
+                'namaCabang',
+                'namaProyek',
+                'listData40x',
+                'listData50x',
+                'listData41x',
+                'listData51x',
+                'listData42x',
+                'listData52x',
+                'listData43x',
+                'listData53x',
+                'listData44x',
+                'listData54x',
+                'listData60x',
+                'listData7xx',
+                'listData80x',
+                'listData83x',
+            ));
+        }
+
+        if ($excel != '') {
+            // return Excel::download(new ExportNeraca($dataExcel), 'laporan_neraca.xlsx');
+            return view('report.labaRugiExcel', compact(
+                'bulan1',
+                'bulan2',
+                'tahun',
+                'namaCabang',
+                'namaProyek',
+                'listData40x',
+                'listData50x',
+                'listData41x',
+                'listData51x',
+                'listData42x',
+                'listData52x',
+                'listData43x',
+                'listData53x',
+                'listData44x',
+                'listData54x',
+                'listData60x',
+                'listData7xx',
+                'listData80x',
+                'listData83x',
+            ));
+        }
+
+        if ($pdf != '') {
+            $pdf = Pdf::loadView('report.labaRugiPdf', compact(
+                'bulan1',
+                'bulan2',
+                'tahun',
+                'namaCabang',
+                'namaProyek',
+                'listData40x',
+                'listData50x',
+                'listData41x',
+                'listData51x',
+                'listData42x',
+                'listData52x',
+                'listData43x',
+                'listData53x',
+                'listData44x',
+                'listData54x',
+                'listData60x',
+                'listData7xx',
+                'listData80x',
+                'listData83x',
+            ));
+            return $pdf->download('laporan_laba_rugi.pdf');
+        }
+
+        // ------------------------------------------------------------------------------------------------------
+    }
 }

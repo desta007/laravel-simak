@@ -107,6 +107,24 @@
                         </div>
 
                         @if ($isView != '')
+                            <div class="card-footer">
+                                <form action="{{ route('labaRugiExport') }}" method="POST" target="_blank">
+                                    @csrf
+                                    <input type="hidden" name="id_cabang2" value="{{ $id_cabang }}">
+                                    <input type="hidden" name="id_proyek2" value="{{ $id_proyek }}">
+                                    <input type="hidden" name="bulan12" value="{{ $bulan1 }}">
+                                    <input type="hidden" name="bulan22" value="{{ $bulan2 }}">
+                                    <input type="hidden" name="tahun2" value="{{ $tahun }}">
+
+                                    <button type="submit" name="print" value="print"
+                                        class="btn btn-secondary">Print</button>&nbsp;
+                                    <button type="submit" name="pdf" value="pdf"
+                                        class="btn btn-secondary">PDF</button>&nbsp;
+                                    <button type="submit" name="excel" value="excel" class="btn btn-secondary">
+                                        Excel</button>
+                                </form>
+                            </div>
+
                             <div class="card-body table-responsive p-0">
                                 <table class="table table-hover text-nowrap">
                                     <tr>

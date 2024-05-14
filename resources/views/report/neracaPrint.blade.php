@@ -714,17 +714,6 @@
             </tr>
         </table>
     </div>
-    <!-- /.card-body -->
-    {{-- </div> --}}
-    <!-- /.card-body -->
-    </div>
-    <!-- /.card -->
-    </div>
-    </div>
-    <!-- /.row -->
-
-
-    </div><!-- /.container-fluid -->
     <!-- /.content -->
 
     <script>
