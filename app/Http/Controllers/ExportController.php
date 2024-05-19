@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExportLabaRugi;
 use Illuminate\Http\Request;
 use App\Exports\ExportNeraca;
 use App\Models\Cabang;
@@ -2052,6 +2053,8 @@ class ExportController extends Controller
         // 1. HASIL PENJUALAN (40x)
         $listGroupAcc40x = GroupAccount::where('kode', 'like', '40%')->orderBy('kode', 'asc')->get();
         $listData40x = array();
+        $subtotal40x = 0;
+
         foreach ($listGroupAcc40x as $groupAcc40x) {
 
             // get saldo tiap bulan
@@ -2078,12 +2081,38 @@ class ExportController extends Controller
                 'nama' => $groupAcc40x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal40x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc40x->kode,
+                'Nama' => $groupAcc40x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $laba_rugi_penjualan += $subtotal40x;
+
+        $dataExcel[] = [
+            'Nomor' => '2',
+            'Judul' => 'BIAYA PENJUALAN/PROYEK'
+        ];
         // ------------------------------------------------------------------------
 
         // 2. BIAYA PENJUALAN/PROYEK (50X)
         $listGroupAcc50x = GroupAccount::where('kode', 'like', '50%')->orderBy('kode', 'asc')->get();
         $listData50x = array();
+        $subtotal50x = 0;
+
         foreach ($listGroupAcc50x as $groupAcc50x) {
 
             // get saldo tiap bulan
@@ -2110,12 +2139,53 @@ class ExportController extends Controller
                 'nama' => $groupAcc50x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal50x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc50x->kode,
+                'Nama' => $groupAcc50x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $laba_rugi_penjualan -= $subtotal50x;
+
+        $dataExcel[] = [
+            'Nomor' => '3',
+            'Kode' => 'LABA (RUGI) PENJUALAN',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($laba_rugi_penjualan)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Judul' => ''
+        ];
         // ------------------------------------------------------------------------
+
+        $laba_rugi_joint_operation = 0;
+
+        $dataExcel[] = [
+            'Nomor' => '4',
+            'Judul' => 'HASIL JOINT OPERATION'
+        ];
 
         // 4. HASIL JOINT OPERATION (41x)
         $listGroupAcc41x = GroupAccount::where('kode', 'like', '41%')->orderBy('kode', 'asc')->get();
         $listData41x = array();
+        $subtotal41x = 0;
+
         foreach ($listGroupAcc41x as $groupAcc41x) {
 
             // get saldo tiap bulan
@@ -2142,12 +2212,38 @@ class ExportController extends Controller
                 'nama' => $groupAcc41x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal41x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc41x->kode,
+                'Nama' => $groupAcc41x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $laba_rugi_joint_operation += $subtotal41x;
         // ------------------------------------------------------------------------
+
+        $dataExcel[] = [
+            'Nomor' => '5',
+            'Judul' => 'BIAYA JOINT OPERATION'
+        ];
 
         // 5. BIAYA JOINT OPERATION (51x)
         $listGroupAcc51x = GroupAccount::where('kode', 'like', '51%')->orderBy('kode', 'asc')->get();
         $listData51x = array();
+        $subtotal51x = 0;
+
         foreach ($listGroupAcc51x as $groupAcc51x) {
 
             // get saldo tiap bulan
@@ -2174,12 +2270,51 @@ class ExportController extends Controller
                 'nama' => $groupAcc51x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal51x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc51x->kode,
+                'Nama' => $groupAcc51x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $laba_rugi_joint_operation -= $subtotal51x;
+
+        $dataExcel[] = [
+            'Nomor' => '6',
+            'Kode' => 'LABA (RUGI) JOINT OPERATION',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($laba_rugi_joint_operation)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Judul' => ''
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '7',
+            'Judul' => 'HASIL PENJUALAN PROPERTY'
+        ];
         // ------------------------------------------------------------------------
 
         // 7. HASIL PENJUALAN PROPERTY (42x)
         $listGroupAcc42x = GroupAccount::where('kode', 'like', '42%')->orderBy('kode', 'asc')->get();
         $listData42x = array();
+        $subtotal42x = 0;
+
         foreach ($listGroupAcc42x as $groupAcc42x) {
 
             // get saldo tiap bulan
@@ -2206,12 +2341,35 @@ class ExportController extends Controller
                 'nama' => $groupAcc42x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal42x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc42x->kode,
+                'Nama' => $groupAcc42x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '8',
+            'Judul' => 'HARGA POKOK PROPERTY'
+        ];
         // ------------------------------------------------------------------------
 
         // 8. HARGA POKOK PROPERTY (52x)
         $listGroupAcc52x = GroupAccount::where('kode', 'like', '52%')->orderBy('kode', 'asc')->get();
         $listData52x = array();
+        $subtotal52x = 0;
         foreach ($listGroupAcc52x as $groupAcc52x) {
 
             // get saldo tiap bulan
@@ -2238,12 +2396,50 @@ class ExportController extends Controller
                 'nama' => $groupAcc52x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal52x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc52x->kode,
+                'Nama' => $groupAcc52x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $laba_rugi_property = $subtotal42x - $subtotal52x;
+
+        $dataExcel[] = [
+            'Nomor' => '9',
+            'Kode' => 'LABA (RUGI) PROPERTY',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($laba_rugi_property)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Judul' => ''
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '10',
+            'Judul' => 'HASIL PENJUALAN BRG/TRADING'
+        ];
         // ------------------------------------------------------------------------
 
         // 10. HASIL PENJUALAN BRG/TRADING (43x)
         $listGroupAcc43x = GroupAccount::where('kode', 'like', '43%')->orderBy('kode', 'asc')->get();
         $listData43x = array();
+        $subtotal43x = 0;
         foreach ($listGroupAcc43x as $groupAcc43x) {
 
             // get saldo tiap bulan
@@ -2270,12 +2466,35 @@ class ExportController extends Controller
                 'nama' => $groupAcc43x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal43x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc43x->kode,
+                'Nama' => $groupAcc43x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '11',
+            'Judul' => 'HARGA POKOK BRG/TRADING'
+        ];
         // ------------------------------------------------------------------------
 
         // 11. HARGA POKOK BRG/TRADING (53x)
         $listGroupAcc53x = GroupAccount::where('kode', 'like', '53%')->orderBy('kode', 'asc')->get();
         $listData53x = array();
+        $subtotal53x = 0;
         foreach ($listGroupAcc53x as $groupAcc53x) {
 
             // get saldo tiap bulan
@@ -2302,12 +2521,50 @@ class ExportController extends Controller
                 'nama' => $groupAcc53x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal53x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc53x->kode,
+                'Nama' => $groupAcc53x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $laba_rugi_trading = $subtotal43x - $subtotal53x;
+
+        $dataExcel[] = [
+            'Nomor' => '12',
+            'Kode' => 'LABA (RUGI) TRADING',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($laba_rugi_trading)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Judul' => ''
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '13',
+            'Judul' => 'HASIL SEWA PROPERTY/PERALATAN'
+        ];
         // ------------------------------------------------------------------------
 
         // 13. HASIL SEWA PROPERTY/PERALATAN (44x)
         $listGroupAcc44x = GroupAccount::where('kode', 'like', '44%')->orderBy('kode', 'asc')->get();
         $listData44x = array();
+        $subtotal44x = 0;
         foreach ($listGroupAcc44x as $groupAcc44x) {
 
             // get saldo tiap bulan
@@ -2334,12 +2591,35 @@ class ExportController extends Controller
                 'nama' => $groupAcc44x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal44x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc44x->kode,
+                'Nama' => $groupAcc44x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '14',
+            'Judul' => 'BIAYA SEWA PROPERTY/PERALATAN'
+        ];
         // ------------------------------------------------------------------------
 
         // 14. BIAYA SEWA PROPERTY/PERALATAN (54x)
         $listGroupAcc54x = GroupAccount::where('kode', 'like', '54%')->orderBy('kode', 'asc')->get();
         $listData54x = array();
+        $subtotal54x = 0;
         foreach ($listGroupAcc54x as $groupAcc54x) {
 
             // get saldo tiap bulan
@@ -2366,12 +2646,70 @@ class ExportController extends Controller
                 'nama' => $groupAcc54x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal54x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc54x->kode,
+                'Nama' => $groupAcc54x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $laba_rugi_sewa = $subtotal44x - $subtotal54x;
+
+        $dataExcel[] = [
+            'Nomor' => '15',
+            'Kode' => 'LABA (RUGI) SEWA PROPERTY/PERALATAN',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($laba_rugi_sewa)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Judul' => ''
+        ];
+
+        $laba_rugi_bruto =
+            $laba_rugi_penjualan +
+            $laba_rugi_joint_operation +
+            $laba_rugi_property +
+            $laba_rugi_trading +
+            $laba_rugi_sewa;
+
+        $dataExcel[] = [
+            'Nomor' => '16',
+            'Judul' => 'LABA (RUGI) USAHA BRUTO',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($laba_rugi_bruto)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Judul' => ''
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '17',
+            'Judul' => 'BIAYA TIDAK LANGSUNG'
+        ];
         // ------------------------------------------------------------------------
 
         // 17. BIAYA TIDAK LANGSUNG (60X)
         $listGroupAcc60x = GroupAccount::where('kode', 'like', '60%')->orderBy('kode', 'asc')->get();
         $listData60x = array();
+        $subtotal60x = 0;
         foreach ($listGroupAcc60x as $groupAcc60x) {
 
             // get saldo tiap bulan
@@ -2398,12 +2736,50 @@ class ExportController extends Controller
                 'nama' => $groupAcc60x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal60x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc60x->kode,
+                'Nama' => $groupAcc60x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $laba_rugi_bersih = $laba_rugi_bruto - $subtotal60x;
+
+        $dataExcel[] = [
+            'Nomor' => '18',
+            'Judul' => 'LABA (RUGI) USAHA BERSIH',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($laba_rugi_bersih)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Judul' => ''
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '19',
+            'Judul' => 'HASIL LAIN-LAIN'
+        ];
         // ------------------------------------------------------------------------
 
         // 19. HASIL LAIN-LAIN (7xx)
         $listGroupAcc7xx = GroupAccount::where('kode', 'like', '7%')->orderBy('kode', 'asc')->get();
         $listData7xx = array();
+        $subtotal7xx = 0;
         foreach ($listGroupAcc7xx as $groupAcc7xx) {
 
             // get saldo tiap bulan
@@ -2430,12 +2806,35 @@ class ExportController extends Controller
                 'nama' => $groupAcc7xx->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal7xx += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc7xx->kode,
+                'Nama' => $groupAcc7xx->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '20',
+            'Judul' => 'BIAYA LAIN-LAIN'
+        ];
         // ------------------------------------------------------------------------
 
         // 20. BIAYA LAIN-LAIN (80x)
         $listGroupAcc80x = GroupAccount::where('kode', 'like', '80%')->orderBy('kode', 'asc')->get();
         $listData80x = array();
+        $subtotal80x = 0;
         foreach ($listGroupAcc80x as $groupAcc80x) {
 
             // get saldo tiap bulan
@@ -2462,12 +2861,65 @@ class ExportController extends Controller
                 'nama' => $groupAcc80x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal80x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc80x->kode,
+                'Nama' => $groupAcc80x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $laba_rugi_lain = $subtotal7xx - $subtotal80x;
+
+        $dataExcel[] = [
+            'Nomor' => '21',
+            'Judul' => 'LABA (RUGI) LAIN-LAIN',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($laba_rugi_lain)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Judul' => ''
+        ];
+
+        $laba_rugi_sebelum_pph = $laba_rugi_bersih - $laba_rugi_lain;
+
+        $dataExcel[] = [
+            'Nomor' => '22',
+            'Judul' => 'LABA (RUGI) KOMPREHENSIF SEBELUM PPH',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($laba_rugi_sebelum_pph)
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Judul' => ''
+        ];
+
+        $dataExcel[] = [
+            'Nomor' => '23',
+            'Judul' => 'PAJAK FINAL'
+        ];
         // ------------------------------------------------------------------------
 
         // 23. PAJAK FINAL (83x)
         $listGroupAcc83x = GroupAccount::where('kode', 'like', '83%')->orderBy('kode', 'asc')->get();
         $listData83x = array();
+        $subtotal83x = 0;
         foreach ($listGroupAcc83x as $groupAcc83x) {
 
             // get saldo tiap bulan
@@ -2494,7 +2946,34 @@ class ExportController extends Controller
                 'nama' => $groupAcc83x->nama,
                 'saldo' => $jumlah
             );
+
+            $subtotal83x += $jumlah;
+
+            $dataExcel[] = [
+                'Nomor' => '',
+                'Kode' => $groupAcc83x->kode,
+                'Nama' => $groupAcc83x->nama,
+                'Saldo' => number_format($jumlah)
+            ];
         }
+
+        $dataExcel[] = [
+            'Nomor' => '',
+            'Kode' => '',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($jumlah)
+        ];
+
+        $laba_rugi_setelah_pph = $laba_rugi_sebelum_pph - $subtotal83x;
+
+        $dataExcel[] = [
+            'Nomor' => '24',
+            'Judul' => 'LABA (RUGI) KOMPREHENSIF SETELAH PPH',
+            'Nama' => '',
+            'Saldo' => '',
+            'Subtotal' => number_format($laba_rugi_setelah_pph)
+        ];
 
         if ($print != '') {
             return view('report.labaRugiPrint', compact(
@@ -2521,28 +3000,28 @@ class ExportController extends Controller
         }
 
         if ($excel != '') {
-            // return Excel::download(new ExportNeraca($dataExcel), 'laporan_neraca.xlsx');
-            return view('report.labaRugiExcel', compact(
-                'bulan1',
-                'bulan2',
-                'tahun',
-                'namaCabang',
-                'namaProyek',
-                'listData40x',
-                'listData50x',
-                'listData41x',
-                'listData51x',
-                'listData42x',
-                'listData52x',
-                'listData43x',
-                'listData53x',
-                'listData44x',
-                'listData54x',
-                'listData60x',
-                'listData7xx',
-                'listData80x',
-                'listData83x',
-            ));
+            return Excel::download(new ExportLabaRugi($dataExcel), 'laporan_labarugi.xlsx');
+            // return view('report.labaRugiExcel', compact(
+            //     'bulan1',
+            //     'bulan2',
+            //     'tahun',
+            //     'namaCabang',
+            //     'namaProyek',
+            //     'listData40x',
+            //     'listData50x',
+            //     'listData41x',
+            //     'listData51x',
+            //     'listData42x',
+            //     'listData52x',
+            //     'listData43x',
+            //     'listData53x',
+            //     'listData44x',
+            //     'listData54x',
+            //     'listData60x',
+            //     'listData7xx',
+            //     'listData80x',
+            //     'listData83x',
+            // ));
         }
 
         if ($pdf != '') {
