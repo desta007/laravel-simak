@@ -131,6 +131,15 @@
                                                     <br>
                                                     {{ \Carbon\Carbon::parse($detail->tgl)->format('d/m/Y') }}
 
+                                                    @if ($detail->isLock == 2)
+                                                        <b>Locked</b>
+                                                    @else
+                                                        <a target="_blank"
+                                                            href="{{ route('editTransJurnal', $detail->id_transaksi) }}"
+                                                            class="btn-sm btn-info btn">
+                                                            Edit
+                                                        </a>
+                                                    @endif
                                                 </td>
                                                 <td>
                                                     {{ $detail->transaksi->no_bukti }}

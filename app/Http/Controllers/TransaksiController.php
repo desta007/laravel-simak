@@ -600,9 +600,33 @@ class TransaksiController extends Controller
         $tgl_awal = $request->input('tgl_awal');
         $tgl_akhir = $request->input('tgl_akhir');
 
+        /*
+$transaksis = Transaksi::query()
+            ->addSelect([
+                'isLock' => KunciTransaksi::query()
+                    ->select('status_akses')
+                    ->whereColumn('id_cabang', 'transaksis.id_cabang')
+                    ->whereColumn('id_proyek', 'transaksis.id_proyek')
+                    ->whereRaw('bulan = MONTH(transaksis.tgl)')
+                    ->whereRaw('tahun = YEAR(transaksis.tgl)')
+                    ->limit(1)
+            ]);
+        $transaksis->whereBetween('tgl', array($tgl_awal, $tgl_akhir));
+        */
+
         $transaksiDetails = TransaksiDetail::with(['kodePerkiraan', 'transaksi.cabang', 'transaksi.proyek'])
             ->join('transaksis', 'transaksis.id', '=', 'transaksi_details.id_transaksi')
-            ->whereBetween('transaksis.tgl', [$tgl_awal, $tgl_akhir]);
+            ->addSelect([
+                'isLock' => KunciTransaksi::query()
+                    ->select('status_akses')
+                    ->whereColumn('id_cabang', 'transaksis.id_cabang')
+                    ->whereColumn('id_proyek', 'transaksis.id_proyek')
+                    ->whereRaw('bulan = MONTH(transaksis.tgl)')
+                    ->whereRaw('tahun = YEAR(transaksis.tgl)')
+                    ->limit(1)
+            ]);
+
+        $transaksiDetails->whereBetween('transaksis.tgl', [$tgl_awal, $tgl_akhir]);
 
         //->get(['transaksi_details.id', 'transaksi_details.id_kode_perkiraan', 'transaksi_details.id_transaksi']);
 
@@ -656,6 +680,7 @@ class TransaksiController extends Controller
 
         // dd($transaksiDetails->toSql());
         $results = $transaksiDetails->get([
+            'isLock',
             'transaksi_details.id',
             'transaksi_details.id_kode_perkiraan', 'transaksi_details.id_transaksi',
             'transaksi_details.jenis', 'transaksi_details.jumlah'
