@@ -8,6 +8,7 @@ use App\Models\Proyek;
 use App\Models\User;
 use App\Models\UserProyek;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -23,6 +24,7 @@ class UserController extends Controller
     public function index()
     {
         //$users = User::orderBy('created_at', 'desc')->get();
+        DB::statement("SET SQL_MODE=''");
         $users = User::select('users.*')
             ->selectRaw('IF(COUNT(user_proyeks.id_proyek) > 0, true, false) as has_proyek')
             ->leftJoin('user_proyeks', 'users.id', '=', 'user_proyeks.id_user')
