@@ -682,8 +682,10 @@ $transaksis = Transaksi::query()
         $results = $transaksiDetails->get([
             'isLock',
             'transaksi_details.id',
-            'transaksi_details.id_kode_perkiraan', 'transaksi_details.id_transaksi',
-            'transaksi_details.jenis', 'transaksi_details.jumlah'
+            'transaksi_details.id_kode_perkiraan',
+            'transaksi_details.id_transaksi',
+            'transaksi_details.jenis',
+            'transaksi_details.jumlah'
         ]);
         // dd($results);
         $isView = 1;

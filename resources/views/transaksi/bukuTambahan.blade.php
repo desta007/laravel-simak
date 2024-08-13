@@ -129,7 +129,7 @@
                                                 <td>
                                                     {{ $detail->transaksi->no_urut_jurnal }}
                                                     <br>
-                                                    {{ \Carbon\Carbon::parse($detail->tgl)->format('d/m/Y') }}
+                                                    {{ \Carbon\Carbon::parse($detail->transaksi->tgl)->format('d/m/Y') }}
 
                                                     @if ($detail->isLock == 2)
                                                         <b>Locked</b>
