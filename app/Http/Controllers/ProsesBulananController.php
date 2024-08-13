@@ -164,6 +164,11 @@ class ProsesBulananController extends Controller
                             'saldo_debet' => 0,
                             'saldo_kredit' => 0
                         ]);
+                    } else {
+                        $cekSaldoAkun->update([
+                            'saldo_debet' => 0,
+                            'saldo_kredit' => 0
+                        ]);
                     }
                 }
             }
