@@ -56,12 +56,13 @@
                                         <label for="proyek">Proyek</label>
                                         <select name="id_proyek1" class="form-control select2" id="id_proyek1"
                                             style="width: 100%;">
-                                            @forelse ($proyeks as $proyek)
-                                                <option value="{{ $proyek->id }}">
-                                                    {{ $proyek->nama . ' (WO:' . $proyek->nomor_wo . ')' }}</option>
-                                            @empty
-                                                <option value="0" selected>- None -</option>
-                                            @endforelse
+                                            <option value="0" selected>- None -</option>
+                                            @if (is_array($proyeks))
+                                                @foreach ($proyeks as $proyek)
+                                                    <option value="{{ $proyek->id }}">
+                                                        {{ $proyek->nama . ' (WO:' . $proyek->nomor_wo . ')' }}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
                                         <input type="hidden" name="id_proyek" id="id_proyek" value="0">
                                     </div>
