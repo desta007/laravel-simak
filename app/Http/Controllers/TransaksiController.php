@@ -361,7 +361,13 @@ class TransaksiController extends Controller
     public function edit($id)
     {
         $id_group_user = auth()->user()->id_group_user;
-        $id_cabang = auth()->user()->id_cabang;
+        // $id_cabang = auth()->user()->id_cabang;
+
+        $transaksi = Transaksi::findOrFail($id);
+
+        $id_cabang = $transaksi->id_cabang;
+        // echo $id_cabang;
+        // die();
 
         // get list cabang by group user
         if ($id_group_user == 1) {
@@ -374,7 +380,7 @@ class TransaksiController extends Controller
 
         $proyeks = '';
         // utk user cabang/proyek, otomatis muncul list proyeknya by cabang
-        if ($id_group_user == 2) {
+        if ($id_group_user == 2 || $id_group_user == 1) {
             $proyeks = Proyek::where('id_cabang', '=', $id_cabang)->get();
         } else if ($id_group_user == 3) {
             $id_user = auth()->user()->id;
