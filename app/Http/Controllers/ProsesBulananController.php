@@ -572,17 +572,33 @@ class ProsesBulananController extends Controller
                     ->where('tahun', $tahun)->first();
 
                 if ($saldoAkun320 == null) {
-                    SaldoAkun::create([
-                        'id_kode_perkiraan' => $akun320->id,
-                        'bulan' => $bulan,
-                        'tahun' => $tahun,
-                        'saldo_debet' => 0,
-                        'saldo_kredit' => abs($laba_rugi_setelah_pph)
-                    ]);
+                    if ($laba_rugi_setelah_pph >= 0) {
+                        SaldoAkun::create([
+                            'id_kode_perkiraan' => $akun320->id,
+                            'bulan' => $bulan,
+                            'tahun' => $tahun,
+                            'saldo_debet' => 0,
+                            'saldo_kredit' => abs($laba_rugi_setelah_pph)
+                        ]);
+                    } else {
+                        SaldoAkun::create([
+                            'id_kode_perkiraan' => $akun320->id,
+                            'bulan' => $bulan,
+                            'tahun' => $tahun,
+                            'saldo_debet' => abs($laba_rugi_setelah_pph),
+                            'saldo_kredit' => 0
+                        ]);
+                    }
                 } else {
-                    $saldoAkun320->update([
-                        'saldo_kredit' => abs($laba_rugi_setelah_pph)
-                    ]);
+                    if ($laba_rugi_setelah_pph >= 0) {
+                        $saldoAkun320->update([
+                            'saldo_kredit' => abs($laba_rugi_setelah_pph)
+                        ]);
+                    } else {
+                        $saldoAkun320->update([
+                            'saldo_debet' => abs($laba_rugi_setelah_pph)
+                        ]);
+                    }
                 }
             }
 
@@ -599,17 +615,33 @@ class ProsesBulananController extends Controller
                     ->where('tahun', $tahun)->first();
 
                 if ($saldoAkun900 == null) {
-                    SaldoAkun::create([
-                        'id_kode_perkiraan' => $akun900->id,
-                        'bulan' => $bulan,
-                        'tahun' => $tahun,
-                        'saldo_debet' => abs($laba_rugi_setelah_pph),
-                        'saldo_kredit' => 0
-                    ]);
+                    if ($laba_rugi_setelah_pph >= 0) {
+                        SaldoAkun::create([
+                            'id_kode_perkiraan' => $akun900->id,
+                            'bulan' => $bulan,
+                            'tahun' => $tahun,
+                            'saldo_debet' => abs($laba_rugi_setelah_pph),
+                            'saldo_kredit' => 0
+                        ]);
+                    } else {
+                        SaldoAkun::create([
+                            'id_kode_perkiraan' => $akun900->id,
+                            'bulan' => $bulan,
+                            'tahun' => $tahun,
+                            'saldo_debet' => 0,
+                            'saldo_kredit' => abs($laba_rugi_setelah_pph)
+                        ]);
+                    }
                 } else {
-                    $saldoAkun900->update([
-                        'saldo_debet' => abs($laba_rugi_setelah_pph)
-                    ]);
+                    if ($laba_rugi_setelah_pph >= 0) {
+                        $saldoAkun900->update([
+                            'saldo_debet' => abs($laba_rugi_setelah_pph)
+                        ]);
+                    } else {
+                        $saldoAkun900->update([
+                            'saldo_kredit' => abs($laba_rugi_setelah_pph)
+                        ]);
+                    }
                 }
             }
 
