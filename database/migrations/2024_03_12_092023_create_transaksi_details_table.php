@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('id_transaksi');
             $table->integer('id_kode_perkiraan');
-            $table->integer('jumlah');
+            $table->bigInteger('jumlah');
             $table->char('jenis', 1);
             $table->timestamps();
         });

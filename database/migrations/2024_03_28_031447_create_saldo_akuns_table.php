@@ -16,8 +16,8 @@ return new class extends Migration
             $table->integer('id_kode_perkiraan');
             $table->string('bulan')->nullable();
             $table->year('tahun');
-            $table->integer('saldo_debet');
-            $table->integer('saldo_kredit');
+            $table->bigInteger('saldo_debet');
+            $table->bigInteger('saldo_kredit');
             $table->integer('is_saldo_awal')->default(0);
             $table->timestamps();
         });
