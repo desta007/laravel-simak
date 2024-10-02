@@ -573,7 +573,7 @@
                                         <th>22</th>
                                         <th colspan="3">LABA (RUGI) KOMPREHENSIF SEBELUM PPH</th>
                                         <th style="text-align: right">@php
-                                            $laba_rugi_sebelum_pph = $laba_rugi_bersih - $laba_rugi_lain;
+                                            $laba_rugi_sebelum_pph = $laba_rugi_bersih + $laba_rugi_lain;
                                         @endphp
                                             <b>{{ number_format($laba_rugi_sebelum_pph) }}</b>
                                         </th>

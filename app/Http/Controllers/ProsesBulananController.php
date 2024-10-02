@@ -529,7 +529,7 @@ class ProsesBulananController extends Controller
             $laba_rugi_lain = $subtotal7xx - $subtotal80x;
 
             // 22. LABA(RUGI) KOMPREHENSIF SEBELUM PPh (18+21)
-            $laba_rugi_sebelum_pph = $laba_rugi_bersih - $laba_rugi_lain;
+            $laba_rugi_sebelum_pph = $laba_rugi_bersih + $laba_rugi_lain;
 
             // 23. PAJAK FINAL (83x)
             $listGroupAcc83x = GroupAccount::where('kode', 'like', '83%')->orderBy('kode', 'asc')->get();
