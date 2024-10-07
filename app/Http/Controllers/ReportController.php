@@ -327,11 +327,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData40x[] = array(
-                'kode' => $groupAcc40x->kode,
-                'nama' => $groupAcc40x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData40x[] = array(
+                    'kode' => $groupAcc40x->kode,
+                    'nama' => $groupAcc40x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -359,11 +361,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData50x[] = array(
-                'kode' => $groupAcc50x->kode,
-                'nama' => $groupAcc50x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData50x[] = array(
+                    'kode' => $groupAcc50x->kode,
+                    'nama' => $groupAcc50x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -391,11 +395,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData41x[] = array(
-                'kode' => $groupAcc41x->kode,
-                'nama' => $groupAcc41x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData41x[] = array(
+                    'kode' => $groupAcc41x->kode,
+                    'nama' => $groupAcc41x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -423,11 +429,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData51x[] = array(
-                'kode' => $groupAcc51x->kode,
-                'nama' => $groupAcc51x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData51x[] = array(
+                    'kode' => $groupAcc51x->kode,
+                    'nama' => $groupAcc51x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -455,11 +463,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData42x[] = array(
-                'kode' => $groupAcc42x->kode,
-                'nama' => $groupAcc42x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData42x[] = array(
+                    'kode' => $groupAcc42x->kode,
+                    'nama' => $groupAcc42x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -487,11 +497,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData52x[] = array(
-                'kode' => $groupAcc52x->kode,
-                'nama' => $groupAcc52x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData52x[] = array(
+                    'kode' => $groupAcc52x->kode,
+                    'nama' => $groupAcc52x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -519,11 +531,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData43x[] = array(
-                'kode' => $groupAcc43x->kode,
-                'nama' => $groupAcc43x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData43x[] = array(
+                    'kode' => $groupAcc43x->kode,
+                    'nama' => $groupAcc43x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -551,11 +565,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData53x[] = array(
-                'kode' => $groupAcc53x->kode,
-                'nama' => $groupAcc53x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData53x[] = array(
+                    'kode' => $groupAcc53x->kode,
+                    'nama' => $groupAcc53x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -583,11 +599,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData44x[] = array(
-                'kode' => $groupAcc44x->kode,
-                'nama' => $groupAcc44x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData44x[] = array(
+                    'kode' => $groupAcc44x->kode,
+                    'nama' => $groupAcc44x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -615,11 +633,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData54x[] = array(
-                'kode' => $groupAcc54x->kode,
-                'nama' => $groupAcc54x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData54x[] = array(
+                    'kode' => $groupAcc54x->kode,
+                    'nama' => $groupAcc54x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -647,11 +667,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData60x[] = array(
-                'kode' => $groupAcc60x->kode,
-                'nama' => $groupAcc60x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData60x[] = array(
+                    'kode' => $groupAcc60x->kode,
+                    'nama' => $groupAcc60x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -679,11 +701,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData7xx[] = array(
-                'kode' => $groupAcc7xx->kode,
-                'nama' => $groupAcc7xx->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData7xx[] = array(
+                    'kode' => $groupAcc7xx->kode,
+                    'nama' => $groupAcc7xx->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -711,11 +735,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData80x[] = array(
-                'kode' => $groupAcc80x->kode,
-                'nama' => $groupAcc80x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData80x[] = array(
+                    'kode' => $groupAcc80x->kode,
+                    'nama' => $groupAcc80x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -743,11 +769,13 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData83x[] = array(
-                'kode' => $groupAcc83x->kode,
-                'nama' => $groupAcc83x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData83x[] = array(
+                    'kode' => $groupAcc83x->kode,
+                    'nama' => $groupAcc83x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ------------------------------------------------------------------------
 
@@ -969,11 +997,15 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData10x[] = array(
-                'kode' => $groupAcc10x->kode,
-                'nama' => $groupAcc10x->nama,
-                'saldo' => $jumlah
-            );
+            if ($jumlah != 0) {
+                $listData10x[] = array(
+                    'kode' => $groupAcc10x->kode,
+                    'nama' => $groupAcc10x->nama,
+                    'saldo' => $jumlah
+                );
+            }
+            // else
+            //     $listData10x = '';
         }
         // ------------------------------------------------------------------------
 
@@ -1016,11 +1048,17 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData11x[] = array(
-                'kode' => $groupAcc11x->kode,
-                'nama' => $groupAcc11x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData11x[] = array(
+                    'kode' => $groupAcc11x->kode,
+                    'nama' => $groupAcc11x->nama,
+                    'saldo' => $jumlah
+                );
+            }
+            // else {
+            //     $listData11x = '';
+            // }
         }
         // ------------------------------------------------------------------------
 
@@ -1063,11 +1101,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData12x[] = array(
-                'kode' => $groupAcc12x->kode,
-                'nama' => $groupAcc12x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData12x[] = array(
+                    'kode' => $groupAcc12x->kode,
+                    'nama' => $groupAcc12x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1110,11 +1151,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData13x[] = array(
-                'kode' => $groupAcc13x->kode,
-                'nama' => $groupAcc13x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData13x[] = array(
+                    'kode' => $groupAcc13x->kode,
+                    'nama' => $groupAcc13x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1157,11 +1201,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData14x[] = array(
-                'kode' => $groupAcc14x->kode,
-                'nama' => $groupAcc14x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData14x[] = array(
+                    'kode' => $groupAcc14x->kode,
+                    'nama' => $groupAcc14x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1204,11 +1251,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData15x[] = array(
-                'kode' => $groupAcc15x->kode,
-                'nama' => $groupAcc15x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData15x[] = array(
+                    'kode' => $groupAcc15x->kode,
+                    'nama' => $groupAcc15x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1251,11 +1301,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData16x[] = array(
-                'kode' => $groupAcc16x->kode,
-                'nama' => $groupAcc16x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData16x[] = array(
+                    'kode' => $groupAcc16x->kode,
+                    'nama' => $groupAcc16x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1298,11 +1351,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData17x[] = array(
-                'kode' => $groupAcc17x->kode,
-                'nama' => $groupAcc17x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData17x[] = array(
+                    'kode' => $groupAcc17x->kode,
+                    'nama' => $groupAcc17x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1345,11 +1401,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData18x[] = array(
-                'kode' => $groupAcc18x->kode,
-                'nama' => $groupAcc18x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData18x[] = array(
+                    'kode' => $groupAcc18x->kode,
+                    'nama' => $groupAcc18x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1392,11 +1451,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData19x[] = array(
-                'kode' => $groupAcc19x->kode,
-                'nama' => $groupAcc19x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData19x[] = array(
+                    'kode' => $groupAcc19x->kode,
+                    'nama' => $groupAcc19x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1439,11 +1501,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData1Ax[] = array(
-                'kode' => $groupAcc1Ax->kode,
-                'nama' => $groupAcc1Ax->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData1Ax[] = array(
+                    'kode' => $groupAcc1Ax->kode,
+                    'nama' => $groupAcc1Ax->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1486,11 +1551,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData1Bx[] = array(
-                'kode' => $groupAcc1Bx->kode,
-                'nama' => $groupAcc1Bx->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData1Bx[] = array(
+                    'kode' => $groupAcc1Bx->kode,
+                    'nama' => $groupAcc1Bx->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1535,11 +1603,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData20x[] = array(
-                'kode' => $groupAcc20x->kode,
-                'nama' => $groupAcc20x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData20x[] = array(
+                    'kode' => $groupAcc20x->kode,
+                    'nama' => $groupAcc20x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1582,11 +1653,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData21x[] = array(
-                'kode' => $groupAcc21x->kode,
-                'nama' => $groupAcc21x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData21x[] = array(
+                    'kode' => $groupAcc21x->kode,
+                    'nama' => $groupAcc21x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1629,11 +1703,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData22x[] = array(
-                'kode' => $groupAcc22x->kode,
-                'nama' => $groupAcc22x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData22x[] = array(
+                    'kode' => $groupAcc22x->kode,
+                    'nama' => $groupAcc22x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1676,11 +1753,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData23x[] = array(
-                'kode' => $groupAcc23x->kode,
-                'nama' => $groupAcc23x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData23x[] = array(
+                    'kode' => $groupAcc23x->kode,
+                    'nama' => $groupAcc23x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1723,11 +1803,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData24x[] = array(
-                'kode' => $groupAcc24x->kode,
-                'nama' => $groupAcc24x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData24x[] = array(
+                    'kode' => $groupAcc24x->kode,
+                    'nama' => $groupAcc24x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1770,11 +1853,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData25x[] = array(
-                'kode' => $groupAcc25x->kode,
-                'nama' => $groupAcc25x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData25x[] = array(
+                    'kode' => $groupAcc25x->kode,
+                    'nama' => $groupAcc25x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1817,11 +1903,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData26x[] = array(
-                'kode' => $groupAcc26x->kode,
-                'nama' => $groupAcc26x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData26x[] = array(
+                    'kode' => $groupAcc26x->kode,
+                    'nama' => $groupAcc26x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1864,11 +1953,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData27x[] = array(
-                'kode' => $groupAcc27x->kode,
-                'nama' => $groupAcc27x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData27x[] = array(
+                    'kode' => $groupAcc27x->kode,
+                    'nama' => $groupAcc27x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1911,11 +2003,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData28x[] = array(
-                'kode' => $groupAcc28x->kode,
-                'nama' => $groupAcc28x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData28x[] = array(
+                    'kode' => $groupAcc28x->kode,
+                    'nama' => $groupAcc28x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -1958,11 +2053,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData30x[] = array(
-                'kode' => $groupAcc30x->kode,
-                'nama' => $groupAcc30x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData30x[] = array(
+                    'kode' => $groupAcc30x->kode,
+                    'nama' => $groupAcc30x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -2005,11 +2103,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData31x[] = array(
-                'kode' => $groupAcc31x->kode,
-                'nama' => $groupAcc31x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData31x[] = array(
+                    'kode' => $groupAcc31x->kode,
+                    'nama' => $groupAcc31x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
@@ -2052,11 +2153,14 @@ class ReportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData32x[] = array(
-                'kode' => $groupAcc32x->kode,
-                'nama' => $groupAcc32x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData32x[] = array(
+                    'kode' => $groupAcc32x->kode,
+                    'nama' => $groupAcc32x->nama,
+                    'saldo' => $jumlah
+                );
+            }
         }
         // ---------------------------------------------------------------------------
 
