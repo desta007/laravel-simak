@@ -133,6 +133,15 @@
 
                 @if (auth()->user()->id_group_user == 1)
                     <li class="nav-item">
+                        <a href="{{ route('pejabat.index') }}"
+                            class="nav-link {{ request()->is('pejabat*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-city"></i>
+                            <p>
+                                Pejabat
+                            </p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="{{ route('pedomanMutu.index') }}"
                             class="nav-link {{ request()->is('pedomanMutu*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-book"></i>

@@ -9,6 +9,7 @@ use App\Http\Controllers\KodeBuktiController;
 use App\Http\Controllers\KodePerkiraanController;
 use App\Http\Controllers\KunciTransaksiController;
 use App\Http\Controllers\PedomanMutuController;
+use App\Http\Controllers\PejabatController;
 use App\Http\Controllers\ProsesAwalTahunController;
 use App\Http\Controllers\ProsesBulananController;
 use App\Http\Controllers\ProyekController;
@@ -56,6 +57,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('pedomanMutu', PedomanMutuController::class);
     Route::resource('catatanMutu', CatatanMutuController::class);
     Route::resource('kunciTransaksi', KunciTransaksiController::class);
+    Route::resource('pejabat', PejabatController::class);
 
     Route::get('addModalCabang', [CabangController::class, 'addModal'])->name('addModalCabang');
     Route::get('addModalProyek', [ProyekController::class, 'addModal'])->name('addModalProyek');
