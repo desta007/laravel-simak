@@ -116,11 +116,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData10x[] = array(
-                'kode' => $groupAcc10x->kode,
-                'nama' => $groupAcc10x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData10x[] = array(
+                    'kode' => $groupAcc10x->kode,
+                    'nama' => $groupAcc10x->nama,
+                    'saldo' => $jumlah
+                );
+            }
             //$jumlahSubtotal += $jumlah; // utk excel
             $subtotal10x += $jumlah;
 
@@ -185,11 +188,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData11x[] = array(
-                'kode' => $groupAcc11x->kode,
-                'nama' => $groupAcc11x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData11x[] = array(
+                    'kode' => $groupAcc11x->kode,
+                    'nama' => $groupAcc11x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             // $jumlahSubtotal += $jumlah; // utk excel
             $subtotal11x += $jumlah;
@@ -254,11 +260,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData12x[] = array(
-                'kode' => $groupAcc12x->kode,
-                'nama' => $groupAcc12x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData12x[] = array(
+                    'kode' => $groupAcc12x->kode,
+                    'nama' => $groupAcc12x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             // $jumlahSubtotal += $jumlah; // utk excel
             $subtotal12x += $jumlah;
@@ -323,11 +332,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData13x[] = array(
-                'kode' => $groupAcc13x->kode,
-                'nama' => $groupAcc13x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData13x[] = array(
+                    'kode' => $groupAcc13x->kode,
+                    'nama' => $groupAcc13x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal13x += $jumlah; // utk excel
 
@@ -391,11 +403,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData14x[] = array(
-                'kode' => $groupAcc14x->kode,
-                'nama' => $groupAcc14x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData14x[] = array(
+                    'kode' => $groupAcc14x->kode,
+                    'nama' => $groupAcc14x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal14x += $jumlah; // utk excel
 
@@ -459,11 +474,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData15x[] = array(
-                'kode' => $groupAcc15x->kode,
-                'nama' => $groupAcc15x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData15x[] = array(
+                    'kode' => $groupAcc15x->kode,
+                    'nama' => $groupAcc15x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal15x += $jumlah; // utk excel
 
@@ -527,11 +545,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData16x[] = array(
-                'kode' => $groupAcc16x->kode,
-                'nama' => $groupAcc16x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData16x[] = array(
+                    'kode' => $groupAcc16x->kode,
+                    'nama' => $groupAcc16x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal16x += $jumlah; // utk excel
 
@@ -617,11 +638,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData17x[] = array(
-                'kode' => $groupAcc17x->kode,
-                'nama' => $groupAcc17x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData17x[] = array(
+                    'kode' => $groupAcc17x->kode,
+                    'nama' => $groupAcc17x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal17x += $jumlah; // utk excel
 
@@ -700,11 +724,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData18x[] = array(
-                'kode' => $groupAcc18x->kode,
-                'nama' => $groupAcc18x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData18x[] = array(
+                    'kode' => $groupAcc18x->kode,
+                    'nama' => $groupAcc18x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal18x += $jumlah; // utk excel
 
@@ -783,11 +810,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData19x[] = array(
-                'kode' => $groupAcc19x->kode,
-                'nama' => $groupAcc19x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData19x[] = array(
+                    'kode' => $groupAcc19x->kode,
+                    'nama' => $groupAcc19x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal19x += $jumlah; // utk excel
 
@@ -865,11 +895,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData1Ax[] = array(
-                'kode' => $groupAcc1Ax->kode,
-                'nama' => $groupAcc1Ax->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData1Ax[] = array(
+                    'kode' => $groupAcc1Ax->kode,
+                    'nama' => $groupAcc1Ax->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal1Ax += $jumlah; // utk excel
 
@@ -947,11 +980,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
                 }
             }
-            $listData1Bx[] = array(
-                'kode' => $groupAcc1Bx->kode,
-                'nama' => $groupAcc1Bx->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData1Bx[] = array(
+                    'kode' => $groupAcc1Bx->kode,
+                    'nama' => $groupAcc1Bx->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal1Bx += $jumlah; // utk excel
 
@@ -1049,11 +1085,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData20x[] = array(
-                'kode' => $groupAcc20x->kode,
-                'nama' => $groupAcc20x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData20x[] = array(
+                    'kode' => $groupAcc20x->kode,
+                    'nama' => $groupAcc20x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal20x += $jumlah; // utk excel
 
@@ -1117,11 +1156,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData21x[] = array(
-                'kode' => $groupAcc21x->kode,
-                'nama' => $groupAcc21x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData21x[] = array(
+                    'kode' => $groupAcc21x->kode,
+                    'nama' => $groupAcc21x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal21x += $jumlah; // utk excel
 
@@ -1185,11 +1227,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData22x[] = array(
-                'kode' => $groupAcc22x->kode,
-                'nama' => $groupAcc22x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData22x[] = array(
+                    'kode' => $groupAcc22x->kode,
+                    'nama' => $groupAcc22x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal22x += $jumlah; // utk excel
 
@@ -1253,11 +1298,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData23x[] = array(
-                'kode' => $groupAcc23x->kode,
-                'nama' => $groupAcc23x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData23x[] = array(
+                    'kode' => $groupAcc23x->kode,
+                    'nama' => $groupAcc23x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal23x += $jumlah; // utk excel
 
@@ -1321,11 +1369,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData24x[] = array(
-                'kode' => $groupAcc24x->kode,
-                'nama' => $groupAcc24x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData24x[] = array(
+                    'kode' => $groupAcc24x->kode,
+                    'nama' => $groupAcc24x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal24x += $jumlah; // utk excel
 
@@ -1404,11 +1455,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData25x[] = array(
-                'kode' => $groupAcc25x->kode,
-                'nama' => $groupAcc25x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData25x[] = array(
+                    'kode' => $groupAcc25x->kode,
+                    'nama' => $groupAcc25x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal25x += $jumlah; // utk excel
 
@@ -1472,11 +1526,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData26x[] = array(
-                'kode' => $groupAcc26x->kode,
-                'nama' => $groupAcc26x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData26x[] = array(
+                    'kode' => $groupAcc26x->kode,
+                    'nama' => $groupAcc26x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal26x += $jumlah; // utk excel
 
@@ -1550,11 +1607,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData27x[] = array(
-                'kode' => $groupAcc27x->kode,
-                'nama' => $groupAcc27x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData27x[] = array(
+                    'kode' => $groupAcc27x->kode,
+                    'nama' => $groupAcc27x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal27x += $jumlah; // utk excel
 
@@ -1618,11 +1678,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData28x[] = array(
-                'kode' => $groupAcc28x->kode,
-                'nama' => $groupAcc28x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData28x[] = array(
+                    'kode' => $groupAcc28x->kode,
+                    'nama' => $groupAcc28x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal28x += $jumlah; // utk excel
 
@@ -1696,11 +1759,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData30x[] = array(
-                'kode' => $groupAcc30x->kode,
-                'nama' => $groupAcc30x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData30x[] = array(
+                    'kode' => $groupAcc30x->kode,
+                    'nama' => $groupAcc30x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal30x += $jumlah; // utk excel
 
@@ -1764,11 +1830,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData31x[] = array(
-                'kode' => $groupAcc31x->kode,
-                'nama' => $groupAcc31x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData31x[] = array(
+                    'kode' => $groupAcc31x->kode,
+                    'nama' => $groupAcc31x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal31x += $jumlah; // utk excel
 
@@ -1832,11 +1901,14 @@ class ExportController extends Controller
                     $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
                 }
             }
-            $listData32x[] = array(
-                'kode' => $groupAcc32x->kode,
-                'nama' => $groupAcc32x->nama,
-                'saldo' => $jumlah
-            );
+
+            if ($jumlah != 0) {
+                $listData32x[] = array(
+                    'kode' => $groupAcc32x->kode,
+                    'nama' => $groupAcc32x->nama,
+                    'saldo' => $jumlah
+                );
+            }
 
             $subtotal32x += $jumlah; // utk excel
 
