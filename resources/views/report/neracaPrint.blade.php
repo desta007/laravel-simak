@@ -40,10 +40,14 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal10x) }}</td>
-            </tr>
+
+            @if ($subtotal10x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal10x) }}</td>
+                </tr>
+            @endif
+
             @php
                 $subtotal11x = 0;
             @endphp
@@ -60,10 +64,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal11x) }}</td>
-            </tr>
+
+            @if ($subtotal11x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal11x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal12x = 0;
@@ -81,10 +88,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal12x) }}</td>
-            </tr>
+
+            @if ($subtotal12x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal12x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal13x = 0;
@@ -102,10 +112,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal13x) }}</td>
-            </tr>
+
+            @if ($subtotal13x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal13x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal14x = 0;
@@ -123,10 +136,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal14x) }}</td>
-            </tr>
+
+            @if ($subtotal14x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal14x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal15x = 0;
@@ -144,10 +160,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal15x) }}</td>
-            </tr>
+
+            @if ($subtotal15x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal15x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal16x = 0;
@@ -165,10 +184,14 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal16x) }}</td>
-            </tr>
+
+            @if ($subtotal16x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal16x) }}</td>
+                </tr>
+            @endif
+
             <tr style="background-color: #EEEEEE">
                 <td colspan="4" style="text-align: center"><b>JUMLAH ASET LANCAR</b></td>
                 <td style="text-align: right">@php
@@ -206,10 +229,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal17x) }}</td>
-            </tr>
+
+            @if ($subtotal17x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal17x) }}</td>
+                </tr>
+            @endif
 
             <tr style="background-color: #EEEEEE">
                 <td colspan="4" style="text-align: center"><b>JUMLAH INVESTASI JANGKA
@@ -242,10 +268,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal18x) }}</td>
-            </tr>
+
+            @if ($subtotal18x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal18x) }}</td>
+                </tr>
+            @endif
 
             <tr style="background-color: #EEEEEE">
                 <td colspan="4" style="text-align: center"><b>JUMLAH ASET TETAP</b>
@@ -277,10 +306,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal19x) }}</td>
-            </tr>
+
+            @if ($subtotal19x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal19x) }}</td>
+                </tr>
+            @endif
 
             <tr style="background-color: #EEEEEE">
                 <td colspan="4" style="text-align: center"><b>JUMLAH HAK PENGELOLAAN</b>
@@ -312,10 +344,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal1Ax) }}</td>
-            </tr>
+
+            @if ($subtotal1Ax != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal1Ax) }}</td>
+                </tr>
+            @endif
 
             <tr style="background-color: #EEEEEE">
                 <td colspan="4" style="text-align: center"><b>JUMLAH ASET TIDAK BERWUJUD</b>
@@ -347,10 +382,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal1Bx) }}</td>
-            </tr>
+
+            @if ($subtotal1Bx != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal1Bx) }}</td>
+                </tr>
+            @endif
 
             <tr style="background-color: #EEEEEE">
                 <td colspan="4" style="text-align: center"><b>JUMLAH ASET LAIN-LAIN</b>
@@ -409,10 +447,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal20x) }}</td>
-            </tr>
+
+            @if ($subtotal20x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal20x) }}</td>
+                </tr>
+            @endif
             @php
                 $subtotal21x = 0;
             @endphp
@@ -429,10 +470,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal21x) }}</td>
-            </tr>
+
+            @if ($subtotal21x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal21x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal22x = 0;
@@ -450,10 +494,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal22x) }}</td>
-            </tr>
+
+            @if ($subtotal22x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal22x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal23x = 0;
@@ -471,10 +518,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal23x) }}</td>
-            </tr>
+
+            @if ($subtotal23x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal23x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal24x = 0;
@@ -492,10 +542,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal24x) }}</td>
-            </tr>
+
+            @if ($subtotal24x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal24x) }}</td>
+                </tr>
+            @endif
 
             <tr style="background-color: #EEEEEE">
                 <td colspan="4" style="text-align: center"><b>JUMLAH LIABILITAS JANGKA
@@ -529,10 +582,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal25x) }}</td>
-            </tr>
+
+            @if ($subtotal25x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal25x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal26x = 0;
@@ -550,10 +606,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal26x) }}</td>
-            </tr>
+
+            @if ($subtotal26x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal26x) }}</td>
+                </tr>
+            @endif
 
             <tr style="background-color: #EEEEEE">
                 <td colspan="4" style="text-align: center"><b>JUMLAH LIABILITAS JANGKA
@@ -586,10 +645,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal27x) }}</td>
-            </tr>
+
+            @if ($subtotal27x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal27x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal28x = 0;
@@ -607,10 +669,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal28x) }}</td>
-            </tr>
+
+            @if ($subtotal28x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal28x) }}</td>
+                </tr>
+            @endif
 
             <tr style="background-color: #EEEEEE">
                 <td colspan="4" style="text-align: center"><b>JUMLAH LIABILITAS LAIN-LAIN</b>
@@ -642,10 +707,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal30x) }}</td>
-            </tr>
+
+            @if ($subtotal30x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal30x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal31x = 0;
@@ -663,10 +731,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal31x) }}</td>
-            </tr>
+
+            @if ($subtotal31x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal31x) }}</td>
+                </tr>
+            @endif
 
             @php
                 $subtotal32x = 0;
@@ -684,10 +755,13 @@
                     <td>&nbsp;</td>
                 </tr>
             @endfor
-            <tr style="background-color: #EEEEEE">
-                <td colspan="4">&nbsp;</td>
-                <td style="text-align: right">{{ number_format($subtotal32x) }}</td>
-            </tr>
+
+            @if ($subtotal32x != 0)
+                <tr style="background-color: #EEEEEE">
+                    <td colspan="4">&nbsp;</td>
+                    <td style="text-align: right">{{ number_format($subtotal32x) }}</td>
+                </tr>
+            @endif
 
             <tr style="background-color: #EEEEEE">
                 <td colspan="4" style="text-align: center"><b>JUMLAH EKUITAS</b>
