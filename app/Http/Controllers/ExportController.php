@@ -1991,6 +1991,44 @@ class ExportController extends Controller
         if ($excel != '') {
             return Excel::download(new ExportNeraca($dataExcel), 'laporan_neraca.xlsx');
         }
+        // modif 17-10-2024 utk excel. dikomen lagi, msh error
+        /*if ($excel != '') {
+            $data = [
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+                'namaCabang' => $namaCabang,
+                'namaProyek' => $namaProyek,
+                'listData10x' => $listData10x,
+                'listData11x' => $listData11x,
+                'listData12x' => $listData12x,
+                'listData13x' => $listData13x,
+                'listData14x' => $listData14x,
+                'listData15x' => $listData15x,
+                'listData16x' => $listData16x,
+                'listData17x' => $listData17x,
+                'listData18x' => $listData18x,
+                'listData19x' => $listData19x,
+                'listData1Ax' => $listData1Ax,
+                'listData1Bx' => $listData1Bx,
+
+                'listData20x' => $listData20x,
+                'listData21x' => $listData21x,
+                'listData22x' => $listData22x,
+                'listData23x' => $listData23x,
+                'listData24x' => $listData24x,
+                'listData25x' => $listData25x,
+                'listData26x' => $listData26x,
+                'listData27x' => $listData27x,
+                'listData28x' => $listData28x,
+                'listData30x' => $listData30x,
+                'listData31x' => $listData31x,
+                'listData32x' => $listData32x,
+            ];
+
+            // dd($data);
+
+            return Excel::download(new ExportNeraca($data), 'neraca.xlsx');
+        } */
 
         if ($pdf != '') {
             // $data = [

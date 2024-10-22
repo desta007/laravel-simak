@@ -20,6 +20,8 @@ class TransaksiController extends Controller
     public function index()
     {
         //$isView = '1';
+        session()->forget('totalAmountD');
+
         $tgl_awal = Carbon::now()->startOfMonth()->toDateString();
         $tgl_akhir = Carbon::now()->toDateString();
         $noBukti = '';
@@ -92,6 +94,8 @@ class TransaksiController extends Controller
 
     public function search(Request $request)
     {
+        session()->forget('totalAmountD');
+
         $id_group_user = auth()->user()->id_group_user;
         $id_user = auth()->user()->id;
 
@@ -200,6 +204,8 @@ class TransaksiController extends Controller
         $kode_buktis = KodeBukti::all();
         $tgl = Carbon::now()->toDateString();
 
+        session()->forget('totalAmountD');
+
         return view('transaksi.transaksiadd', [
             'cabangs' => $cabangs,
             'proyeks' => $proyeks,
@@ -282,6 +288,8 @@ class TransaksiController extends Controller
 
             // Commit the transaction if all operations are successful
             DB::commit();
+
+            session()->forget('totalAmountD');
 
             Alert::success('Berhasil', 'Transaksi berhasil disimpan');
             return redirect()->route('transJurnal');
@@ -697,5 +705,45 @@ $transaksis = Transaksi::query()
         $isView = 1;
         return view('transaksi.bukuTambahan', compact('id_group_user', 'id_cabang', 'id_proyek', 'cabangs', 'proyeks', 'tgl_awal', 'tgl_akhir', 'kodePerkiraan', 'results', 'isView'));
         // --------
+    }
+
+    // 17-10-2024
+    public function hitungSessionByJenis(Request $request)
+    {
+        // ambil parameter jenis
+        $jenis = $request->input('jenis');
+
+        if ($jenis == 'K')
+            $totalAmount = session()->get('totalAmountD', 0);
+        else
+            $totalAmount = 0;
+
+        return $totalAmount;
+    }
+
+    // 18-10-2024
+    public function saveSessionByJenis(Request $request)
+    {
+        // Validate the amount input
+        $request->validate([
+            'amount' => 'required|numeric',
+        ]);
+
+        // Store the amount in session
+        $amount = $request->input('amount');
+        $jenis = $request->input('jenis');
+
+        if ($jenis == 'D') {
+            $currentAmountD = session()->get('totalAmountD', 0);
+            $totalAmount = $currentAmountD + $amount;
+            session()->put('totalAmountD', $totalAmount);  // Update or save to session
+        }
+
+        // Respond back to the AJAX call
+        return response()->json([
+            'success' => true,
+            'message' => 'Amount Debet saved to session successfully!',
+            'total' => session('totalAmountD')
+        ]);
     }
 }

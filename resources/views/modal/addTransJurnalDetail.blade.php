@@ -22,7 +22,8 @@
                     </div>
                     <div class="form-group">
                         <label for="jenis">Jenis Transaksi</label>
-                        <select name="jenis" class="form-control" id="jenis">
+                        <select name="jenis" class="form-control" id="jenis"
+                            onchange="hitung_akumulasi(this.value);">
                             <option value="D">Debet (D)</option>
                             <option value="K">Kredit (K)</option>
                         </select>
@@ -61,25 +62,38 @@
             var jumlah = $('#jumlah').val();
             var jumlahx = $('#jumlahx').val();
 
-            // Append the data to the table
-            counter++;
-            //console.log(counter);
-            $('#dataTable tbody').append('<tr><td>' + counter +
-                '</td><td><input type="hidden" name="id1[]" value="0"><input type="hidden" name="id_kode_perkiraan1[]" value="' +
-                id_kode_perkiraan + '">' + selectedTextKode +
-                '</td><td><input type="hidden" name="jenis1[]" value="' +
-                jenis + '">' +
-                jenis + '</td><td><input type="hidden" name="jumlah1[]" value="' + jumlah + '">' +
-                jumlahx +
-                '</td><td><button class="btn-sm btn-danger delete-btn">Delete</button></td></tr>');
+            // 18-10-2024 save to session for jenis = D. supaya ketika add kode akun dgn jenis K, otomatis muncul total D
+            $.ajax({
+                url: "{{ route('saveSessionJumlah') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}", // CSRF token for security
+                    amount: jumlah,
+                    jenis: jenis
+                },
+                success: function(response) {
+                    // Append the data to the table
+                    counter++;
+                    //console.log(counter);
+                    $('#dataTable tbody').append('<tr><td>' + counter +
+                        '</td><td><input type="hidden" name="id1[]" value="0"><input type="hidden" name="id_kode_perkiraan1[]" value="' +
+                        id_kode_perkiraan + '">' + selectedTextKode +
+                        '</td><td><input type="hidden" name="jenis1[]" value="' +
+                        jenis + '">' +
+                        jenis +
+                        '</td><td><input type="hidden" name="jumlah1[]" value="' +
+                        jumlah + '">' +
+                        jumlahx +
+                        '</td><td><button class="btn-sm btn-danger delete-btn">Delete</button></td></tr>'
+                    );
 
-            $('#counter').val(counter);
+                    $('#counter').val(counter);
 
-            // Close the modal
-            $('#addModal').modal('hide');
+                    // Close the modal
+                    $('#addModal').modal('hide');
+                }
+            });
 
-            // Reset the form
-            //$('#addDataForm')[0].reset();
         });
 
         // Handle deletion of rows. 04-04-2024 ini ganti pake function aja di onclick. onclick = "deletedata(rownumber)"
@@ -101,6 +115,34 @@
             $('#counter').val(hitung);
         });
     });
+
+    // 17-10-2024
+    function hitung_akumulasi(jenis_akun) {
+        $.ajax({
+            url: "{{ route('hitungSessionJumlah') }}",
+            type: "GET",
+            data: {
+                jenis: jenis_akun
+            },
+            success: function(response) {
+                var jumlahx = addCommas(response);
+                $('#jumlahx').val(jumlahx);
+                $('#jumlah').val(response);
+            }
+        });
+    }
+
+    function addCommas(nStr) {
+        nStr += '';
+        x = nStr.split('.');
+        x1 = x[0];
+        x2 = x.length > 1 ? '.' + x[1] : '';
+        var rgx = /(\d+)(\d{3})/;
+        while (rgx.test(x1)) {
+            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        }
+        return x1 + x2;
+    }
 
     function formatangka(objek) {
         a = objek.value;

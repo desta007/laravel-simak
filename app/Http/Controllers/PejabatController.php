@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pejabat;
 use Illuminate\Http\Request;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class PejabatController extends Controller
 {
@@ -34,7 +35,24 @@ class PejabatController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'nama' => 'required',
+            'jabatan' => 'required',
+            'is_active' => 'required',
+            'is_ttd_laporan_neraca' => 'required',
+            'is_ttd_laporan_labarugi' => 'required'
+        ]);
+
+        Pejabat::create([
+            'nama' => $request['nama'],
+            'jabatan' => $request['jabatan'],
+            'is_active' => $request['is_active'],
+            'is_ttd_laporan_neraca' => $request['is_ttd_laporan_neraca'],
+            'is_ttd_laporan_labarugi' => $request['is_ttd_laporan_labarugi'],
+        ]);
+
+        Alert::success('Berhasil', 'Data Pejabat berhasil disimpan');
+        return redirect()->route('pejabat.index');
     }
 
     /**
@@ -48,17 +66,38 @@ class PejabatController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        //
+        $pejabat = Pejabat::findOrFail($id);
+
+        return view('transaksi.pejabatedit', compact('pejabat'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request,  $id)
     {
-        //
+        $pejabat = Pejabat::findOrFail($id);
+
+        $request->validate([
+            'nama' => 'required',
+            'jabatan' => 'required',
+            'is_active' => 'required',
+            'is_ttd_laporan_neraca' => 'required',
+            'is_ttd_laporan_labarugi' => 'required'
+        ]);
+
+        $pejabat->nama = $request->nama;
+        $pejabat->jabatan = $request->jabatan;
+        $pejabat->is_active = $request->is_active;
+        $pejabat->is_ttd_laporan_neraca = $request->is_ttd_laporan_neraca;
+        $pejabat->is_ttd_laporan_labarugi = $request->is_ttd_laporan_labarugi;
+
+        $pejabat->save();
+
+        Alert::success('Berhasil', 'Data pejabat berhasil diupdate');
+        return redirect()->route('pejabat.index');
     }
 
     /**
@@ -66,6 +105,17 @@ class PejabatController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $pejabat = Pejabat::findOrFail($id);
+
+        $pejabat->delete();
+        Alert::success('Berhasil', 'Data pejabat berhasil dihapus');
+        return redirect()->route('pejabat.index');
+    }
+
+    public function addModal()
+    {
+        return view('modal.addPejabat', [
+            'title' => 'Tambah Data Pejabat'
+        ]);
     }
 }

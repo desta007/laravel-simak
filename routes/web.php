@@ -74,6 +74,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('addModalPedomanMutu', [PedomanMutuController::class, 'addModal'])->name('addModalPedomanMutu');
     Route::get('addModalCatatanMutu', [CatatanMutuController::class, 'addModal'])->name('addModalCatatanMutu');
 
+    Route::get('addModalPejabat', [PejabatController::class, 'addModal'])->name('addModalPejabat');
+
     Route::get('transJurnal', [TransaksiController::class, 'index'])->name('transJurnal');
     Route::post('transJurnalSearch', [TransaksiController::class, 'search'])->name('transJurnalSearch');
     Route::get('addTransJurnal', [TransaksiController::class, 'create'])->name('addTransJurnal');
@@ -110,4 +112,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('exportNeraca', [ExcelExportController::class, 'exportNeraca'])->name('exportNeraca');
     Route::post('neracaExport', [ExportController::class, 'neracaExport'])->name('neracaExport');
     Route::post('labaRugiExport', [ExportController::class, 'labaRugiExport'])->name('labaRugiExport');
+
+    // 17-10-2024
+    Route::get('hitungSessionJumlah', [TransaksiController::class, 'hitungSessionByJenis'])->name('hitungSessionJumlah');
+    Route::post('saveSessionJumlah', [TransaksiController::class, 'saveSessionByJenis'])->name('saveSessionJumlah');
 });

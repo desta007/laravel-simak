@@ -18,6 +18,8 @@ class KodePerkiraanController extends Controller
      */
     public function index()
     {
+        session()->forget('totalAmountD');
+
         $id_group_user = auth()->user()->id_group_user;
         $id_user = auth()->user()->id;
         $id_cabang = auth()->user()->id_cabang;

@@ -46,7 +46,7 @@
                                         <th>No</th>
                                         <th>Nama</th>
                                         <th>Jabatan</th>
-                                        <th>Is Active</th>
+                                        <th>Status</th>
                                         <th>Ttd Neraca</th>
                                         <th>Ttd Laba Rugi</th>
                                         <th>Tgl Update</th>
@@ -131,7 +131,7 @@
             e.preventDefault();
 
             $.ajax({
-                url: "{{ route('addModalPedomanMutu') }}",
+                url: "{{ route('addModalPejabat') }}",
                 success: function(response) {
                     $('.tampilData').html(response).show();
                     $('#addModal').modal('show');
