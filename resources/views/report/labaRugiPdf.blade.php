@@ -512,6 +512,36 @@
                 </th>
             </tr>
         </table>
+
+        <br><br>
+        <p style="text-align: center">Disahkan Oleh</p>
+        <table style="border: none; width: 50%;" align="center">
+            <tr>
+                @forelse ($listPejabat as $pejabat)
+                    <td style="text-align: center">{{ $pejabat['jabatan'] }}</td>
+
+                @empty
+                    <td>&nbsp;</td>
+                @endforelse
+            </tr>
+            <tr>
+                @forelse ($listPejabat as $pejabat)
+                    <td style="text-align: center">
+                        <img src="data:image/png;base64,{{ $pejabat['qrCode'] }}" alt="QR Code" class="qr-code">
+                    </td>
+                @empty
+                    <td>&nbsp;</td>
+                @endforelse
+            </tr>
+            <tr>
+                @forelse ($listPejabat as $pejabat)
+                    <td style="text-align: center">{{ $pejabat['nama'] }}</td>
+
+                @empty
+                    <td>&nbsp;</td>
+                @endforelse
+            </tr>
+        </table>
     </div>
     <!-- /.content -->
 

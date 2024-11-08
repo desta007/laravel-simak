@@ -112,6 +112,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('exportNeraca', [ExcelExportController::class, 'exportNeraca'])->name('exportNeraca');
     Route::post('neracaExport', [ExportController::class, 'neracaExport'])->name('neracaExport');
     Route::post('labaRugiExport', [ExportController::class, 'labaRugiExport'])->name('labaRugiExport');
+    Route::post('generalLedgerExport', [ExportController::class, 'generalLedgerExport'])->name('generalLedgerExport');
 
     // 17-10-2024
     Route::get('hitungSessionJumlah', [TransaksiController::class, 'hitungSessionByJenis'])->name('hitungSessionJumlah');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pejabat;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PejabatController extends Controller
 {
@@ -43,13 +44,28 @@ class PejabatController extends Controller
             'is_ttd_laporan_labarugi' => 'required'
         ]);
 
-        Pejabat::create([
+        $pejabat = Pejabat::create([
             'nama' => $request['nama'],
             'jabatan' => $request['jabatan'],
             'is_active' => $request['is_active'],
             'is_ttd_laporan_neraca' => $request['is_ttd_laporan_neraca'],
             'is_ttd_laporan_labarugi' => $request['is_ttd_laporan_labarugi'],
         ]);
+
+        // $qrCodePath = 'qrcodes/' . $pejabat->id . '.png';
+        // $fullPath = storage_path('app/public/' . $qrCodePath);
+
+        // // Cek apakah folder qrcodes sudah ada, jika belum buat folder tersebut
+        // if (!file_exists(dirname($fullPath))) {
+        //     mkdir(dirname($fullPath), 0755, true);
+        // }
+
+        // $content = 'Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')';
+
+        // // $qrCode = QrCode::size(100)->generate('test penandatangan');
+        // QrCode::format('png')->size(200)->generate($content);
+
+        // $pejabat->update(['qr_code_path' => $qrCodePath]);
 
         Alert::success('Berhasil', 'Data Pejabat berhasil disimpan');
         return redirect()->route('pejabat.index');

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Cabang;
 use App\Models\GroupAccount;
 use App\Models\KodePerkiraan;
+use App\Models\Pejabat;
 use App\Models\Proyek;
 use App\Models\SaldoAkun;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ReportController extends Controller
 {
@@ -98,7 +100,7 @@ class ReportController extends Controller
         if ($id_proyek != 'all')
             $listAkun->where('id_proyek', $id_proyek);
         $listAkun->where('kode', 'like', $kodePerkiraan . '%')
-            ->orderBy('kode', 'desc');
+            ->orderBy('kode', 'asc');
         //dd($listAkun->toSql());
 
         $results = $listAkun->get();
@@ -192,14 +194,16 @@ class ReportController extends Controller
             $jumlahSaldoAkhir = $jumlahSaldoAwal + $jumlahSaldoMutasi;
             //echo $akun->kode . " " . $akunnya->saldo_debet . " " . $akunnya->saldo_kredit . " " . $jumlahSaldoMutasi . "<br>";
 
-            $listData[] = array(
-                'kode' => $akun->kode,
-                'nama' => $akun->nama,
-                'saldo_awal' => $jumlahSaldoAwal,
-                'mutasi_debet' => $jumlahSaldoMutasiDebet,
-                'mutasi_kredit' => $jumlahSaldoMutasiKredit,
-                'saldo_akhir' => $jumlahSaldoAkhir
-            );
+            if ($jumlahSaldoAwal != 0 || $jumlahSaldoMutasiDebet != 0 || $jumlahSaldoMutasiKredit != 0 || $jumlahSaldoAkhir != 0) {
+                $listData[] = array(
+                    'kode' => $akun->kode,
+                    'nama' => $akun->nama,
+                    'saldo_awal' => $jumlahSaldoAwal,
+                    'mutasi_debet' => $jumlahSaldoMutasiDebet,
+                    'mutasi_kredit' => $jumlahSaldoMutasiKredit,
+                    'saldo_akhir' => $jumlahSaldoAkhir
+                );
+            }
         }
         //die();
 
@@ -801,9 +805,26 @@ class ReportController extends Controller
 
         */
 
+        // 02-11-2024 qrcode dari nama pejabat
+        $pejabats = Pejabat::where('is_active', 1)->where('is_ttd_laporan_neraca', 1)
+            ->orderBy('id', 'asc')->get();
+
+        $listPejabat = [];
+        if (!$pejabats->isEmpty()) {
+            foreach ($pejabats as $pejabat) {
+                $qrCode = QrCode::size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')');
+                $listPejabat[] = array(
+                    'nama' => $pejabat->nama,
+                    'jabatan' => $pejabat->jabatan,
+                    'qrCode' => $qrCode
+                );
+            }
+        }
+
         $isView = 1;
 
         return view('report.labaRugi', compact(
+            'listPejabat',
             'id_group_user',
             'id_cabang',
             'id_proyek',
@@ -2164,8 +2185,27 @@ class ReportController extends Controller
         }
         // ---------------------------------------------------------------------------
 
+        // 02-11-2024 qrcode dari nama pejabat
+        $pejabats = Pejabat::where('is_active', 1)->where('is_ttd_laporan_neraca', 1)
+            ->orderBy('id', 'asc')->get();
+
+        $listPejabat = [];
+        if (!$pejabats->isEmpty()) {
+            foreach ($pejabats as $pejabat) {
+                $qrCode = QrCode::size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')');
+                $listPejabat[] = array(
+                    'nama' => $pejabat->nama,
+                    'jabatan' => $pejabat->jabatan,
+                    'qrCode' => $qrCode
+                );
+            }
+        }
+
+        // $qrCode = QrCode::size(100)->generate('test penandatangan');
+
         $isView = 1;
         return view('report.neraca', compact(
+            'listPejabat',
             'id_group_user',
             'id_cabang',
             'id_proyek',

@@ -616,6 +616,34 @@
                                         </th>
                                     </tr>
                                 </table>
+
+                                <br><br>
+                                <p style="text-align: center">Disahkan Oleh</p>
+                                <table style="border: none; width: 50%;" align="center">
+                                    <tr>
+                                        @forelse ($listPejabat as $pejabat)
+                                            <td style="text-align: center">{{ $pejabat['jabatan'] }}</td>
+
+                                        @empty
+                                            <td>&nbsp;</td>
+                                        @endforelse
+                                    </tr>
+                                    <tr>
+                                        @forelse ($listPejabat as $pejabat)
+                                            <td style="text-align: center">{!! $pejabat['qrCode'] !!}</td>
+                                        @empty
+                                            <td>&nbsp;</td>
+                                        @endforelse
+                                    </tr>
+                                    <tr>
+                                        @forelse ($listPejabat as $pejabat)
+                                            <td style="text-align: center">{{ $pejabat['nama'] }}</td>
+
+                                        @empty
+                                            <td>&nbsp;</td>
+                                        @endforelse
+                                    </tr>
+                                </table>
                             </div>
                         @endif
                         <!-- /.card-body -->

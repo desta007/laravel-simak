@@ -7,10 +7,13 @@ use Illuminate\Http\Request;
 use App\Exports\ExportNeraca;
 use App\Models\Cabang;
 use App\Models\GroupAccount;
+use App\Models\KodePerkiraan;
+use App\Models\Pejabat;
 use App\Models\Proyek;
 use App\Models\SaldoAkun;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ExportController extends Controller
 {
@@ -1955,7 +1958,26 @@ class ExportController extends Controller
         ];
 
         if ($print != '') {
+            // 02-11-2024 qrcode dari nama pejabat
+            $pejabats = Pejabat::where('is_active', 1)->where('is_ttd_laporan_neraca', 1)
+                ->orderBy('id', 'asc')->get();
+
+            $listPejabat = [];
+            if (!$pejabats->isEmpty()) {
+                foreach ($pejabats as $pejabat) {
+                    $qrCode = QrCode::size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')');
+                    // $qrCode = base64_encode(QrCode::format('svg')->size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')'));
+
+                    $listPejabat[] = array(
+                        'nama' => $pejabat->nama,
+                        'jabatan' => $pejabat->jabatan,
+                        'qrCode' => $qrCode
+                    );
+                }
+            }
+
             return view('report.neracaPrint', compact(
+                'listPejabat',
                 'bulan',
                 'tahun',
                 'namaCabang',
@@ -2063,7 +2085,26 @@ class ExportController extends Controller
             //     'listData32x' => $listData32x,
             // ];
             // $pdf = PDF::loadView('report.neracaPdf', $data);
+
+            // 02-11-2024 qrcode dari nama pejabat
+            $pejabats = Pejabat::where('is_active', 1)->where('is_ttd_laporan_neraca', 1)
+                ->orderBy('id', 'asc')->get();
+
+            $listPejabat = [];
+            if (!$pejabats->isEmpty()) {
+                foreach ($pejabats as $pejabat) {
+                    // $qrCode = QrCode::size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')');
+                    $qrCode = base64_encode(QrCode::format('svg')->size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')'));
+
+                    $listPejabat[] = array(
+                        'nama' => $pejabat->nama,
+                        'jabatan' => $pejabat->jabatan,
+                        'qrCode' => $qrCode
+                    );
+                }
+            }
             $pdf = Pdf::loadView('report.neracaPdf', compact(
+                'listPejabat',
                 'bulan',
                 'tahun',
                 'namaCabang',
@@ -3128,7 +3169,26 @@ class ExportController extends Controller
         ];
 
         if ($print != '') {
+            // 02-11-2024 qrcode dari nama pejabat
+            $pejabats = Pejabat::where('is_active', 1)->where('is_ttd_laporan_neraca', 1)
+                ->orderBy('id', 'asc')->get();
+
+            $listPejabat = [];
+            if (!$pejabats->isEmpty()) {
+                foreach ($pejabats as $pejabat) {
+                    $qrCode = QrCode::size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')');
+                    // $qrCode = base64_encode(QrCode::format('svg')->size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')'));
+
+                    $listPejabat[] = array(
+                        'nama' => $pejabat->nama,
+                        'jabatan' => $pejabat->jabatan,
+                        'qrCode' => $qrCode
+                    );
+                }
+            }
+
             return view('report.labaRugiPrint', compact(
+                'listPejabat',
                 'bulan1',
                 'bulan2',
                 'tahun',
@@ -3177,7 +3237,26 @@ class ExportController extends Controller
         }
 
         if ($pdf != '') {
+            // 02-11-2024 qrcode dari nama pejabat
+            $pejabats = Pejabat::where('is_active', 1)->where('is_ttd_laporan_neraca', 1)
+                ->orderBy('id', 'asc')->get();
+
+            $listPejabat = [];
+            if (!$pejabats->isEmpty()) {
+                foreach ($pejabats as $pejabat) {
+                    // $qrCode = QrCode::size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')');
+                    $qrCode = base64_encode(QrCode::format('svg')->size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')'));
+
+                    $listPejabat[] = array(
+                        'nama' => $pejabat->nama,
+                        'jabatan' => $pejabat->jabatan,
+                        'qrCode' => $qrCode
+                    );
+                }
+            }
+
             $pdf = Pdf::loadView('report.labaRugiPdf', compact(
+                'listPejabat',
                 'bulan1',
                 'bulan2',
                 'tahun',
@@ -3202,5 +3281,183 @@ class ExportController extends Controller
         }
 
         // ------------------------------------------------------------------------------------------------------
+    }
+
+    // 05-11-2024
+    public function generalLedgerExport(Request $request)
+    {
+        set_time_limit(300);
+        $bulan1 = $request->input('bulan12');
+        $bulan2 = $request->input('bulan22');
+        $tahun = $request->input('tahun2');
+
+        $id_cabang = $request->input('id_cabang2');
+        $id_proyek = $request->input('id_proyek2');
+        $kodePerkiraan = $request->input('kodePerkiraan2');
+
+        $print = $request->input('print');
+        $pdf = $request->input('pdf');
+        $excel = $request->input('excel');
+
+        if ($id_cabang != '') {
+            $cabang = Cabang::where('id', $id_cabang)->first();
+            $namaCabang = $cabang->nama;
+        } else {
+            $namaCabang = 'All';
+        }
+
+        if ($id_proyek != 0 && $id_proyek != 'all') {
+            $proyek = Proyek::where('id', $id_proyek)->first();
+            $namaProyek = $proyek->nama;
+        } else {
+            if ($id_proyek == 0)
+                $namaProyek = 'Non Proyek';
+            else
+                $namaProyek = 'All';
+        }
+
+        // get data kode perkiraan dan saldo
+        $listAkun = KodePerkiraan::query();
+        if ($id_cabang != '')
+            $listAkun->where('id_cabang', $id_cabang);
+        if ($id_proyek != 'all')
+            $listAkun->where('id_proyek', $id_proyek);
+        $listAkun->where('kode', 'like', $kodePerkiraan . '%')
+            ->orderBy('kode', 'asc');
+        //dd($listAkun->toSql());
+
+        $results = $listAkun->get();
+
+        $listData = array();
+        foreach ($results as $akun) {
+            // get saldo awal, mutasi, dan saldo akhir
+            // 1. saldo awal tahun
+            $dataSaldoAwal = SaldoAkun::with('kodePerkiraan')
+                ->where('tahun', $tahun)
+                ->where('is_saldo_awal', 1)
+                ->whereHas('kodePerkiraan', function ($query) use ($akun, $id_cabang, $id_proyek) {
+                    $query->where('kode', $akun->kode);
+                    if ($id_cabang != '')
+                        $query->where('id_cabang', $id_cabang);
+                    if ($id_proyek != 'all')
+                        $query->where('id_proyek', $id_proyek);
+                })->get();
+            // dd($dataSaldoAwal);
+
+            $saldoAwalDebet = 0;
+            $saldoAwalKredit = 0;
+            foreach ($dataSaldoAwal as $sa) {
+                $saldoAwalDebet += $sa->saldo_debet;
+                $saldoAwalKredit += $sa->saldo_kredit;
+            }
+
+            //$jumlahSaldoAwal = 0;
+            if (substr($akun->kode, 0, 1) == '1' || substr($akun->kode, 0, 1) == '5' || substr($akun->kode, 0, 1) == '6' || substr($akun->kode, 0, 1) == '8') {
+                $jumlahSaldoAwal = $saldoAwalDebet - $saldoAwalKredit;
+            } else {
+                $jumlahSaldoAwal = $saldoAwalKredit - $saldoAwalDebet;
+            }
+
+            // 2. hitung total dari jan s/d bulan1
+            // get saldo tiap bulan
+            for ($i = 1; $i <= $bulan1; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($akun, $id_cabang, $id_proyek) {
+                        $query->where('kode', $akun->kode);
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    if (substr($akunnya->kodePerkiraan->kode, 0, 1) == '1' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '5' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '6' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '8') {
+                        $jumlahSaldoAwal += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                    } else {
+                        $jumlahSaldoAwal += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                    }
+                }
+            }
+            // smape sini done 17-04-2024 4:54.
+            // lanjut 18-04-2024
+
+            // mutasi dari bulan awal s/d bulan akhir
+            $jumlahSaldoMutasi = 0;
+            $jumlahSaldoMutasiDebet = 0;
+            $jumlahSaldoMutasiKredit = 0;
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($akun, $id_cabang, $id_proyek) {
+                        $query->where('kode', $akun->kode);
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlahSaldoMutasiDebet += $akunnya->saldo_debet;
+                    $jumlahSaldoMutasiKredit += $akunnya->saldo_kredit;
+
+                    if (substr($akunnya->kodePerkiraan->kode, 0, 1) == '1' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '5' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '6' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '8') {
+                        $jumlahSaldoMutasi += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                    } else {
+                        $jumlahSaldoMutasi += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                    }
+                }
+            }
+
+            // saldo akhir, perhitungan
+            $jumlahSaldoAkhir = $jumlahSaldoAwal + $jumlahSaldoMutasi;
+            //echo $akun->kode . " " . $akunnya->saldo_debet . " " . $akunnya->saldo_kredit . " " . $jumlahSaldoMutasi . "<br>";
+
+            if ($jumlahSaldoAwal != 0 || $jumlahSaldoMutasiDebet != 0 || $jumlahSaldoMutasiKredit != 0 || $jumlahSaldoAkhir != 0) {
+                $listData[] = array(
+                    'kode' => $akun->kode,
+                    'nama' => $akun->nama,
+                    'saldo_awal' => $jumlahSaldoAwal,
+                    'mutasi_debet' => $jumlahSaldoMutasiDebet,
+                    'mutasi_kredit' => $jumlahSaldoMutasiKredit,
+                    'saldo_akhir' => $jumlahSaldoAkhir
+                );
+            }
+        }
+
+        if ($pdf != '') {
+
+            // qrcode dari nama pejabat
+            $pejabats = Pejabat::where('is_active', 1)->where('is_ttd_laporan_neraca', 1)
+                ->orderBy('id', 'asc')->get();
+
+            $listPejabat = [];
+            if (!$pejabats->isEmpty()) {
+                foreach ($pejabats as $pejabat) {
+                    // $qrCode = QrCode::size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')');
+                    $qrCode = base64_encode(QrCode::format('svg')->size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')'));
+
+                    $listPejabat[] = array(
+                        'nama' => $pejabat->nama,
+                        'jabatan' => $pejabat->jabatan,
+                        'qrCode' => $qrCode
+                    );
+                }
+            }
+            $pdf = Pdf::loadView('report.generalLedgerPdf', compact(
+                'listPejabat',
+                'bulan1',
+                'bulan2',
+                'tahun',
+                'namaCabang',
+                'namaProyek',
+                'listData'
+            ));
+            return $pdf->download('general_ledger.pdf');
+        }
     }
 }
