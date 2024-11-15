@@ -3429,6 +3429,37 @@ class ExportController extends Controller
             }
         }
 
+        // 15-11-2024
+        if ($print != '') {
+            // 02-11-2024 qrcode dari nama pejabat
+            $pejabats = Pejabat::where('is_active', 1)->where('is_ttd_laporan_neraca', 1)
+                ->orderBy('id', 'asc')->get();
+
+            $listPejabat = [];
+            if (!$pejabats->isEmpty()) {
+                foreach ($pejabats as $pejabat) {
+                    $qrCode = QrCode::size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')');
+                    // $qrCode = base64_encode(QrCode::format('svg')->size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')'));
+
+                    $listPejabat[] = array(
+                        'nama' => $pejabat->nama,
+                        'jabatan' => $pejabat->jabatan,
+                        'qrCode' => $qrCode
+                    );
+                }
+            }
+
+            return view('report.generalLedgerPrint', compact(
+                'listPejabat',
+                'bulan1',
+                'bulan2',
+                'tahun',
+                'namaCabang',
+                'namaProyek',
+                'listData'
+            ));
+        }
+
         if ($pdf != '') {
 
             // qrcode dari nama pejabat
