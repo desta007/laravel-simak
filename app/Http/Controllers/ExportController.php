@@ -2107,6 +2107,7 @@ class ExportController extends Controller
                 'listPejabat',
                 'bulan',
                 'tahun',
+                'id_cabang',
                 'namaCabang',
                 'namaProyek',
                 'listData10x',
@@ -3260,6 +3261,7 @@ class ExportController extends Controller
                 'bulan1',
                 'bulan2',
                 'tahun',
+                'id_cabang',
                 'namaCabang',
                 'namaProyek',
                 'listData40x',
@@ -3484,6 +3486,7 @@ class ExportController extends Controller
                 'bulan1',
                 'bulan2',
                 'tahun',
+                'id_cabang',
                 'namaCabang',
                 'namaProyek',
                 'listData'
