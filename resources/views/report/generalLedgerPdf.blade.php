@@ -25,6 +25,7 @@
     @else
         <img src="{{ storage_path('app/public/ptsam.jpg') }}" alt="" width="70" height="70">
         <img src="{{ storage_path('app/public/cvnimo.jpg') }}" alt="" width="70" height="70">
+        <br>
     @endif
 
     General Ledger {{ date('F', mktime(0, 0, 0, $bulan1, 1)) }} s.d. {{ date('F', mktime(0, 0, 0, $bulan2, 1)) }}
