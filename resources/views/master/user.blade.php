@@ -28,7 +28,7 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Form Data User Management xxx</h3>
+                            <h3 class="card-title">Form Data User Management</h3>
                             <div class="section-header-button float-right">
                                 <button class="btn btn-info" id="addData"
                                     onclick="window.location.href='{{ route('user.create') }}'">
