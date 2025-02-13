@@ -22,6 +22,9 @@
     @elseif ($id_cabang == 3)
         <img src="{{ storage_path('app/public/cvnimo.jpg') }}" alt="" width="70" height="70">
         <br>
+    @else
+        <img src="{{ storage_path('app/public/ptsam.jpg') }}" alt="" width="70" height="70">
+        <img src="{{ storage_path('app/public/cvnimo.jpg') }}" alt="" width="70" height="70">
     @endif
 
     Laporan Neraca {{ date('F', mktime(0, 0, 0, $bulan, 1)) }} {{ $tahun }}<br>
