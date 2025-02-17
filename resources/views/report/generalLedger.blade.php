@@ -131,8 +131,8 @@
                                         class="btn btn-secondary">Print</button>&nbsp;
                                     <button type="submit" name="pdf" value="pdf"
                                         class="btn btn-secondary">PDF</button>&nbsp;
-                                    <button type="submit" name="excel" value="excel" class="btn btn-secondary">
-                                        Excel</button>
+                                    {{-- <button type="submit" name="excel" value="excel" class="btn btn-secondary">
+                                        Excel</button> --}}
                                 </form>
                             </div>
 

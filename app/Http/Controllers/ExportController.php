@@ -47,18 +47,53 @@ class ExportController extends Controller
                 $namaProyek = 'All';
         }
 
+        $dataExcel[] = [
+            'id_cabang' => $id_cabang
+        ];
         // ----------- START PERHITUNGAN, NANTI DITAMPUNG DI ARRAY GLOBAL UTK VIEW DI LAYAR/PDF/EXCEL ------------------
-        $dataExcel[] = [
-            'Judul' => 'Laporan Neraca ' . date('F', mktime(0, 0, 0, $bulan, 1)) . ' ' . $tahun
-        ];
+        if ($id_cabang != '') {
+            $dataExcel[] = [
+                'A' => '', // Empty space for image
+                'B' => '', // Empty space for image
+                'C' => 'Laporan Neraca ' . date('F', mktime(0, 0, 0, $bulan, 1)) . ' ' . $tahun
+            ];
 
-        $dataExcel[] = [
-            'Judul' => 'Cabang: ' . $namaCabang
-        ];
+            $dataExcel[] = [
+                'A' => '',
+                'B' => '',
+                'C' => 'Cabang: ' . $namaCabang
+            ];
 
-        $dataExcel[] = [
-            'Judul' => 'Proyek: ' . $namaProyek
-        ];
+            $dataExcel[] = [
+                'A' => '',
+                'B' => '',
+                'C' => 'Proyek: ' . $namaProyek
+            ];
+        } else {
+            $dataExcel[] = [
+                'A' => '', // Empty space for image
+                'B' => '', // Empty space for image
+                'C' => '', // Empty space for image
+                // 'D' => '', // Empty space for image
+                'D' => 'Laporan Neraca ' . date('F', mktime(0, 0, 0, $bulan, 1)) . ' ' . $tahun
+            ];
+
+            $dataExcel[] = [
+                'A' => '',
+                'B' => '',
+                'C' => '',
+                // 'D' => '',
+                'D' => 'Cabang: ' . $namaCabang
+            ];
+
+            $dataExcel[] = [
+                'A' => '',
+                'B' => '',
+                'C' => '',
+                // 'D' => '',
+                'D' => 'Proyek: ' . $namaProyek
+            ];
+        }
 
         $dataExcel[] = [
             'Judul' => ''
@@ -2174,18 +2209,67 @@ class ExportController extends Controller
                 $namaProyek = 'All';
         }
 
+        $dataExcel[] = [
+            'id_cabang' => $id_cabang
+        ];
+
         // ----------- START PERHITUNGAN, NANTI DITAMPUNG DI ARRAY GLOBAL UTK VIEW DI LAYAR/PDF/EXCEL ------------------
-        $dataExcel[] = [
-            'Judul' => 'Laporan Laba/Rugi ' . date('F', mktime(0, 0, 0, $bulan1, 1)) . ' s.d. ' . date('F', mktime(0, 0, 0, $bulan2, 1)) . ' ' . $tahun
-        ];
 
-        $dataExcel[] = [
-            'Judul' => 'Cabang: ' . $namaCabang
-        ];
+        if ($id_cabang != '') {
+            $dataExcel[] = [
+                'A' => '', // Empty space for image
+                'B' => '', // Empty space for image
+                'C' => 'Laporan Laba/Rugi ' . date('F', mktime(0, 0, 0, $bulan1, 1)) . ' s.d. ' . date('F', mktime(0, 0, 0, $bulan2, 1)) . ' ' . $tahun
+            ];
 
-        $dataExcel[] = [
-            'Judul' => 'Proyek: ' . $namaProyek
-        ];
+            $dataExcel[] = [
+                'A' => '',
+                'B' => '',
+                'C' => 'Cabang: ' . $namaCabang
+            ];
+
+            $dataExcel[] = [
+                'A' => '',
+                'B' => '',
+                'C' => 'Proyek: ' . $namaProyek
+            ];
+        } else {
+            $dataExcel[] = [
+                'A' => '', // Empty space for image
+                'B' => '', // Empty space for image
+                'C' => '', // Empty space for image
+                // 'D' => '', // Empty space for image
+                'D' => 'Laporan Laba/Rugi ' . date('F', mktime(0, 0, 0, $bulan1, 1)) . ' s.d. ' . date('F', mktime(0, 0, 0, $bulan2, 1)) . ' ' . $tahun
+            ];
+
+            $dataExcel[] = [
+                'A' => '',
+                'B' => '',
+                'C' => '',
+                // 'D' => '',
+                'D' => 'Cabang: ' . $namaCabang
+            ];
+
+            $dataExcel[] = [
+                'A' => '',
+                'B' => '',
+                'C' => '',
+                // 'D' => '',
+                'D' => 'Proyek: ' . $namaProyek
+            ];
+        }
+
+        // $dataExcel[] = [
+        //     'Judul' => 'Laporan Laba/Rugi ' . date('F', mktime(0, 0, 0, $bulan1, 1)) . ' s.d. ' . date('F', mktime(0, 0, 0, $bulan2, 1)) . ' ' . $tahun
+        // ];
+
+        // $dataExcel[] = [
+        //     'Judul' => 'Cabang: ' . $namaCabang
+        // ];
+
+        // $dataExcel[] = [
+        //     'Judul' => 'Proyek: ' . $namaProyek
+        // ];
 
         $dataExcel[] = [
             'Judul' => ''
