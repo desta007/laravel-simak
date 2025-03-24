@@ -109,10 +109,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('labaRugi', [ReportController::class, 'labaRugi'])->name('labaRugi');
     Route::post('labaRugiSearch', [ReportController::class, 'labaRugiSearch'])->name('labaRugiSearch');
 
+    // 20-03-2025
+    Route::get('resumeKeuanganProyek', [ReportController::class, 'resumeKeuanganProyek'])->name('resumeKeuanganProyek');
+    Route::post('resumeKeuanganProyekSearch', [ReportController::class, 'resumeKeuanganProyekSearch'])->name('resumeKeuanganProyekSearch');
+
     Route::get('exportNeraca', [ExcelExportController::class, 'exportNeraca'])->name('exportNeraca');
     Route::post('neracaExport', [ExportController::class, 'neracaExport'])->name('neracaExport');
     Route::post('labaRugiExport', [ExportController::class, 'labaRugiExport'])->name('labaRugiExport');
     Route::post('generalLedgerExport', [ExportController::class, 'generalLedgerExport'])->name('generalLedgerExport');
+    Route::post('resumeKeuanganProyekExport', [ExportController::class, 'resumeKeuanganProyekExport'])->name('resumeKeuanganProyekExport');
 
     // 17-10-2024
     Route::get('hitungSessionJumlah', [TransaksiController::class, 'hitungSessionByJenis'])->name('hitungSessionJumlah');

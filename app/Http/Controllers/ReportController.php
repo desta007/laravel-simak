@@ -2241,4 +2241,549 @@ class ReportController extends Controller
             'listData32x',
         ));
     }
+
+    // 23-03-2025 resume lap keu proyek
+    public function resumeKeuanganProyek()
+    {
+        $bulan1 = 1;
+        $bulan2 = Carbon::now()->month;
+        $tahun = Carbon::now()->year;
+
+        $id_group_user = auth()->user()->id_group_user;
+        $id_user = auth()->user()->id;
+        $id_cabang = auth()->user()->id_cabang;
+
+        // get list cabang by group user
+        if ($id_group_user == 1) {
+            // admin
+            $cabangs = Cabang::all();
+            $proyeks = Proyek::all();
+            $id_proyek = 'all';
+        } else if ($id_group_user == 2) {
+            // cabang
+            $cabangs = Cabang::where('id', $id_cabang)->get();
+            $proyeks = Proyek::where('id_cabang', '=', $id_cabang)->get();
+            $id_proyek = 'all';
+        } else {
+            // proyek
+            $cabangs = Cabang::where('id', $id_cabang)->get();
+
+            $proyeks = Proyek::select('proyeks.*')
+                ->join('user_proyeks', 'proyeks.id', '=', 'user_proyeks.id_proyek')
+                ->where('user_proyeks.id_user', $id_user)->get();
+
+            $proyek_first = Proyek::select('proyeks.*')
+                ->join('user_proyeks', 'proyeks.id', '=', 'user_proyeks.id_proyek')
+                ->where('user_proyeks.id_user', $id_user)->first();
+
+            $id_proyek = $proyek_first['id'];
+        }
+
+        $isView = '';
+        return view('report.resumeKeuanganProyek', compact('id_group_user', 'id_cabang', 'id_proyek', 'cabangs', 'proyeks', 'bulan1', 'bulan2', 'tahun', 'isView'));
+    }
+
+    // 23-03-2025 search
+    public function resumeKeuanganProyekSearch(Request $request)
+    {
+        $id_group_user = auth()->user()->id_group_user;
+        $id_user = auth()->user()->id;
+
+        $bulan1 = $request->input('bulan1');
+        $bulan2 = $request->input('bulan2');
+        $tahun = $request->input('tahun');
+
+        $id_cabang = $request->input('id_cabang');
+        $id_proyek = $request->input('id_proyek');
+
+        // echo $bulan1 . " " . $bulan2 . " " . $tahun . " " . $id_cabang . " " . $id_proyek;
+        // die();
+
+        // get list cabang by group user
+        if ($id_group_user == 1) {
+            // admin
+            $cabangs = Cabang::all();
+            $proyeks = Proyek::all();
+            //$id_proyek = 'all';
+        } else if ($id_group_user == 2) {
+            // cabang
+            $cabangs = Cabang::where('id', $id_cabang)->get();
+            $proyeks = Proyek::where('id_cabang', '=', $id_cabang)->get();
+            //$id_proyek = 'all';
+        } else {
+            // proyek
+            $cabangs = Cabang::where('id', $id_cabang)->get();
+
+            $proyeks = Proyek::select('proyeks.*')
+                ->join('user_proyeks', 'proyeks.id', '=', 'user_proyeks.id_proyek')
+                ->where('user_proyeks.id_user', $id_user)->get();
+
+            $proyek_first = Proyek::select('proyeks.*')
+                ->join('user_proyeks', 'proyeks.id', '=', 'user_proyeks.id_proyek')
+                ->where('user_proyeks.id_user', $id_user)->first();
+        }
+
+        $listAkun1 = ['1', '10', '11', '12', '13', '14', '15', '16', '18'];
+        $listNamaAkun1 = ['Aset', 'Kas', 'Bank', 'Piutang', 'Piutang Pajak', 'Persediaan', 'Tagbrut', 'Transitoris', 'Aktiva'];
+        $listAkun2 = ['2', '20', '22', '23', '24', '25', '27'];
+        $listNamaAkun2 = ['Utang', 'Utang', 'Utang Pajak', 'Antisipasi', 'Utang Jangka Pendek Lain', 'Utang Pada Induk', 'R/K'];
+        $listAkun3 = ['3', '310', '320'];
+        $listNamaAkun3 = ['Laba', 'Laba/Rugi Tahun Lalu', 'Laba/Rugi Tahun Berjalan'];
+
+        // listAkun1
+        // get saldo_akuns per bulan
+        // -------------------------------------------------------------------
+        $index = 0;
+        foreach ($listAkun1 as $akun1) {
+            $detailSaldoPerBulan = array();
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $jumlah = 0;
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($akun1, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $akun1 . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                }
+
+                $detailSaldoPerBulan[] = array(
+                    'bulan' => $i,
+                    'saldo' => $jumlah
+                );
+            }
+
+            $listDataAkun1[] = array(
+                'kode' => $akun1,
+                'uraian' => $listNamaAkun1[$index],
+                'detail_saldo_perbulan' => $detailSaldoPerBulan
+            );
+            $index++;
+        }
+
+        // listAkun2
+        // get saldo_akuns per bulan
+        // -------------------------------------------------------------------
+        $index = 0;
+        foreach ($listAkun2 as $akun2) {
+
+            $detailSaldoPerBulan = array();
+
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $jumlah = 0;
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($akun2, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $akun2 . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                }
+
+                $detailSaldoPerBulan[] = array(
+                    'bulan' => $i,
+                    'saldo' => $jumlah
+                );
+            }
+
+            $listDataAkun2[] = array(
+                'kode' => $akun2,
+                'uraian' => $listNamaAkun2[$index],
+                'detail_saldo_perbulan' => $detailSaldoPerBulan
+            );
+            $index++;
+        }
+
+        // listAkun3
+        // get saldo_akuns per bulan
+        // -------------------------------------------------------------------
+        $index = 0;
+        foreach ($listAkun3 as $akun3) {
+
+            $detailSaldoPerBulan = array();
+
+            for ($i = $bulan1; $i <= $bulan2; $i++) {
+                $jumlah = 0;
+                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->whereHas('kodePerkiraan', function ($query) use ($akun3, $id_cabang, $id_proyek) {
+                        $query->where('kode', 'like', $akun3 . '%');
+                        if ($id_cabang != '')
+                            $query->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $query->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($listAkunSaldo as $akunnya) {
+                    $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                }
+
+                $detailSaldoPerBulan[] = array(
+                    'bulan' => $i,
+                    'saldo' => $jumlah
+                );
+            }
+
+            $listDataAkun3[] = array(
+                'kode' => $akun3,
+                'uraian' => $listNamaAkun3[$index],
+                'detail_saldo_perbulan' => $detailSaldoPerBulan
+            );
+            $index++;
+        }
+
+        // Akun 4
+        $detailSaldoPerBulan = array();
+        for ($i = $bulan1; $i <= $bulan2; $i++) {
+            $jumlah = 0;
+            $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                ->where('tahun', $tahun)
+                ->where('bulan', $i)
+                ->where('is_saldo_awal', 0)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek) {
+                    $query->where('kode', 'like', '4%');
+                    if ($id_cabang != '')
+                        $query->where('id_cabang', $id_cabang);
+                    if ($id_proyek != 'all')
+                        $query->where('id_proyek', $id_proyek);
+                })->get();
+
+            foreach ($listAkunSaldo as $akunnya) {
+                $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+            }
+
+            $detailSaldoPerBulan[] = array(
+                'bulan' => $i,
+                'saldo' => $jumlah
+            );
+        }
+
+        $listDataAkun4 = array(
+            'kode' => '4',
+            'uraian' => 'Pendapatan Usaha',
+            'detail_saldo_perbulan' => $detailSaldoPerBulan
+        );
+
+        // Akun 5
+        $detailSaldoPerBulan = array();
+        for ($i = $bulan1; $i <= $bulan2; $i++) {
+            $jumlah = 0;
+            $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                ->where('tahun', $tahun)
+                ->where('bulan', $i)
+                ->where('is_saldo_awal', 0)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek) {
+                    $query->where('kode', 'like', '5%');
+                    if ($id_cabang != '')
+                        $query->where('id_cabang', $id_cabang);
+                    if ($id_proyek != 'all')
+                        $query->where('id_proyek', $id_proyek);
+                })->get();
+
+            foreach ($listAkunSaldo as $akunnya) {
+                $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+            }
+
+            $detailSaldoPerBulan[] = array(
+                'bulan' => $i,
+                'saldo' => $jumlah
+            );
+        }
+
+        $listDataAkun5 = array(
+            'kode' => '5',
+            'uraian' => 'Biaya Konstruksi',
+            'detail_saldo_perbulan' => $detailSaldoPerBulan
+        );
+
+        // Akun 6
+        $detailSaldoPerBulan = array();
+        for ($i = $bulan1; $i <= $bulan2; $i++) {
+            $jumlah = 0;
+            $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                ->where('tahun', $tahun)
+                ->where('bulan', $i)
+                ->where('is_saldo_awal', 0)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek) {
+                    $query->where('kode', 'like', '6%');
+                    if ($id_cabang != '')
+                        $query->where('id_cabang', $id_cabang);
+                    if ($id_proyek != 'all')
+                        $query->where('id_proyek', $id_proyek);
+                })->get();
+
+            foreach ($listAkunSaldo as $akunnya) {
+                $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+            }
+
+            $detailSaldoPerBulan[] = array(
+                'bulan' => $i,
+                'saldo' => $jumlah
+            );
+        }
+
+        $listDataAkun6 = array(
+            'kode' => '6',
+            'uraian' => 'BTL',
+            'detail_saldo_perbulan' => $detailSaldoPerBulan
+        );
+
+        // Akun 7
+        $detailSaldoPerBulan = array();
+        for ($i = $bulan1; $i <= $bulan2; $i++) {
+            $jumlah = 0;
+            $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                ->where('tahun', $tahun)
+                ->where('bulan', $i)
+                ->where('is_saldo_awal', 0)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek) {
+                    $query->where('kode', 'like', '7%');
+                    if ($id_cabang != '')
+                        $query->where('id_cabang', $id_cabang);
+                    if ($id_proyek != 'all')
+                        $query->where('id_proyek', $id_proyek);
+                })->get();
+
+            foreach ($listAkunSaldo as $akunnya) {
+                $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+            }
+
+            $detailSaldoPerBulan[] = array(
+                'bulan' => $i,
+                'saldo' => $jumlah
+            );
+        }
+
+        $listDataAkun7 = array(
+            'kode' => '7',
+            'uraian' => 'Hasil Lain-Lain',
+            'detail_saldo_perbulan' => $detailSaldoPerBulan
+        );
+
+        // Akun 8
+        $detailSaldoPerBulan = array();
+        for ($i = $bulan1; $i <= $bulan2; $i++) {
+            $jumlah = 0;
+            $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                ->where('tahun', $tahun)
+                ->where('bulan', $i)
+                ->where('is_saldo_awal', 0)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek) {
+                    $query->where('kode', 'like', '8%');
+                    if ($id_cabang != '')
+                        $query->where('id_cabang', $id_cabang);
+                    if ($id_proyek != 'all')
+                        $query->where('id_proyek', $id_proyek);
+                })->get();
+
+            foreach ($listAkunSaldo as $akunnya) {
+                $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+            }
+
+            $detailSaldoPerBulan[] = array(
+                'bulan' => $i,
+                'saldo' => $jumlah
+            );
+        }
+
+        $listDataAkun8 = array(
+            'kode' => '8',
+            'uraian' => 'Biaya Lain-Lain',
+            'detail_saldo_perbulan' => $detailSaldoPerBulan
+        );
+
+        // Akun 9
+        $detailSaldoPerBulan = array();
+        for ($i = $bulan1; $i <= $bulan2; $i++) {
+            $jumlah = 0;
+            $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                ->where('tahun', $tahun)
+                ->where('bulan', $i)
+                ->where('is_saldo_awal', 0)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek) {
+                    $query->where('kode', 'like', '9%');
+                    if ($id_cabang != '')
+                        $query->where('id_cabang', $id_cabang);
+                    if ($id_proyek != 'all')
+                        $query->where('id_proyek', $id_proyek);
+                })->get();
+
+            foreach ($listAkunSaldo as $akunnya) {
+                $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+            }
+
+            $detailSaldoPerBulan[] = array(
+                'bulan' => $i,
+                'saldo' => $jumlah
+            );
+        }
+
+        $listDataAkun9 = array(
+            'kode' => '9',
+            'uraian' => 'Laba',
+            'detail_saldo_perbulan' => $detailSaldoPerBulan
+        );
+
+        // Akun 127
+        $detailSaldoPerBulan = array();
+        for ($i = $bulan1; $i <= $bulan2; $i++) {
+            $jumlah = 0;
+            $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                ->where('tahun', $tahun)
+                ->where('bulan', $i)
+                ->where('is_saldo_awal', 0)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek) {
+                    $query->where('kode', 'like', '127%');
+                    if ($id_cabang != '')
+                        $query->where('id_cabang', $id_cabang);
+                    if ($id_proyek != 'all')
+                        $query->where('id_proyek', $id_proyek);
+                })->get();
+
+            foreach ($listAkunSaldo as $akunnya) {
+                $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+            }
+
+            $detailSaldoPerBulan[] = array(
+                'bulan' => $i,
+                'saldo' => $jumlah
+            );
+        }
+
+        $listDataAkun127 = array(
+            'kode' => '127',
+            'uraian' => 'Piutang JO',
+            'detail_saldo_perbulan' => $detailSaldoPerBulan
+        );
+
+        // Akun 172
+        $detailSaldoPerBulan = array();
+        for ($i = $bulan1; $i <= $bulan2; $i++) {
+            $jumlah = 0;
+            $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                ->where('tahun', $tahun)
+                ->where('bulan', $i)
+                ->where('is_saldo_awal', 0)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek) {
+                    $query->where('kode', 'like', '172%');
+                    if ($id_cabang != '')
+                        $query->where('id_cabang', $id_cabang);
+                    if ($id_proyek != 'all')
+                        $query->where('id_proyek', $id_proyek);
+                })->get();
+
+            foreach ($listAkunSaldo as $akunnya) {
+                $jumlah += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+            }
+
+            $detailSaldoPerBulan[] = array(
+                'bulan' => $i,
+                'saldo' => $jumlah
+            );
+        }
+
+        $listDataAkun172 = array(
+            'kode' => '172',
+            'uraian' => 'Piutang Laba',
+            'detail_saldo_perbulan' => $detailSaldoPerBulan
+        );
+
+        // Akun 242
+        $detailSaldoPerBulan = array();
+        for ($i = $bulan1; $i <= $bulan2; $i++) {
+            $jumlah = 0;
+            $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                ->where('tahun', $tahun)
+                ->where('bulan', $i)
+                ->where('is_saldo_awal', 0)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek) {
+                    $query->where('kode', 'like', '242%');
+                    if ($id_cabang != '')
+                        $query->where('id_cabang', $id_cabang);
+                    if ($id_proyek != 'all')
+                        $query->where('id_proyek', $id_proyek);
+                })->get();
+
+            foreach ($listAkunSaldo as $akunnya) {
+                $jumlah += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+            }
+
+            $detailSaldoPerBulan[] = array(
+                'bulan' => $i,
+                'saldo' => $jumlah
+            );
+        }
+
+        $listDataAkun242 = array(
+            'kode' => '242',
+            'uraian' => 'Hutang ke JO',
+            'detail_saldo_perbulan' => $detailSaldoPerBulan
+        );
+
+        // -------------------------------------------------------------------
+
+        // 02-11-2024 qrcode dari nama pejabat
+        $pejabats = Pejabat::where('is_active', 1)->where('is_ttd_laporan_neraca', 1)
+            ->orderBy('id', 'asc')->get();
+
+        $listPejabat = [];
+        if (!$pejabats->isEmpty()) {
+            foreach ($pejabats as $pejabat) {
+                $qrCode = QrCode::size(100)->generate('Disahkan oleh: ' . $pejabat->nama . ' (' . $pejabat->jabatan . ')');
+                $listPejabat[] = array(
+                    'nama' => $pejabat->nama,
+                    'jabatan' => $pejabat->jabatan,
+                    'qrCode' => $qrCode
+                );
+            }
+        }
+
+        $isView = 1;
+
+        $jumBulan = 0;
+        for ($i = $bulan1; $i <= $bulan2; $i++) {
+            $jumBulan++;
+        }
+        return view('report.resumeKeuanganProyek', compact(
+            'listPejabat',
+            'id_group_user',
+            'id_cabang',
+            'id_proyek',
+            'cabangs',
+            'proyeks',
+            'bulan1',
+            'bulan2',
+            'tahun',
+            'isView',
+            'jumBulan',
+            'listDataAkun1',
+            'listDataAkun2',
+            'listDataAkun3',
+            'listDataAkun4',
+            'listDataAkun5',
+            'listDataAkun6',
+            'listDataAkun7',
+            'listDataAkun8',
+            'listDataAkun9',
+            'listDataAkun127',
+            'listDataAkun172',
+            'listDataAkun242'
+        ));
+    }
 }

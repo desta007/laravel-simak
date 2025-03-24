@@ -242,6 +242,13 @@
                                 <p>Laporan Laba/Rugi</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('resumeKeuanganProyek') }}"
+                                class="nav-link {{ request()->is('resumeKeuanganProyek*') ? 'active' : '' }}">
+                                <i class="fas fa-chart-line nav-icon"></i>
+                                <p>Resume Lap Keu Proyek</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 {{-- <li class="nav-item">
