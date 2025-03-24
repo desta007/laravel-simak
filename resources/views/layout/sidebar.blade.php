@@ -203,7 +203,7 @@
                 <li class="nav-header">REPORT</li>
 
                 <li
-                    class="nav-item {{ request()->is('bukuTambahan*') || request()->is('neraca*') || request()->is('labaRugi*') || request()->is('generalLedger*') ? 'menu-open' : '' }}">
+                    class="nav-item {{ request()->is('bukuTambahan*') || request()->is('neraca*') || request()->is('labaRugi*') || request()->is('generalLedger*') || request()->is('resumeKeuanganProyek*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('bukuTambahan*') ? 'active' : '' }}">
                         <i class="nav-icon far fa-envelope"></i>
                         <p>
