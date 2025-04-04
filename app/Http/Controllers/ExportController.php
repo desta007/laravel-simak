@@ -3445,25 +3445,27 @@ class ExportController extends Controller
             }
 
             // 2. hitung total dari jan s/d bulan1
-            // get saldo tiap bulan
-            for ($i = 1; $i <= $bulan1; $i++) {
-                $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
-                    ->where('tahun', $tahun)
-                    ->where('bulan', $i)
-                    ->where('is_saldo_awal', 0)
-                    ->whereHas('kodePerkiraan', function ($query) use ($akun, $id_cabang, $id_proyek) {
-                        $query->where('kode', $akun->kode);
-                        if ($id_cabang != '')
-                            $query->where('id_cabang', $id_cabang);
-                        if ($id_proyek != 'all')
-                            $query->where('id_proyek', $id_proyek);
-                    })->get();
+            // get saldo tiap bulan. modif 04-04-2025 tambahin if $bulan2 != 1
+            if ($bulan2 != 1) {
+                for ($i = 1; $i <= $bulan1; $i++) {
+                    $listAkunSaldo = SaldoAkun::with('kodePerkiraan')
+                        ->where('tahun', $tahun)
+                        ->where('bulan', $i)
+                        ->where('is_saldo_awal', 0)
+                        ->whereHas('kodePerkiraan', function ($query) use ($akun, $id_cabang, $id_proyek) {
+                            $query->where('kode', $akun->kode);
+                            if ($id_cabang != '')
+                                $query->where('id_cabang', $id_cabang);
+                            if ($id_proyek != 'all')
+                                $query->where('id_proyek', $id_proyek);
+                        })->get();
 
-                foreach ($listAkunSaldo as $akunnya) {
-                    if (substr($akunnya->kodePerkiraan->kode, 0, 1) == '1' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '5' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '6' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '8') {
-                        $jumlahSaldoAwal += $akunnya->saldo_debet - $akunnya->saldo_kredit;
-                    } else {
-                        $jumlahSaldoAwal += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                    foreach ($listAkunSaldo as $akunnya) {
+                        if (substr($akunnya->kodePerkiraan->kode, 0, 1) == '1' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '5' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '6' || substr($akunnya->kodePerkiraan->kode, 0, 1) == '8') {
+                            $jumlahSaldoAwal += $akunnya->saldo_debet - $akunnya->saldo_kredit;
+                        } else {
+                            $jumlahSaldoAwal += $akunnya->saldo_kredit - $akunnya->saldo_debet;
+                        }
                     }
                 }
             }
