@@ -1,25 +1,21 @@
 @extends('layout.main')
 
 @section('content')
-    <!-- Content Wrapper. Contains page content -->
-
-    <!-- Content Header (Page header) -->
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0">Master Kode Perkiraan</h1>
-                </div><!-- /.col -->
+                </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
                         <li class="breadcrumb-item active">Kode Perkiraan</li>
                     </ol>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- /.content-header -->
 
     <!-- Main content -->
     <section class="content">
@@ -31,16 +27,24 @@
                             <h3 class="card-title">Form Data Kode Perkiraan</h3>
                             <div class="section-header-button float-right">
                                 <button class="btn btn-info" id="addData">
-                                    <i class="fa fa-plus">
-                                        <span>Tambah Data</span>
-                                    </i>
+                                    <i class="fa fa-plus"></i> <span>Tambah Data</span>
                                 </button>
                             </div>
-
                         </div>
-                        <!-- /.card-header -->
+
                         <div class="card-body">
-                            <table id="list_kodePerkiraan" class="table table-bordered table-striped">
+                            <!-- Search Form -->
+                            <form method="GET" action="{{ route('kodePerkiraan.index') }}" class="mb-3">
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control"
+                                        placeholder="Cari nama atau kode perkiraan..." value="{{ request('search') }}">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="submit">Cari</button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <table class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -54,12 +58,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($kodePerkiraans as $kodePerkiraan)
+                                    @forelse ($kodePerkiraans as $index => $kodePerkiraan)
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>
-                                                {{ $kodePerkiraan->cabang->nama }}
-                                            </td>
+                                            <td>{{ $kodePerkiraans->firstItem() + $index }}</td>
+                                            <td>{{ $kodePerkiraan->cabang->nama }}</td>
                                             <td>
                                                 @if ($kodePerkiraan->id_proyek != '0')
                                                     {{ $kodePerkiraan->proyek->nama . ' (WO: ' . $kodePerkiraan->proyek->nomor_wo . ')' }}
@@ -73,62 +75,48 @@
                                             <td>
                                                 {{ '(' . $kodePerkiraan->kode . ') ' . $kodePerkiraan->nama }}
                                             </td>
-                                            <td>
-                                                {{ $kodePerkiraan->keterangan }}
-                                            </td>
+                                            <td>{{ $kodePerkiraan->keterangan }}</td>
                                             <td>{{ $kodePerkiraan->updated_at }}</td>
                                             <td>
                                                 <div class="d-flex justify-content-center">
                                                     <a href="{{ route('kodePerkiraan.edit', $kodePerkiraan->id) }}"
-                                                        class="btn-sm btn-info btn">
-                                                        Edit
-                                                    </a>
+                                                        class="btn btn-sm btn-info">Edit</a>
                                                     &nbsp;
                                                     <a href="{{ route('kodePerkiraan.destroy', $kodePerkiraan->id) }}"
                                                         class="btn btn-sm btn-danger" data-confirm-delete="true">Delete</a>
                                                 </div>
-
                                             </td>
                                         </tr>
-                                    @endforeach
-
+                                    @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center">Data tidak ditemukan.</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
+
+                            <!-- Pagination with query string -->
+                            <div class="mt-3 float-right">
+                                {{ $kodePerkiraans->appends(['search' => request('search')])->links() }}
+                            </div>
                         </div>
-                        <!-- /.card-body -->
                     </div>
-                    <!-- /.card -->
                 </div>
             </div>
-            <!-- /.row -->
-
-
-        </div><!-- /.container-fluid -->
+        </div>
     </section>
-    <!-- /.content -->
 
     <div class="tampilData" style="display: none"></div>
 
     <script>
-        $(function() {
-            $("#list_kodePerkiraan").DataTable({
-                "responsive": true,
-                "lengthChange": false,
-                "autoWidth": false,
-                "buttons": ["pdf", "print"]
-            }).buttons().container().appendTo('#list_kodePerkiraan_wrapper .col-md-6:eq(0)');
-        });
-
         $('#addData').click(function(e) {
             e.preventDefault();
-
             $.ajax({
                 url: "{{ route('addModalKodePerkiraan') }}",
                 success: function(response) {
                     $('.tampilData').html(response).show();
                     $('#addModal').modal('show');
                 }
-
             });
         });
     </script>

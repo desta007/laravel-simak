@@ -16,7 +16,7 @@ class KodePerkiraanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         session()->forget('totalAmountD');
 
@@ -24,24 +24,35 @@ class KodePerkiraanController extends Controller
         $id_user = auth()->user()->id;
         $id_cabang = auth()->user()->id_cabang;
 
-        if ($id_group_user == 1) {
-            // $kodePerkiraans = KodePerkiraan::orderBy('created_at', 'desc')->get();
-            $kodePerkiraans = KodePerkiraan::orderBy('kode')->get();
-        } else {
-            if ($id_group_user == 2) {
-                $kodePerkiraans = KodePerkiraan::where('id_cabang', $id_cabang)
-                    ->where('id_proyek', 0)
-                    // ->orderBy('created_at', 'desc')->get();
-                    ->orderBy('kode')->get();
-            } else if ($id_group_user == 3) {
-                $kodePerkiraans = KodePerkiraan::whereIn('id_proyek', function ($query) use ($id_user) {
-                    $query->select('id_proyek')
-                        ->from('user_proyeks')
-                        ->where('id_user', $id_user);
-                })->orderBy('kode')->get();
-            }
+        $search = $request->input('search');
+
+        $query = KodePerkiraan::with(['cabang', 'proyek', 'groupaccount'])->orderBy('kode');
+
+        // Apply user group filters
+        if ($id_group_user == 2) {
+            $query->where('id_cabang', $id_cabang)->where('id_proyek', 0);
+        } elseif ($id_group_user == 3) {
+            $query->whereIn('id_proyek', function ($subquery) use ($id_user) {
+                $subquery->select('id_proyek')
+                    ->from('user_proyeks')
+                    ->where('id_user', $id_user);
+            });
         }
 
+        // Apply search filter (if provided)
+        if (!empty($search)) {
+            $search = strtolower($search);
+            $query->where(function ($q) use ($search) {
+                $q->whereRaw('LOWER(nama) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(kode) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(keterangan) LIKE ?', ["%{$search}%"]);
+            });
+        }
+
+        // Paginate results
+        $kodePerkiraans = $query->paginate(10);
+
+        // Alert dialog
         $title = 'Delete Data!';
         $text = "Apakah anda yakin akan menghapus data?";
         confirmDelete($title, $text);
