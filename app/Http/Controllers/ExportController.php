@@ -3412,7 +3412,7 @@ class ExportController extends Controller
             ->orderBy('kode', 'asc');
         //dd($listAkun->toSql());
 
-        $results = $listAkun->get();
+        $results = $listAkun->with(['cabang', 'groupAccount'])->get();
 
         $listData = array();
         foreach ($results as $akun) {
@@ -3509,6 +3509,8 @@ class ExportController extends Controller
                 $listData[] = array(
                     'kode' => $akun->kode,
                     'nama' => $akun->nama,
+                    'proyek' => $akun->proyek->nama ?? '-', // Get cabang name
+                    'group_account' => optional($akun->groupaccount)->nama ?? '-',
                     'saldo_awal' => $jumlahSaldoAwal,
                     'mutasi_debet' => $jumlahSaldoMutasiDebet,
                     'mutasi_kredit' => $jumlahSaldoMutasiKredit,
@@ -3516,6 +3518,13 @@ class ExportController extends Controller
                 );
             }
         }
+
+        // 14-07-2025
+        $groupedListData = collect($listData)->groupBy(function ($item) {
+            $prefix = substr($item['kode'], 0, 3);
+            $groupName = $item['group_account'] ?? 'Unknown';
+            return "{$prefix} | {$groupName}";
+        });
 
         // 15-11-2024
         if ($print != '') {
@@ -3544,7 +3553,8 @@ class ExportController extends Controller
                 'tahun',
                 'namaCabang',
                 'namaProyek',
-                'listData'
+                'listData',
+                'groupedListData'
             ));
         }
 
@@ -3575,7 +3585,8 @@ class ExportController extends Controller
                 'id_cabang',
                 'namaCabang',
                 'namaProyek',
-                'listData'
+                'listData',
+                'groupedListData'
             ));
             return $pdf->download('general_ledger.pdf');
         }
