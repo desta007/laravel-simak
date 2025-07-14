@@ -201,6 +201,8 @@ class ReportController extends Controller
                 $listData[] = array(
                     'kode' => $akun->kode,
                     'nama' => $akun->nama,
+                    'proyek' => $akun->proyek->nama ?? '-', // Get cabang name
+                    'group_account' => optional($akun->groupaccount)->nama ?? '-',
                     'saldo_awal' => $jumlahSaldoAwal,
                     'mutasi_debet' => $jumlahSaldoMutasiDebet,
                     'mutasi_kredit' => $jumlahSaldoMutasiKredit,
@@ -211,6 +213,12 @@ class ReportController extends Controller
         //die();
 
         $isView = 1;
+
+        $groupedListData = collect($listData)->groupBy(function ($item) {
+            $kodePrefix = substr($item['kode'], 0, 3);
+            $groupAccountName = $item['group_account'] ?? 'Unknown';
+            return "{$kodePrefix} | {$groupAccountName}";
+        });
 
         return view('report.generalLedger', compact(
             'id_group_user',
@@ -223,7 +231,8 @@ class ReportController extends Controller
             'tahun',
             'kodePerkiraan',
             'isView',
-            'listData'
+            'listData',
+            'groupedListData'
         ));
     }
 
