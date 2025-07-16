@@ -141,7 +141,7 @@
 
                                             </td>
                                             <td>
-                                                {{ $transaksi->no_urut_bukti }}<br><br>
+                                                {{ $transaksi->no_bukti }}<br><br>
                                                 {{ $transaksi->keterangan }}
                                             </td>
                                             <td style="white-space: nowrap">
