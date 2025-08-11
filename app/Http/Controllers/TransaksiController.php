@@ -429,6 +429,34 @@ class TransaksiController extends Controller
             'no_urut_bukti' => 'required'
         ]);
 
+        $totalDebet = 0;
+        $totalKredit = 0;
+        $jenisList = $request->input('jenis1', []);
+        $jumlahList = $request->input('jumlah1', []);
+
+        foreach ($jenisList as $idx => $jenis) {
+            $jumlah = (float)($jumlahList[$idx] ?? 0);
+            if ($jenis == 'D') {
+                $totalDebet += $jumlah;
+            } elseif ($jenis == 'K') {
+                $totalKredit += $jumlah;
+            }
+        }
+
+        if ($totalDebet !== $totalKredit) {
+            // Untuk AJAX request:
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Total Debet (' . number_format($totalDebet) . ') tidak sama dengan Total Kredit (' . number_format($totalKredit) . ')'
+                ], 422);
+            }
+
+            // Untuk normal request:
+            Alert::error('Tidak Balance!', 'Total Debet (' . number_format($totalDebet) . ') tidak sama dengan Total Kredit (' . number_format($totalKredit) . ')');
+            return back()->withInput();
+        }
+
         // ------------
         try {
             DB::beginTransaction();
@@ -474,6 +502,15 @@ class TransaksiController extends Controller
                         'jenis' => $jenis1[$i],
                         'jumlah' => $jumlah1[$i]
                     ]);
+                } else {
+                    // UPDATE jika id1 != 0
+                    $detail = TransaksiDetail::find($id1[$i]);
+                    if ($detail) {
+                        $detail->id_kode_perkiraan = $id_kode_perkiraan1[$i];
+                        $detail->jenis = $jenis1[$i];
+                        $detail->jumlah = $jumlah1[$i];
+                        $detail->save();
+                    }
                 }
             }
 

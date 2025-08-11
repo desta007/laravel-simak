@@ -12,18 +12,14 @@
 
                     <div class="form-group">
                         <label for="kode_perk">Kode Perkiraan</label>
-                        <select name="id_kode_perkiraan" class="form-control select2" id="id_kode_perkiraan">
+                        <select name="id_kode_perkiraan" class="form-control select2" id="id_kode_perkiraan"
+                            style="width:100%">
                             <option value="" selected>- Pilih Kode Perkiraan -</option>
-                            @foreach ($kodePerkiraans as $kodePerkiraan)
-                                <option value="{{ $kodePerkiraan->id }}">
-                                    {{ $kodePerkiraan->kode . ' - ' . $kodePerkiraan->nama }}</option>
-                            @endforeach
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="jenis">Jenis Transaksi</label>
-                        <select name="jenis" class="form-control" id="jenis"
-                            onchange="hitung_akumulasi(this.value);">
+                        <select name="jenis" class="form-control" id="jenis">
                             <option value="D">Debet (D)</option>
                             <option value="K">Kredit (K)</option>
                         </select>
@@ -54,6 +50,37 @@
             theme: 'bootstrap4'
         });
 
+        $('#id_kode_perkiraan').select2({
+            dropdownParent: $("#addModal"),
+            theme: 'bootstrap4',
+            minimumInputLength: 2,
+            ajax: {
+                url: "{{ route('ajaxSearchKodePerkiraan') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term, // search term
+                        id_cabang: $('#id_cabang').val(),
+                        id_proyek: $('#id_proyek').val()
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: $.map(data, function(item) {
+                            return {
+                                id: item.id,
+                                text: item.kode + ' - ' + item.nama
+                            }
+                        })
+                    };
+                },
+                cache: true
+            },
+            placeholder: '- Pilih Kode Perkiraan -',
+            allowClear: true
+        });
+
         $('#addDataButton').click(function() {
             // Get the form data
             var id_kode_perkiraan = $('#id_kode_perkiraan').val();
@@ -75,19 +102,28 @@
                     // Append the data to the table
                     counter++;
                     //console.log(counter);
-                    $('#dataTable tbody').append('<tr><td>' + counter +
-                        '</td><td><input type="hidden" name="id1[]" value="0"><input type="hidden" name="id_kode_perkiraan1[]" value="' +
-                        id_kode_perkiraan + '">' + selectedTextKode +
-                        '</td><td><input type="hidden" name="jenis1[]" value="' +
-                        jenis + '">' +
+                    $('#dataTable tbody').append('<tr data-row="' + counter + '"><td>' +
+                        counter +
+                        '</td><td class="kode-perkiraan-cell"><input type="hidden" name="id1[]" value="0"><input type="hidden" name="id_kode_perkiraan1[]" value="' +
+                        id_kode_perkiraan + '"><span class="kode-perkiraan-text">' +
+                        selectedTextKode +
+                        '</span><select class="form-control select2-inline" style="display:none; width:100%"></select></td><td class="jenis-cell"><input type="hidden" name="jenis1[]" value="' +
+                        jenis + '"><span class="jenis-text">' +
                         jenis +
-                        '</td><td><input type="hidden" name="jumlah1[]" value="' +
-                        jumlah + '">' +
+                        '</span><select class="form-control jenis-select" style="display:none;"><option value="D">D</option><option value="K">K</option></select></td><td class="jumlah-cell"><input type="hidden" name="jumlah1[]" value="' +
+                        jumlah + '"><span class="jumlah-text">' +
                         jumlahx +
-                        '</td><td><button class="btn-sm btn-danger delete-btn">Delete</button></td></tr>'
+                        '</span><input type="text" class="form-control jumlah-input" style="display:none; text-align:right;" value="' +
+                        jumlahx +
+                        '"></td><td><button type="button" class="btn-sm btn-primary edit-btn">Edit</button> <button type="button" class="btn-sm btn-success save-btn" style="display:none;">Save</button> <button type="button" class="btn-sm btn-danger delete-btn">Delete</button></td></tr>'
                     );
 
                     $('#counter').val(counter);
+
+                    // Update total balance setelah menambah data
+                    if (typeof hitungTotalBalance === 'function') {
+                        hitungTotalBalance();
+                    }
 
                     // Close the modal
                     $('#addModal').modal('hide');
@@ -113,7 +149,55 @@
                 hitung++;
             });
             $('#counter').val(hitung);
+
+            // Update total balance setelah menghapus data
+            if (typeof hitungTotalBalance === 'function') {
+                hitungTotalBalance();
+            }
         });
+
+        $('#jenis').change(function() {
+            var jenis = $(this).val();
+            if (jenis === 'K') {
+                // Hitung balance untuk Kredit
+                hitungBalanceKredit();
+            } else {
+                // Reset field jumlah untuk Debet
+                $('#jumlahx').val('0');
+                $('#jumlah').val('0');
+            }
+        });
+
+        function hitungBalanceKredit() {
+            var totalDebet = 0;
+            var totalKredit = 0;
+
+            // Hitung total dari tabel detail yang sudah ada
+            $('#dataTable tbody tr').each(function() {
+                var jenis = $(this).find('input[name="jenis1[]"]').val();
+                var jumlah = parseFloat($(this).find('input[name="jumlah1[]"]').val()) || 0;
+
+                if (jenis === 'D') {
+                    totalDebet += jumlah;
+                } else if (jenis === 'K') {
+                    totalKredit += jumlah;
+                }
+            });
+
+            // Hitung selisih untuk balance
+            var selisih = totalDebet - totalKredit;
+
+            // Jika total Debet > total Kredit, isi field dengan selisih
+            if (selisih > 0) {
+                var formattedAmount = addCommas(selisih.toString());
+                $('#jumlahx').val(formattedAmount);
+                $('#jumlah').val(selisih);
+            } else {
+                // Jika sudah balance atau Kredit lebih besar, kosongkan field
+                $('#jumlahx').val('0');
+                $('#jumlah').val('0');
+            }
+        }
     });
 
     // 17-10-2024
@@ -167,4 +251,25 @@
 
         $('#jumlah').val(b);
     }
+
+    // Handle Save button
+    $(document).on('click', '.save-btn', function() {
+        var $row = $(this).closest('tr');
+        // Hide select2 and its container, show text for kode perkiraan
+        $row.find('.select2-inline').hide();
+        $row.find('.select2-inline').next('.select2-container').hide();
+        $row.find('.kode-perkiraan-text').show();
+
+        // Hide select and show text for jenis
+        $row.find('.jenis-select').hide();
+        $row.find('.jenis-text').show();
+
+        // Hide input and show text for jumlah
+        $row.find('.jumlah-input').hide();
+        $row.find('.jumlah-text').show();
+
+        // Hide Save button, show Edit button
+        $(this).hide();
+        $row.find('.edit-btn').show();
+    });
 </script>

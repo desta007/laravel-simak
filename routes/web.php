@@ -122,4 +122,8 @@ Route::middleware(['auth'])->group(function () {
     // 17-10-2024
     Route::get('hitungSessionJumlah', [TransaksiController::class, 'hitungSessionByJenis'])->name('hitungSessionJumlah');
     Route::post('saveSessionJumlah', [TransaksiController::class, 'saveSessionByJenis'])->name('saveSessionJumlah');
+
+    // 24-07-2025
+    Route::get('/get-proyeks-by-cabang', [KodePerkiraanController::class, 'getProyeksByCabang'])->name('getProyeksByCabang');
+    Route::get('ajaxSearchKodePerkiraan', [KodePerkiraanController::class, 'ajaxSearch'])->name('ajaxSearchKodePerkiraan');
 });

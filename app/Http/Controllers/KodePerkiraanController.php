@@ -358,4 +358,43 @@ class KodePerkiraanController extends Controller
             return redirect()->route('saldoAwal');
         }
     }
+
+    // 24-07-2025
+    public function getProyeksByCabang(Request $request)
+    {
+        $cabangId = $request->input('cabang_id');
+
+        $proyeks = \App\Models\Proyek::where('id_cabang', $cabangId)
+            ->orderBy('nama')
+            ->get(['id', 'nama', 'nomor_wo']);
+
+        return response()->json($proyeks);
+    }
+
+    /**
+     * AJAX search for Kode Perkiraan (for Select2 remote)
+     */
+    public function ajaxSearch(Request $request)
+    {
+        $q = $request->input('q');
+        $id_cabang = $request->input('id_cabang');
+        $id_proyek = $request->input('id_proyek');
+
+        $query = KodePerkiraan::query();
+        if ($id_cabang) {
+            $query->where('id_cabang', $id_cabang);
+        }
+        if ($id_proyek) {
+            $query->where('id_proyek', $id_proyek);
+        }
+        if ($q) {
+            $query->where(function ($sub) use ($q) {
+                $sub->where('kode', 'like', "%$q%")
+                    ->orWhere('nama', 'like', "%$q%")
+                    ->orWhere('keterangan', 'like', "%$q%");
+            });
+        }
+        $results = $query->orderBy('kode')->limit(20)->get(['id', 'kode', 'nama']);
+        return response()->json($results);
+    }
 }
