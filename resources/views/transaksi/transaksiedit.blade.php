@@ -45,7 +45,7 @@
                                 <div class="row">
                                     <div class="col-md-6 form-group">
                                         <label for="cabang">Cabang</label>
-                                        <select name="id_cabang1" disabled class="form-control" id="id_cabang1">
+                                        <select name="id_cabang1" disabled class="form-control select2" id="id_cabang1">
                                             <option value="" @if ($transaksi->id_cabang == '') selected @endif>- Pilih
                                                 Cabang -</option>
                                             @foreach ($cabangs as $cabang)

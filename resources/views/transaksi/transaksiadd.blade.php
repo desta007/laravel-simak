@@ -44,7 +44,7 @@
                                 <div class="row">
                                     <div class="col-md-6 form-group">
                                         <label for="cabang">Cabang</label>
-                                        <select name="id_cabang1" class="form-control" id="id_cabang1">
+                                        <select name="id_cabang1" class="form-control select2" id="id_cabang1">
                                             <option value="" selected>- Pilih Cabang -</option>
                                             @foreach ($cabangs as $cabang)
                                                 <option value="{{ $cabang->id }}">{{ $cabang->nama }}</option>
