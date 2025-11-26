@@ -29,8 +29,7 @@
     @endif
 
     Laporan Neraca {{ date('F', mktime(0, 0, 0, $bulan, 1)) }} {{ $tahun }}<br>
-    Cabang: {{ $namaCabang }}<br>
-    Proyek: {{ $namaProyek }}
+    {{ $namaCabang }}
     <br><br>
     <div class="card-body table-responsive p-0">
         <table class="table table-hover text-nowrap">
