@@ -29,9 +29,17 @@
             <br>
         @endif
 
+        @php
+            $bulanIndo = [
+                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+                5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+                9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+            ];
+        @endphp
+
         <strong>Laporan Laba / Rugi</strong><br>
         {{ $namaCabang }}<br>
-        {{ date('F', mktime(0, 0, 0, $bulan1, 1)) }} s.d. {{ date('F', mktime(0, 0, 0, $bulan2, 1)) }} {{ $tahun }}
+        {{ $bulanIndo[$bulan1] }} s.d. {{ $bulanIndo[$bulan2] }} {{ $tahun }}
         <br><br>
     </div>
     <div class="card-body table-responsive p-0">
