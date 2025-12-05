@@ -7,9 +7,12 @@
 </head>
 
 <body>
-    Laporan Neraca {{ date('F', mktime(0, 0, 0, $bulan, 1)) }} {{ $tahun }}<br>
-    {{ $namaCabang }}
-    <br><br>
+    <div style="text-align: center;">
+        <strong>Laporan Neraca</strong><br>
+        {{ $namaCabang }}<br>
+        {{ date('F', mktime(0, 0, 0, $bulan, 1)) }} {{ $tahun }}
+        <br><br>
+    </div>
     <div class="card-body table-responsive p-0">
         <table class="table table-hover text-nowrap">
             {{-- <thead> --}}

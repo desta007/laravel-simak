@@ -7,10 +7,12 @@
 </head>
 
 <body>
-    Laporan Laba / Rugi {{ date('F', mktime(0, 0, 0, $bulan1, 1)) }} s.d. {{ date('F', mktime(0, 0, 0, $bulan2, 1)) }}
-    {{ $tahun }}<br>
-    {{ $namaCabang }}
-    <br><br>
+    <div style="text-align: center;">
+        <strong>Laporan Laba / Rugi</strong><br>
+        {{ $namaCabang }}<br>
+        {{ date('F', mktime(0, 0, 0, $bulan1, 1)) }} s.d. {{ date('F', mktime(0, 0, 0, $bulan2, 1)) }} {{ $tahun }}
+        <br><br>
+    </div>
     <div class="card-body table-responsive p-0">
         <table class="table table-hover text-nowrap">
             <tr>

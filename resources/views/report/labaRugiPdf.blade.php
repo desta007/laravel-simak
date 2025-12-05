@@ -16,23 +16,24 @@
 </head>
 
 <body>
-    @if ($id_cabang == 2)
-        <img src="{{ storage_path('app/public/ptsam.jpg') }}" alt="" width="70" height="70">
-        <br>
-    @elseif ($id_cabang == 3)
-        <img src="{{ storage_path('app/public/cvnimo.jpg') }}" alt="" width="70" height="70">
-        <br>
-    @else
-        <img src="{{ storage_path('app/public/ptsam.jpg') }}" alt="" width="70" height="70">
-        <img src="{{ storage_path('app/public/cvnimo.jpg') }}" alt="" width="70" height="70">
-        <br>
-    @endif
+    <div style="text-align: center;">
+        @if ($id_cabang == 2)
+            <img src="{{ storage_path('app/public/ptsam.jpg') }}" alt="" width="70" height="70">
+            <br>
+        @elseif ($id_cabang == 3)
+            <img src="{{ storage_path('app/public/cvnimo.jpg') }}" alt="" width="70" height="70">
+            <br>
+        @else
+            <img src="{{ storage_path('app/public/ptsam.jpg') }}" alt="" width="70" height="70">
+            <img src="{{ storage_path('app/public/cvnimo.jpg') }}" alt="" width="70" height="70">
+            <br>
+        @endif
 
-    Laporan Laba / Rugi {{ date('F', mktime(0, 0, 0, $bulan1, 1)) }} s.d. {{ date('F', mktime(0, 0, 0, $bulan2, 1)) }}
-    {{ $tahun }}<br>
-    {{ $namaCabang }}
-
-    <br><br>
+        <strong>Laporan Laba / Rugi</strong><br>
+        {{ $namaCabang }}<br>
+        {{ date('F', mktime(0, 0, 0, $bulan1, 1)) }} s.d. {{ date('F', mktime(0, 0, 0, $bulan2, 1)) }} {{ $tahun }}
+        <br><br>
+    </div>
     <div class="card-body table-responsive p-0">
         <table class="table table-hover text-nowrap">
             <tr>
