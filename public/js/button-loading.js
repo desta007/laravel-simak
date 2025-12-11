@@ -96,15 +96,18 @@
 
     /**
      * Set button to loading state
+     * @param {jQuery} $btn - The button element
+     * @param {boolean} delayContentChange - If true, delay HTML change to allow form submission with button data
      */
-    function setButtonLoading($btn) {
+    function setButtonLoading($btn, delayContentChange) {
         if ($btn.hasClass('btn-loading') || shouldExclude($btn)) {
             return;
         }
 
-        // Store original content
+        // Store original content and dimensions
         var originalContent = $btn.html();
         var originalWidth = $btn.outerWidth();
+        var originalHeight = $btn.outerHeight();
         
         $btn.data('original-content', originalContent);
         $btn.data('original-width', originalWidth);
@@ -113,19 +116,41 @@
         var buttonText = $btn.text();
         var loadingText = getLoadingText(buttonText);
         
-        // Set minimum width to prevent button shrinking
-        $btn.css('min-width', originalWidth + 'px');
-        
-        // Add loading class and disable
-        $btn.addClass('btn-loading');
-        $btn.prop('disabled', true);
-        
-        // Create loading content
+        // Create loading content HTML
         var loadingHTML = config.spinnerHTML + '<span class="btn-loading-text">' + loadingText + '</span>';
         
-        // Replace content with loading state
-        $btn.html('<span class="btn-original-content" style="visibility:hidden;">' + originalContent + '</span>' +
-                  '<span class="btn-loading-content">' + loadingHTML + '</span>');
+        // Create a temporary hidden element to measure loading content width
+        var $tempSpan = $('<span style="position:absolute;visibility:hidden;white-space:nowrap;display:inline-flex;align-items:center;font-size:' + $btn.css('font-size') + ';"></span>')
+            .html(loadingHTML)
+            .appendTo('body');
+        var loadingWidth = $tempSpan.outerWidth() + 24; // Add padding for button padding
+        $tempSpan.remove();
+        
+        // Use the larger of original width or loading content width
+        var finalWidth = Math.max(originalWidth, loadingWidth);
+        
+        // Set width to accommodate content and prevent layout shift
+        $btn.css({
+            'min-width': finalWidth + 'px',
+            'min-height': originalHeight + 'px'
+        });
+        
+        // Add loading class for visual feedback
+        $btn.addClass('btn-loading');
+        
+        // Function to disable button and replace content with loading state
+        var applyLoadingState = function() {
+            $btn.prop('disabled', true);
+            $btn.html('<span class="btn-loading-content">' + loadingHTML + '</span>');
+        };
+        
+        // If delayContentChange is true, delay disabling and HTML change to allow form submission
+        // This is important for forms where button name/value needs to be submitted
+        if (delayContentChange) {
+            setTimeout(applyLoadingState, 10);
+        } else {
+            applyLoadingState();
+        }
     }
 
     /**
@@ -144,7 +169,10 @@
         
         $btn.removeClass('btn-loading');
         $btn.prop('disabled', false);
-        $btn.css('min-width', '');
+        $btn.css({
+            'min-width': '',
+            'min-height': ''
+        });
         
         $btn.removeData('original-content');
         $btn.removeData('original-width');
@@ -168,10 +196,16 @@
         }
         
         if ($submitBtn && $submitBtn.length > 0 && !shouldExclude($submitBtn)) {
-            setButtonLoading($submitBtn);
+            // Check if the button has name attribute (used for determining action like print/pdf/excel)
+            // If so, delay content change to allow form to capture button's name/value
+            var hasNameAttr = $submitBtn.attr('name') ? true : false;
+            var isTargetBlank = $form.attr('target') === '_blank';
+            var delayContentChange = hasNameAttr || isTargetBlank;
+            
+            setButtonLoading($submitBtn, delayContentChange);
             
             // For forms with target="_blank", reset button after delay
-            if ($form.attr('target') === '_blank') {
+            if (isTargetBlank) {
                 setTimeout(function() {
                     resetButton($submitBtn);
                 }, config.resetDelay);
@@ -250,9 +284,9 @@
 
     // Expose methods globally for manual control
     window.ButtonLoading = {
-        setLoading: function(selector) {
+        setLoading: function(selector, delayContentChange) {
             $(selector).each(function() {
-                setButtonLoading($(this));
+                setButtonLoading($(this), delayContentChange || false);
             });
         },
         reset: function(selector) {

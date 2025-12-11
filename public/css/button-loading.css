@@ -19,6 +19,7 @@
     pointer-events: none;
     opacity: 0.8;
     cursor: not-allowed;
+    text-align: center;
 }
 
 .btn.btn-loading:disabled {
@@ -52,18 +53,14 @@
     border-width: 2.5px;
 }
 
-/* Hide original text/icon when loading */
+/* Hide original content when loading */
 .btn.btn-loading .btn-original-content {
-    visibility: hidden;
+    display: none;
 }
 
-/* Show loading content */
+/* Show loading content - inline flow instead of absolute positioning */
 .btn.btn-loading .btn-loading-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     white-space: nowrap;
@@ -107,7 +104,7 @@
     }
 }
 
-/* Loading overlay effect (optional - for button groups) */
+/* Loading overlay effect for button groups */
 .btn-group.btn-group-loading {
     pointer-events: none;
 }
@@ -126,13 +123,7 @@
     font-size: 0.95em;
 }
 
-/* Center the loading content properly */
-.btn {
-    position: relative;
-    overflow: hidden;
-}
-
-/* Ensure icons don't jump during loading transition */
+/* Ensure icons dont jump during loading transition */
 .btn i,
 .btn .fa,
 .btn .fas,
@@ -148,4 +139,3 @@
 .btn.btn-loading .fab {
     opacity: 0;
 }
-
