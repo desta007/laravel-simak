@@ -143,22 +143,21 @@ class ReportController extends Controller
                 $jumlahSaldoAwal = $saldoAwalKredit - $saldoAwalDebet;
             }
 
-            // 2. hitung total dari jan s/d bulan1
-            // get saldo tiap bulan. modif 04-04-2025 tambahin if $bulan2 != 1
-            if ($bulan2 != 1) {
-                for ($i = 1; $i <= $bulan1; $i++) {
-                    $listSaldo = SaldoAkun::where('tahun', $tahun)
-                        ->where('bulan', $i)
-                        ->where('is_saldo_awal', 0)
-                        ->where('id_kode_perkiraan', $akun->id)
-                        ->get();
+            // 2. hitung total dari jan s/d sebelum bulan1 (untuk akumulasi saldo awal)
+            // Loop dari bulan 1 hingga sebelum bulan1 (menggunakan < bukan <=)
+            // agar bulan1 tidak dihitung dua kali (sekali di saldo awal, sekali di mutasi)
+            for ($i = 1; $i < $bulan1; $i++) {
+                $listSaldo = SaldoAkun::where('tahun', $tahun)
+                    ->where('bulan', $i)
+                    ->where('is_saldo_awal', 0)
+                    ->where('id_kode_perkiraan', $akun->id)
+                    ->get();
 
-                    foreach ($listSaldo as $s) {
-                        if (in_array(substr($akun->kode, 0, 1), ['1', '5', '6', '8'])) {
-                            $jumlahSaldoAwal += $s->saldo_debet - $s->saldo_kredit;
-                        } else {
-                            $jumlahSaldoAwal += $s->saldo_kredit - $s->saldo_debet;
-                        }
+                foreach ($listSaldo as $s) {
+                    if (in_array(substr($akun->kode, 0, 1), ['1', '5', '6', '8'])) {
+                        $jumlahSaldoAwal += $s->saldo_debet - $s->saldo_kredit;
+                    } else {
+                        $jumlahSaldoAwal += $s->saldo_kredit - $s->saldo_debet;
                     }
                 }
             }
