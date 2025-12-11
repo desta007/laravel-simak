@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('adminlte/css/adminlte.min.css') }}">
+    <!-- Button Loading Styles -->
+    <link rel="stylesheet" href="{{ asset('css/button-loading.css') }}">
 </head>
 
 <body class="hold-transition login-page">
@@ -85,6 +87,8 @@
     <script src="{{ asset('adminlte/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <!-- AdminLTE App -->
     <script src="{{ asset('adminlte/js/adminlte.min.js') }}"></script>
+    <!-- Button Loading Script -->
+    <script src="{{ asset('js/button-loading.js') }}"></script>
 </body>
 
 </html>

@@ -1,0 +1,151 @@
+/**
+ * Button Loading Styles
+ * Memberikan efek loading yang bagus pada tombol saat diklik
+ */
+
+/* Loading Spinner Animation */
+@keyframes btn-loading-spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Button Loading State */
+.btn.btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+.btn.btn-loading:disabled {
+    opacity: 0.8;
+}
+
+/* Loading Spinner Icon */
+.btn-loading-spinner {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: btn-loading-spinner 0.75s linear infinite;
+    margin-right: 0.5em;
+    vertical-align: middle;
+}
+
+/* Small button spinner adjustment */
+.btn-sm .btn-loading-spinner {
+    width: 0.875em;
+    height: 0.875em;
+    border-width: 1.5px;
+}
+
+/* Large button spinner adjustment */
+.btn-lg .btn-loading-spinner {
+    width: 1.25em;
+    height: 1.25em;
+    border-width: 2.5px;
+}
+
+/* Hide original text/icon when loading */
+.btn.btn-loading .btn-original-content {
+    visibility: hidden;
+}
+
+/* Show loading content */
+.btn.btn-loading .btn-loading-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+/* Different color spinners for different button types */
+.btn-primary.btn-loading .btn-loading-spinner,
+.btn-success.btn-loading .btn-loading-spinner,
+.btn-danger.btn-loading .btn-loading-spinner,
+.btn-warning.btn-loading .btn-loading-spinner,
+.btn-info.btn-loading .btn-loading-spinner,
+.btn-dark.btn-loading .btn-loading-spinner {
+    border-color: rgba(255, 255, 255, 0.8);
+    border-right-color: transparent;
+}
+
+.btn-light.btn-loading .btn-loading-spinner,
+.btn-secondary.btn-loading .btn-loading-spinner,
+.btn-outline-primary.btn-loading .btn-loading-spinner,
+.btn-outline-secondary.btn-loading .btn-loading-spinner,
+.btn-outline-success.btn-loading .btn-loading-spinner,
+.btn-outline-danger.btn-loading .btn-loading-spinner,
+.btn-outline-warning.btn-loading .btn-loading-spinner,
+.btn-outline-info.btn-loading .btn-loading-spinner,
+.btn-outline-dark.btn-loading .btn-loading-spinner {
+    border-color: currentColor;
+    border-right-color: transparent;
+}
+
+/* Pulse effect for the loading button */
+.btn.btn-loading {
+    animation: btn-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes btn-pulse {
+    0%, 100% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Loading overlay effect (optional - for button groups) */
+.btn-group.btn-group-loading {
+    pointer-events: none;
+}
+
+.btn-group.btn-group-loading .btn {
+    opacity: 0.6;
+}
+
+/* Transition for smooth state change */
+.btn {
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+/* Loading text styling */
+.btn-loading-text {
+    font-size: 0.95em;
+}
+
+/* Center the loading content properly */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ensure icons don't jump during loading transition */
+.btn i,
+.btn .fa,
+.btn .fas,
+.btn .far,
+.btn .fab {
+    transition: opacity 0.2s ease;
+}
+
+.btn.btn-loading i,
+.btn.btn-loading .fa,
+.btn.btn-loading .fas,
+.btn.btn-loading .far,
+.btn.btn-loading .fab {
+    opacity: 0;
+}
+

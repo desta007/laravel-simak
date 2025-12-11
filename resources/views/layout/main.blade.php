@@ -39,6 +39,9 @@
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
 
+    <!-- Button Loading Styles -->
+    <link rel="stylesheet" href="{{ asset('css/button-loading.css') }}">
+
     <!-- jQuery -->
     <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
     <!-- jQuery UI 1.11.4 -->
@@ -96,6 +99,9 @@
 
     <!-- SweetAlert2 CDN -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Button Loading Script -->
+    <script src="{{ asset('js/button-loading.js') }}"></script>
 </head>
 
 <body class="hold-transition
