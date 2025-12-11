@@ -8,31 +8,53 @@
             font-size: 10px;
         }
 
-        /* td {
-            height: 1px;
-        } */
+        .header-report {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header-report h3 {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+        .header-report p {
+            margin: 3px 0;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .logo-container img {
+            margin: 0 5px;
+        }
     </style>
     <title>General Ledger</title>
 </head>
 
 <body>
-    @if ($id_cabang == 2)
-        <img src="{{ storage_path('app/public/ptsam.jpg') }}" alt="" width="70" height="70">
-        <br>
-    @elseif ($id_cabang == 3)
-        <img src="{{ storage_path('app/public/cvnimo.jpg') }}" alt="" width="70" height="70">
-        <br>
-    @else
-        <img src="{{ storage_path('app/public/ptsam.jpg') }}" alt="" width="70" height="70">
-        <img src="{{ storage_path('app/public/cvnimo.jpg') }}" alt="" width="70" height="70">
-        <br>
-    @endif
+    @php
+        $namaBulan = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+    @endphp
 
-    General Ledger {{ date('F', mktime(0, 0, 0, $bulan1, 1)) }} s.d. {{ date('F', mktime(0, 0, 0, $bulan2, 1)) }}
-    {{ $tahun }}<br>
-    Cabang: {{ $namaCabang }}<br>
-    Proyek: {{ $namaProyek }}
-    <br><br>
+    <div class="logo-container">
+        @if ($id_cabang == 2)
+            <img src="{{ storage_path('app/public/ptsam.jpg') }}" alt="" width="70" height="70">
+        @elseif ($id_cabang == 3)
+            <img src="{{ storage_path('app/public/cvnimo.jpg') }}" alt="" width="70" height="70">
+        @else
+            <img src="{{ storage_path('app/public/ptsam.jpg') }}" alt="" width="70" height="70">
+            <img src="{{ storage_path('app/public/cvnimo.jpg') }}" alt="" width="70" height="70">
+        @endif
+    </div>
+
+    <div class="header-report">
+        <h3>General Ledger</h3>
+        <p><strong>{{ $namaCabang }}</strong></p>
+        <p>Periode: {{ $namaBulan[$bulan1] }} s.d {{ $namaBulan[$bulan2] }} {{ $tahun }}</p>
+    </div>
 
     <div class="card-body table-responsive p-0">
         <table class="table table-hover text-wrap">
@@ -42,7 +64,7 @@
                     <th rowspan="2">Proyek</th>
                     <th rowspan="2">Nama Perkiraan</th>
                     <th rowspan="2">Akumulasi s.d Periode Lalu</th>
-                    <th colspan="2">Mutasi Bulan {{ $bulan1 }} s.d {{ $bulan2 }}
+                    <th colspan="2">Mutasi Bulan {{ $namaBulan[$bulan1] }} s.d {{ $namaBulan[$bulan2] }}
                     </th>
                     <th rowspan="2">Akumulasi s.d Periode Ini</th>
                 </tr>

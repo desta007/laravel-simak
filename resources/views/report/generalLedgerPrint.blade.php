@@ -3,15 +3,36 @@
 <head>
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('adminlte/css/adminlte.min.css') }}">
-    <title>Neraca</title>
+    <title>General Ledger</title>
+    <style>
+        .header-report {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header-report h3 {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+        .header-report p {
+            margin: 3px 0;
+        }
+    </style>
 </head>
 
 <body>
-    General Ledger {{ date('F', mktime(0, 0, 0, $bulan1, 1)) }} s.d {{ date('F', mktime(0, 0, 0, $bulan2, 1)) }}
-    {{ $tahun }}<br>
-    Cabang: {{ $namaCabang }}<br>
-    Proyek: {{ $namaProyek }}
-    <br><br>
+    @php
+        $namaBulan = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+    @endphp
+
+    <div class="header-report">
+        <h3>General Ledger</h3>
+        <p><strong>{{ $namaCabang }}</strong></p>
+        <p>Periode: {{ $namaBulan[$bulan1] }} s.d {{ $namaBulan[$bulan2] }} {{ $tahun }}</p>
+    </div>
     <div class="card-body table-responsive p-0">
         <table class="table table-hover text-wrap">
             <thead>
@@ -20,7 +41,7 @@
                     <th rowspan="2">Proyek</th>
                     <th rowspan="2">Nama Perkiraan</th>
                     <th rowspan="2">Akumulasi s.d Periode Lalu</th>
-                    <th colspan="2">Mutasi Bulan {{ $bulan1 }} s.d {{ $bulan2 }}
+                    <th colspan="2">Mutasi Bulan {{ $namaBulan[$bulan1] }} s.d {{ $namaBulan[$bulan2] }}
                     </th>
                     <th rowspan="2">Akumulasi s.d Periode Ini</th>
                 </tr>
