@@ -4,11 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Sistem Informasi Akuntansi</title>
+    <title>SIMAK - Sistem Informasi Akuntansi</title>
 
-    <!-- Google Font: Source Sans Pro -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Google Font: Inter + Poppins -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/fontawesome-free/css/all.min.css') }}">
     <!-- Ionicons -->
@@ -41,6 +40,9 @@
 
     <!-- Button Loading Styles -->
     <link rel="stylesheet" href="{{ asset('css/button-loading.css') }}">
+
+    <!-- SIMAK Premium Theme -->
+    <link rel="stylesheet" href="{{ asset('css/simak-theme.css') }}">
 
     <!-- jQuery -->
     <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
@@ -104,14 +106,15 @@
     <script src="{{ asset('js/button-loading.js') }}"></script>
 </head>
 
-<body class="hold-transition
-        sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
 
         <!-- Preloader -->
         <div class="preloader flex-column justify-content-center align-items-center">
-            <img class="animation__shake" src="{{ asset('adminlte/images/AdminLTELogo.png') }}" alt="AdminLTELogo"
-                height="60" width="60">
+            <div class="simak-preloader-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <p class="simak-preloader-text mt-3">SIMAK</p>
         </div>
         @include('sweetalert::alert')
 
