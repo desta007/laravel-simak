@@ -56,8 +56,8 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .preloader-logo {
-    width: 80px;
-    height: 80px;
+    width: 72px;
+    height: 72px;
     border-radius: 1.25rem;
     background: white;
     display: flex;
@@ -67,12 +67,14 @@ h1, h2, h3, h4, h5, h6,
         0 8px 30px rgba(30, 64, 175, 0.12),
         0 0 0 1px rgba(30, 64, 175, 0.06);
     margin-bottom: 1rem;
+    overflow: hidden;
 }
 
 .preloader-logo img {
-    width: 52px;
-    height: 52px;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 1.25rem;
 }
 
 .preloader-text {
