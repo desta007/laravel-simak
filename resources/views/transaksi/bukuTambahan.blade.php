@@ -110,10 +110,37 @@
                                     </thead>
                                     <tbody>
                                         @php
-                                            $saldo = 0;
+                                            $saldoAwalValue = isset($saldoAwal) ? $saldoAwal : 0;
+                                            $saldo = $saldoAwalValue;
                                             $totalDebet = 0;
                                             $totalKredit = 0;
                                         @endphp
+
+                                        <tr style="background-color: #f0f8ff; font-weight: bold;">
+                                            <td></td>
+                                            <td colspan="4">Saldo Awal</td>
+                                            <td style="text-align: right">
+                                                @if ($saldoAwalValue > 0)
+                                                    {{ number_format($saldoAwalValue) }}
+                                                @else
+                                                    0
+                                                @endif
+                                            </td>
+                                            <td style="text-align: right">
+                                                @if ($saldoAwalValue < 0)
+                                                    {{ number_format(abs($saldoAwalValue)) }}
+                                                @else
+                                                    0
+                                                @endif
+                                            </td>
+                                            <td style="text-align: right">
+                                                @if ($saldoAwalValue < 0)
+                                                    ({{ number_format(abs($saldoAwalValue)) }})
+                                                @else
+                                                    {{ number_format($saldoAwalValue) }}
+                                                @endif
+                                            </td>
+                                        </tr>
 
                                         @foreach ($results as $detail)
                                             <tr>

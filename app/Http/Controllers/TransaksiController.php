@@ -7,6 +7,7 @@ use App\Models\KodeBukti;
 use App\Models\KodePerkiraan;
 use App\Models\KunciTransaksi;
 use App\Models\Proyek;
+use App\Models\SaldoAkun;
 use App\Models\Transaksi;
 use App\Models\TransaksiDetail;
 use Carbon\Carbon;
@@ -738,9 +739,29 @@ $transaksis = Transaksi::query()
             'transaksi_details.jenis',
             'transaksi_details.jumlah'
         ]);
-        // dd($results);
+
+        // Hitung saldo awal dari tabel saldo_akuns berdasarkan tahun
+        $tahun = Carbon::parse($tgl_awal)->year;
+
+        $saldoAwalQuery = SaldoAkun::where('is_saldo_awal', 1)
+            ->where('tahun', $tahun)
+            ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek, $kodePerkiraan) {
+                if ($id_cabang != '') {
+                    $query->where('id_cabang', $id_cabang);
+                }
+                if ($id_proyek != 'all') {
+                    $query->where('id_proyek', $id_proyek);
+                }
+                if ($kodePerkiraan != '') {
+                    $query->where('kode', 'like', '%' . $kodePerkiraan . '%');
+                }
+            });
+
+        $saldoAwal = (float) $saldoAwalQuery->selectRaw('COALESCE(SUM(saldo_debet), 0) - COALESCE(SUM(saldo_kredit), 0) as saldo_awal')
+            ->value('saldo_awal');
+
         $isView = 1;
-        return view('transaksi.bukuTambahan', compact('id_group_user', 'id_cabang', 'id_proyek', 'cabangs', 'proyeks', 'tgl_awal', 'tgl_akhir', 'kodePerkiraan', 'results', 'isView'));
+        return view('transaksi.bukuTambahan', compact('id_group_user', 'id_cabang', 'id_proyek', 'cabangs', 'proyeks', 'tgl_awal', 'tgl_akhir', 'kodePerkiraan', 'results', 'isView', 'saldoAwal'));
         // --------
     }
 
