@@ -740,25 +740,82 @@ $transaksis = Transaksi::query()
             'transaksi_details.jumlah'
         ]);
 
-        // Hitung saldo awal dari tabel saldo_akuns berdasarkan tahun
+        // Hitung saldo awal
         $tahun = Carbon::parse($tgl_awal)->year;
+        $bulan = Carbon::parse($tgl_awal)->month;
 
-        $saldoAwalQuery = SaldoAkun::where('is_saldo_awal', 1)
-            ->where('tahun', $tahun)
-            ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek, $kodePerkiraan) {
-                if ($id_cabang != '') {
-                    $query->where('id_cabang', $id_cabang);
-                }
-                if ($id_proyek != 'all') {
-                    $query->where('id_proyek', $id_proyek);
-                }
-                if ($kodePerkiraan != '') {
-                    $query->where('kode', 'like', '%' . $kodePerkiraan . '%');
-                }
-            });
+        if ($bulan == 1) {
+            // Januari: ambil dari tabel saldo_akuns (is_saldo_awal = 1)
+            $saldoAwalQuery = SaldoAkun::where('is_saldo_awal', 1)
+                ->where('tahun', $tahun)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek, $kodePerkiraan) {
+                    if ($id_cabang != '') {
+                        $query->where('id_cabang', $id_cabang);
+                    }
+                    if ($id_proyek != 'all') {
+                        $query->where('id_proyek', $id_proyek);
+                    }
+                    if ($kodePerkiraan != '') {
+                        $query->where('kode', 'like', '%' . $kodePerkiraan . '%');
+                    }
+                });
 
-        $saldoAwal = (float) $saldoAwalQuery->selectRaw('COALESCE(SUM(saldo_debet), 0) - COALESCE(SUM(saldo_kredit), 0) as saldo_awal')
-            ->value('saldo_awal');
+            $saldoAwal = (float) $saldoAwalQuery->selectRaw('COALESCE(SUM(saldo_debet), 0) - COALESCE(SUM(saldo_kredit), 0) as saldo_awal')
+                ->value('saldo_awal');
+        } else {
+            // Selain Januari: hitung dari transaksi sebelum tgl_awal
+            // Kode akun berawalan 1,4,5,6,8 = Debet - Kredit
+            // Kode akun berawalan 2,3,7 = Kredit - Debet
+            $saldoAwalQuery = TransaksiDetail::join('transaksis', 'transaksis.id', '=', 'transaksi_details.id_transaksi')
+                ->join('kode_perkiraans', 'kode_perkiraans.id', '=', 'transaksi_details.id_kode_perkiraan')
+                ->where('transaksis.tgl', '>=', $tahun . '-01-01')
+                ->where('transaksis.tgl', '<', $tgl_awal);
+
+            if ($id_cabang != '') {
+                $saldoAwalQuery->where('transaksis.id_cabang', $id_cabang);
+            }
+            if ($id_proyek != 'all') {
+                $saldoAwalQuery->where('transaksis.id_proyek', $id_proyek);
+            }
+            if ($kodePerkiraan != '') {
+                $saldoAwalQuery->where('kode_perkiraans.kode', 'like', '%' . $kodePerkiraan . '%');
+            }
+
+            // Ambil saldo awal tahun (Januari) sebagai basis
+            $saldoAwalTahunQuery = SaldoAkun::where('is_saldo_awal', 1)
+                ->where('tahun', $tahun)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek, $kodePerkiraan) {
+                    if ($id_cabang != '') {
+                        $query->where('id_cabang', $id_cabang);
+                    }
+                    if ($id_proyek != 'all') {
+                        $query->where('id_proyek', $id_proyek);
+                    }
+                    if ($kodePerkiraan != '') {
+                        $query->where('kode', 'like', '%' . $kodePerkiraan . '%');
+                    }
+                });
+
+            $saldoAwalTahun = (float) $saldoAwalTahunQuery->selectRaw('COALESCE(SUM(saldo_debet), 0) - COALESCE(SUM(saldo_kredit), 0) as saldo_awal')
+                ->value('saldo_awal');
+
+            // Hitung akumulasi transaksi dari awal tahun s/d sebelum tgl_awal
+            // Kode akun 1,4,5,6,8 (normal debet): D - K
+            // Kode akun 2,3,7 (normal kredit): K - D
+            $saldoTransaksi = (float) $saldoAwalQuery->selectRaw("
+                COALESCE(SUM(
+                    CASE
+                        WHEN LEFT(kode_perkiraans.kode, 1) IN ('1','4','5','6','8') THEN
+                            CASE WHEN transaksi_details.jenis = 'D' THEN transaksi_details.jumlah ELSE -transaksi_details.jumlah END
+                        WHEN LEFT(kode_perkiraans.kode, 1) IN ('2','3','7') THEN
+                            CASE WHEN transaksi_details.jenis = 'K' THEN transaksi_details.jumlah ELSE -transaksi_details.jumlah END
+                        ELSE 0
+                    END
+                ), 0) as saldo_trx
+            ")->value('saldo_trx');
+
+            $saldoAwal = $saldoAwalTahun + $saldoTransaksi;
+        }
 
         $isView = 1;
         return view('transaksi.bukuTambahan', compact('id_group_user', 'id_cabang', 'id_proyek', 'cabangs', 'proyeks', 'tgl_awal', 'tgl_akhir', 'kodePerkiraan', 'results', 'isView', 'saldoAwal'));

@@ -110,11 +110,19 @@
     <div class="wrapper">
 
         <!-- Preloader -->
-        <div class="preloader flex-column justify-content-center align-items-center">
-            <div class="simak-preloader-icon">
-                <i class="fas fa-chart-line"></i>
+        <div class="custom-preloader flex-column justify-content-center align-items-center">
+            <div class="preloader-content">
+                <div class="preloader-logo">
+                    <img src="{{ asset('storage/ptsam.jpg') }}" alt="SIMAK Logo">
+                </div>
+                <div class="preloader-text">SIMAK</div>
+                <div class="preloader-bar">
+                    <div class="preloader-bar__track">
+                        <div class="preloader-bar__fill"></div>
+                    </div>
+                </div>
+                <div class="preloader-label">Memuat...</div>
             </div>
-            <p class="simak-preloader-text mt-3">SIMAK</p>
         </div>
         @include('sweetalert::alert')
 
@@ -136,6 +144,70 @@
         <!-- /.control-sidebar -->
     </div>
     <!-- ./wrapper -->
+
+    <script>
+    (function() {
+        var preloader = document.querySelector('.custom-preloader');
+        if (!preloader) return;
+
+        // Fade out on page load
+        $(window).on('load', function() {
+            setTimeout(function() {
+                $(preloader).fadeOut(500, function() {
+                    $(this).remove();
+                });
+            }, 300);
+        });
+
+        // Fade in on navigation: recreate preloader before navigating
+        document.addEventListener('click', function(e) {
+            var link = e.target.closest('a');
+            if (!link) return;
+
+            var href = link.getAttribute('href');
+            if (!href || href === '#' || href === '' || href.startsWith('javascript:')) return;
+            if (link.target === '_blank') return;
+            if (link.hasAttribute('data-toggle') || link.hasAttribute('data-widget')) return;
+            if (link.closest('.modal')) return;
+            if (link.classList.contains('no-loader')) return;
+            if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+
+            // Recreate preloader if it was removed
+            var existing = document.querySelector('.custom-preloader');
+            if (!existing) {
+                var div = document.createElement('div');
+                div.className = 'custom-preloader flex-column justify-content-center align-items-center';
+                div.style.display = 'flex';
+                div.innerHTML =
+                    '<div class="preloader-content">' +
+                        '<div class="preloader-logo">' +
+                            '<img src="{{ asset("adminlte/images/AdminLTELogo.png") }}" alt="SIMAK Logo">' +
+                        '</div>' +
+                        '<div class="preloader-text">SIMAK</div>' +
+                        '<div class="preloader-bar">' +
+                            '<div class="preloader-bar__track">' +
+                                '<div class="preloader-bar__fill"></div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="preloader-label">Memuat...</div>' +
+                    '</div>';
+                document.querySelector('.wrapper').prepend(div);
+            } else {
+                $(existing).stop().fadeIn(200);
+            }
+        });
+
+        // Handle browser back/forward
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) {
+                var el = document.querySelector('.custom-preloader');
+                if (el) {
+                    $(el).fadeOut(500, function() { $(this).remove(); });
+                }
+            }
+        });
+    })();
+    </script>
 </body>
 
 </html>
