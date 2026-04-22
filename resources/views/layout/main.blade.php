@@ -181,7 +181,7 @@
                 div.innerHTML =
                     '<div class="preloader-content">' +
                         '<div class="preloader-logo">' +
-                            '<img src="{{ asset("adminlte/images/AdminLTELogo.png") }}" alt="SIMAK Logo">' +
+                            '<img src="{{ asset("storage/ptsam.jpg") }}" alt="SIMAK Logo">' +
                         '</div>' +
                         '<div class="preloader-text">SIMAK</div>' +
                         '<div class="preloader-bar">' +
