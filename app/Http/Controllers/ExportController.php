@@ -3706,6 +3706,11 @@ class ExportController extends Controller
             $saldoAwal = $saldoAwalTahun + $saldoTransaksi;
         }
 
+        // Generate nama file dinamis
+        $tglAwalFormatted = Carbon::parse($tgl_awal)->format('dmy');
+        $tglAkhirFormatted = Carbon::parse($tgl_akhir)->format('dmy');
+        $namaFile = 'BT_' . ($kodePerkiraan != '' ? $kodePerkiraan . '_' : '') . $tglAwalFormatted . '_sd_' . $tglAkhirFormatted;
+
         // PRINT
         if ($print != '') {
             return view('transaksi.bukuTambahanPrint', compact(
@@ -3781,7 +3786,7 @@ class ExportController extends Controller
             // Total row
             $dataExcel[] = ['', '', '', '', 'Total', $totalDebet, $totalKredit, $saldo];
 
-            return Excel::download(new ExportBukuTambahan($dataExcel), 'buku_tambahan.xlsx');
+            return Excel::download(new ExportBukuTambahan($dataExcel), $namaFile . '.xlsx');
         }
 
         // PDF
@@ -3797,7 +3802,7 @@ class ExportController extends Controller
                 'saldoAwal'
             ));
             $pdf->setPaper('a4', 'landscape');
-            return $pdf->download('buku_tambahan.pdf');
+            return $pdf->download($namaFile . '.pdf');
         }
     }
 }
