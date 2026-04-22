@@ -122,8 +122,8 @@
             position: relative;
             z-index: 10;
             width: 100%;
-            max-width: 440px;
-            padding: 20px;
+            max-width: 380px;
+            padding: 16px;
             animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -165,56 +165,58 @@
 
         .login-header {
             text-align: center;
-            padding: 40px 40px 10px;
+            padding: 28px 32px 8px;
         }
 
-        .login-icon {
-            width: 72px;
-            height: 72px;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            border-radius: 18px;
+        .login-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
-            position: relative;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.15);
+            overflow: hidden;
+            background: #ffffff;
         }
 
-        .login-icon i {
-            font-size: 32px;
-            color: #ffffff;
+        .login-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
         }
 
         .login-header h1 {
             font-family: 'Poppins', sans-serif;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             letter-spacing: -0.3px;
         }
 
         .login-header p {
-            font-size: 14px;
+            font-size: 12.5px;
             color: var(--text-secondary);
             font-weight: 400;
         }
 
         .login-body {
-            padding: 24px 40px 40px;
+            padding: 20px 32px 28px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .form-group label {
             display: block;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             letter-spacing: 0.01em;
         }
 
@@ -224,23 +226,23 @@
 
         .input-wrapper .input-icon {
             position: absolute;
-            left: 16px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-secondary);
-            font-size: 15px;
+            font-size: 13px;
             transition: color 0.2s;
             z-index: 2;
         }
 
         .input-wrapper .form-control {
             width: 100%;
-            height: 48px;
-            padding: 0 16px 0 46px;
+            height: 40px;
+            padding: 0 14px 0 40px;
             border: 2px solid var(--border);
-            border-radius: 12px;
+            border-radius: 10px;
             background: var(--input-bg);
-            font-size: 14px;
+            font-size: 13px;
             font-family: 'Inter', sans-serif;
             color: var(--text-primary);
             transition: all 0.2s ease;
@@ -278,7 +280,7 @@
 
         .password-toggle {
             position: absolute;
-            right: 16px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
@@ -286,7 +288,7 @@
             color: var(--text-secondary);
             cursor: pointer;
             padding: 4px;
-            font-size: 15px;
+            font-size: 13px;
             transition: color 0.2s;
             z-index: 2;
         }
@@ -297,12 +299,12 @@
 
         .btn-login {
             width: 100%;
-            height: 48px;
+            height: 40px;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: #ffffff;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 600;
             font-family: 'Inter', sans-serif;
             cursor: pointer;
@@ -348,12 +350,12 @@
 
         .btn-reset {
             width: 100%;
-            height: 48px;
+            height: 40px;
             border: 2px solid var(--border);
-            border-radius: 12px;
+            border-radius: 10px;
             background: transparent;
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             font-family: 'Inter', sans-serif;
             cursor: pointer;
@@ -368,8 +370,8 @@
 
         .btn-row {
             display: flex;
-            gap: 12px;
-            margin-top: 28px;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .btn-row .btn-col-login {
@@ -382,39 +384,39 @@
 
         .login-footer {
             text-align: center;
-            padding: 0 40px 32px;
+            padding: 0 32px 24px;
         }
 
         .login-footer p {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-secondary);
         }
 
         /* Responsive */
         @media (max-width: 480px) {
             .login-container {
-                padding: 16px;
+                padding: 12px;
             }
 
             .login-header {
-                padding: 32px 24px 8px;
+                padding: 24px 20px 6px;
             }
 
             .login-body {
-                padding: 20px 24px 32px;
+                padding: 16px 20px 24px;
             }
 
             .login-footer {
-                padding: 0 24px 24px;
+                padding: 0 20px 20px;
             }
 
             .login-header h1 {
-                font-size: 20px;
+                font-size: 18px;
             }
 
             .btn-row {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
             }
         }
     </style>
@@ -429,8 +431,8 @@
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <div class="login-icon">
-                    <i class="fas fa-chart-line"></i>
+                <div class="login-logo">
+                    <img src="{{ asset('storage/ptsam.jpg') }}" alt="Logo">
                 </div>
                 <h1>SIMAK</h1>
                 <p>Sistem Informasi Akuntansi Keuangan</p>
