@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExportBukuTambahan;
 use App\Exports\ExportLabaRugi;
 use Illuminate\Http\Request;
 use App\Exports\ExportNeraca;
 use App\Models\Cabang;
 use App\Models\GroupAccount;
 use App\Models\KodePerkiraan;
+use App\Models\KunciTransaksi;
 use App\Models\Pejabat;
 use App\Models\Proyek;
 use App\Models\SaldoAkun;
+use App\Models\TransaksiDetail;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
@@ -3562,6 +3566,238 @@ class ExportController extends Controller
                 'groupedListData'
             ));
             return $pdf->download('general_ledger.pdf');
+        }
+    }
+
+    // Buku Tambahan Export
+    public function bukuTambahanExport(Request $request)
+    {
+        set_time_limit(300);
+
+        $id_cabang = $request->input('id_cabang2');
+        $id_proyek = $request->input('id_proyek2');
+        $tgl_awal = $request->input('tgl_awal2');
+        $tgl_akhir = $request->input('tgl_akhir2');
+        $kodePerkiraan = $request->input('kodePerkiraan2');
+
+        $print = $request->input('print');
+        $pdf = $request->input('pdf');
+        $excel = $request->input('excel');
+
+        // Nama cabang & proyek
+        if ($id_cabang != '') {
+            $cabang = Cabang::where('id', $id_cabang)->first();
+            $namaCabang = $cabang->nama;
+        } else {
+            $namaCabang = 'All';
+        }
+
+        if ($id_proyek != 0 && $id_proyek != 'all') {
+            $proyek = Proyek::where('id', $id_proyek)->first();
+            $namaProyek = $proyek->nama;
+        } else {
+            if ($id_proyek == 0)
+                $namaProyek = 'Non Proyek';
+            else
+                $namaProyek = 'All';
+        }
+
+        // Query transaksi details
+        $transaksiDetails = TransaksiDetail::with(['kodePerkiraan', 'transaksi.cabang', 'transaksi.proyek'])
+            ->join('transaksis', 'transaksis.id', '=', 'transaksi_details.id_transaksi')
+            ->addSelect([
+                'isLock' => KunciTransaksi::query()
+                    ->select('status_akses')
+                    ->whereColumn('id_cabang', 'transaksis.id_cabang')
+                    ->whereColumn('id_proyek', 'transaksis.id_proyek')
+                    ->whereRaw('bulan = MONTH(transaksis.tgl)')
+                    ->whereRaw('tahun = YEAR(transaksis.tgl)')
+                    ->limit(1)
+            ]);
+
+        $transaksiDetails->whereBetween('transaksis.tgl', [$tgl_awal, $tgl_akhir]);
+
+        if ($id_cabang != '')
+            $transaksiDetails->where('transaksis.id_cabang', $id_cabang);
+
+        if ($id_proyek != 'all')
+            $transaksiDetails->where('transaksis.id_proyek', $id_proyek);
+
+        $transaksiDetails->whereHas('kodePerkiraan', function ($query) use ($kodePerkiraan) {
+            $query->where('kode', 'like', '%' . $kodePerkiraan . '%');
+        });
+        $transaksiDetails->orderBy('transaksis.tgl', 'asc')->orderBy('transaksi_details.jenis', 'asc');
+
+        $results = $transaksiDetails->get([
+            'isLock',
+            'transaksi_details.id',
+            'transaksi_details.id_kode_perkiraan',
+            'transaksi_details.id_transaksi',
+            'transaksi_details.jenis',
+            'transaksi_details.jumlah'
+        ]);
+
+        // Hitung saldo awal
+        $tahun = Carbon::parse($tgl_awal)->year;
+        $bulan = Carbon::parse($tgl_awal)->month;
+
+        if ($bulan == 1) {
+            $saldoAwalQuery = SaldoAkun::where('is_saldo_awal', 1)
+                ->where('tahun', $tahun)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek, $kodePerkiraan) {
+                    if ($id_cabang != '') {
+                        $query->where('id_cabang', $id_cabang);
+                    }
+                    if ($id_proyek != 'all') {
+                        $query->where('id_proyek', $id_proyek);
+                    }
+                    if ($kodePerkiraan != '') {
+                        $query->where('kode', 'like', '%' . $kodePerkiraan . '%');
+                    }
+                });
+
+            $saldoAwal = (float) $saldoAwalQuery->selectRaw('COALESCE(SUM(saldo_debet), 0) - COALESCE(SUM(saldo_kredit), 0) as saldo_awal')
+                ->value('saldo_awal');
+        } else {
+            $saldoAwalQuery = TransaksiDetail::join('transaksis', 'transaksis.id', '=', 'transaksi_details.id_transaksi')
+                ->join('kode_perkiraans', 'kode_perkiraans.id', '=', 'transaksi_details.id_kode_perkiraan')
+                ->where('transaksis.tgl', '>=', $tahun . '-01-01')
+                ->where('transaksis.tgl', '<', $tgl_awal);
+
+            if ($id_cabang != '') {
+                $saldoAwalQuery->where('transaksis.id_cabang', $id_cabang);
+            }
+            if ($id_proyek != 'all') {
+                $saldoAwalQuery->where('transaksis.id_proyek', $id_proyek);
+            }
+            if ($kodePerkiraan != '') {
+                $saldoAwalQuery->where('kode_perkiraans.kode', 'like', '%' . $kodePerkiraan . '%');
+            }
+
+            $saldoAwalTahunQuery = SaldoAkun::where('is_saldo_awal', 1)
+                ->where('tahun', $tahun)
+                ->whereHas('kodePerkiraan', function ($query) use ($id_cabang, $id_proyek, $kodePerkiraan) {
+                    if ($id_cabang != '') {
+                        $query->where('id_cabang', $id_cabang);
+                    }
+                    if ($id_proyek != 'all') {
+                        $query->where('id_proyek', $id_proyek);
+                    }
+                    if ($kodePerkiraan != '') {
+                        $query->where('kode', 'like', '%' . $kodePerkiraan . '%');
+                    }
+                });
+
+            $saldoAwalTahun = (float) $saldoAwalTahunQuery->selectRaw('COALESCE(SUM(saldo_debet), 0) - COALESCE(SUM(saldo_kredit), 0) as saldo_awal')
+                ->value('saldo_awal');
+
+            $saldoTransaksi = (float) $saldoAwalQuery->selectRaw("
+                COALESCE(SUM(
+                    CASE
+                        WHEN LEFT(kode_perkiraans.kode, 1) IN ('1','4','5','6','8') THEN
+                            CASE WHEN transaksi_details.jenis = 'D' THEN transaksi_details.jumlah ELSE -transaksi_details.jumlah END
+                        WHEN LEFT(kode_perkiraans.kode, 1) IN ('2','3','7') THEN
+                            CASE WHEN transaksi_details.jenis = 'K' THEN transaksi_details.jumlah ELSE -transaksi_details.jumlah END
+                        ELSE 0
+                    END
+                ), 0) as saldo_trx
+            ")->value('saldo_trx');
+
+            $saldoAwal = $saldoAwalTahun + $saldoTransaksi;
+        }
+
+        // PRINT
+        if ($print != '') {
+            return view('transaksi.bukuTambahanPrint', compact(
+                'namaCabang',
+                'namaProyek',
+                'tgl_awal',
+                'tgl_akhir',
+                'kodePerkiraan',
+                'results',
+                'saldoAwal'
+            ));
+        }
+
+        // EXCEL
+        if ($excel != '') {
+            $dataExcel = [];
+
+            // Header rows (rows 1-4)
+            $dataExcel[] = ['id_cabang' => $id_cabang, '', '', 'Buku Tambahan', '', '', '', ''];
+            $dataExcel[] = ['', '', '', $namaCabang . ' / ' . $namaProyek, '', '', '', ''];
+            $dataExcel[] = ['', '', '', 'Periode: ' . Carbon::parse($tgl_awal)->format('d/m/Y') . ' s.d ' . Carbon::parse($tgl_akhir)->format('d/m/Y'), '', '', '', ''];
+            $dataExcel[] = ['', '', '', $kodePerkiraan != '' ? 'Kode Perkiraan: ' . $kodePerkiraan : '', '', '', '', ''];
+
+            // Table header (row 5)
+            $dataExcel[] = ['No', 'Cabang / Proyek', 'No Jurnal / Tgl', 'No Bukti', 'Kode Perkiraan', 'Debet', 'Kredit', 'Saldo'];
+
+            // Saldo awal row (row 6)
+            $saldoAwalValue = $saldoAwal;
+            $saldo = $saldoAwalValue;
+            $totalDebet = 0;
+            $totalKredit = 0;
+
+            $saldoAwalDebet = $saldoAwalValue > 0 ? $saldoAwalValue : 0;
+            $saldoAwalKredit = $saldoAwalValue < 0 ? abs($saldoAwalValue) : 0;
+            $saldoAwalDisplay = $saldoAwalValue < 0 ? -abs($saldoAwalValue) : $saldoAwalValue;
+
+            $dataExcel[] = ['', 'Saldo Awal', '', '', '', $saldoAwalDebet, $saldoAwalKredit, $saldoAwalDisplay];
+
+            // Data rows
+            $no = 1;
+            foreach ($results as $detail) {
+                $cabangProyek = $detail->id_proyek == 0
+                    ? $detail->transaksi->cabang->nama . ' / -'
+                    : $detail->transaksi->cabang->nama . ' / ' . $detail->transaksi->proyek->nama;
+
+                $noJurnal = $detail->transaksi->no_urut_jurnal . ' (' . Carbon::parse($detail->transaksi->tgl)->format('d/m/Y') . ')';
+
+                $debet = 0;
+                $kredit = 0;
+
+                if ($detail->jenis == 'D') {
+                    $debet = $detail->jumlah;
+                    $saldo += $detail->jumlah;
+                    $totalDebet += $detail->jumlah;
+                } else {
+                    $kredit = $detail->jumlah;
+                    $saldo -= $detail->jumlah;
+                    $totalKredit += $detail->jumlah;
+                }
+
+                $dataExcel[] = [
+                    $no++,
+                    $cabangProyek,
+                    $noJurnal,
+                    $detail->transaksi->no_bukti,
+                    '(' . $detail->kodePerkiraan->kode . ') ' . $detail->kodePerkiraan->nama,
+                    $debet,
+                    $kredit,
+                    $saldo
+                ];
+            }
+
+            // Total row
+            $dataExcel[] = ['', '', '', '', 'Total', $totalDebet, $totalKredit, $saldo];
+
+            return Excel::download(new ExportBukuTambahan($dataExcel), 'buku_tambahan.xlsx');
+        }
+
+        // PDF
+        if ($pdf != '') {
+            $pdf = Pdf::loadView('transaksi.bukuTambahanPdf', compact(
+                'id_cabang',
+                'namaCabang',
+                'namaProyek',
+                'tgl_awal',
+                'tgl_akhir',
+                'kodePerkiraan',
+                'results',
+                'saldoAwal'
+            ));
+            $pdf->setPaper('a4', 'landscape');
+            return $pdf->download('buku_tambahan.pdf');
         }
     }
 }

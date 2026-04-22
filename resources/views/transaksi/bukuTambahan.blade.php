@@ -94,6 +94,24 @@
                         </div>
 
                         @if ($isView != '')
+                            <div class="card-footer">
+                                <form action="{{ route('bukuTambahanExport') }}" method="POST" target="_blank">
+                                    @csrf
+                                    <input type="hidden" name="id_cabang2" value="{{ $id_cabang }}">
+                                    <input type="hidden" name="id_proyek2" value="{{ $id_proyek }}">
+                                    <input type="hidden" name="tgl_awal2" value="{{ $tgl_awal }}">
+                                    <input type="hidden" name="tgl_akhir2" value="{{ $tgl_akhir }}">
+                                    <input type="hidden" name="kodePerkiraan2" value="{{ $kodePerkiraan }}">
+
+                                    <button type="submit" name="print" value="print"
+                                        class="btn btn-secondary">Print</button>&nbsp;
+                                    <button type="submit" name="pdf" value="pdf"
+                                        class="btn btn-secondary">PDF</button>&nbsp;
+                                    <button type="submit" name="excel" value="excel"
+                                        class="btn btn-secondary">Excel</button>
+                                </form>
+                            </div>
+
                             <div class="card-body">
                                 <table id="list_bukuTambahan" class="table table-bordered table-striped">
                                     <thead>

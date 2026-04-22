@@ -118,6 +118,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('labaRugiExport', [ExportController::class, 'labaRugiExport'])->name('labaRugiExport');
     Route::post('generalLedgerExport', [ExportController::class, 'generalLedgerExport'])->name('generalLedgerExport');
     Route::post('resumeKeuanganProyekExport', [ExportController::class, 'resumeKeuanganProyekExport'])->name('resumeKeuanganProyekExport');
+    Route::post('bukuTambahanExport', [ExportController::class, 'bukuTambahanExport'])->name('bukuTambahanExport');
 
     // 17-10-2024
     Route::get('hitungSessionJumlah', [TransaksiController::class, 'hitungSessionByJenis'])->name('hitungSessionJumlah');
