@@ -168,6 +168,7 @@
             if (!href || href === '#' || href === '' || href.startsWith('javascript:')) return;
             if (link.target === '_blank') return;
             if (link.hasAttribute('data-toggle') || link.hasAttribute('data-widget')) return;
+            if (link.hasAttribute('data-confirm-delete')) return;
             if (link.closest('.modal')) return;
             if (link.classList.contains('no-loader')) return;
             if (e.ctrlKey || e.metaKey || e.shiftKey) return;
