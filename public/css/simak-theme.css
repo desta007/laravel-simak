@@ -846,3 +846,347 @@ a:hover {
     background: #f1f5f9 !important;
     border-left: 2px solid #e2e8f0 !important;
 }
+
+/* === TRANSACTION FORM SECTIONS === */
+.trx-form-section {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.trx-form-section:last-child {
+    border-bottom: none;
+}
+
+.trx-form-section-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #2563eb;
+    margin-bottom: 0.6rem;
+}
+
+.trx-form-section-title i {
+    margin-right: 0.25rem;
+    font-size: 0.7rem;
+}
+
+/* --- Detail Section Header --- */
+.trx-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+    background: #2563eb;
+    border-top: none;
+    border-bottom: none;
+}
+
+.trx-detail-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #fff;
+}
+
+.trx-detail-header-left i {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9375rem;
+}
+
+/* --- Empty State --- */
+.trx-empty-state {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: #94a3b8;
+}
+
+.trx-empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    display: block;
+    opacity: 0.4;
+}
+
+.trx-empty-state p {
+    margin: 0;
+    font-size: 0.8125rem;
+}
+
+/* --- Balance Summary --- */
+.trx-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.trx-summary-items {
+    display: flex;
+    align-items: stretch;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.trx-summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.625rem 1rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    min-width: 140px;
+}
+
+.trx-summary-label {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.trx-summary-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.trx-summary-dot--debet {
+    background: #3b82f6;
+}
+
+.trx-summary-dot--kredit {
+    background: #f59e0b;
+}
+
+.trx-summary-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Balance states */
+.trx-summary-item--balance {
+    border-color: #cbd5e1;
+    background: white;
+}
+
+.trx-summary-item--balance .trx-summary-label i {
+    color: #94a3b8;
+}
+
+.trx-summary-item--balanced {
+    border-color: #059669;
+    background: #ecfdf5;
+}
+
+.trx-summary-item--balanced .trx-summary-value {
+    color: #047857;
+}
+
+.trx-summary-item--balanced .trx-summary-label i {
+    color: #059669;
+}
+
+.trx-summary-item--unbalanced {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+.trx-summary-item--unbalanced .trx-summary-value {
+    color: #b91c1c;
+}
+
+.trx-summary-item--unbalanced .trx-summary-label i {
+    color: #dc2626;
+}
+
+.trx-summary-action {
+    display: flex;
+    align-items: center;
+}
+
+/* --- Detail Table Jenis Badge --- */
+.trx-jenis-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.trx-jenis-badge--D {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.trx-jenis-badge--K {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* --- Transaction Amount & Cell Helpers --- */
+.trx-amount {
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    font-size: 0.8125rem;
+}
+
+.trx-cell-sub {
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.trx-file-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    color: #2563eb;
+    text-decoration: none;
+    margin-top: 0.125rem;
+}
+
+.trx-file-link:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+/* --- Transaction Footer Rows --- */
+.trx-subtotal-row {
+    background: #f8fafc;
+}
+
+.trx-subtotal-row td {
+    border-top: 2px solid #cbd5e1 !important;
+    color: #334155;
+}
+
+/* --- Transaction Inline Input Row --- */
+.trx-input-row {
+    background: #eff6ff !important;
+    border-top: 2px solid #bfdbfe;
+}
+
+.trx-input-row td {
+    padding-top: 0.6rem !important;
+    padding-bottom: 0.6rem !important;
+    vertical-align: middle;
+}
+
+.trx-input-row .form-control,
+.trx-input-row .form-control-sm {
+    font-size: 0.8125rem;
+}
+
+/* --- Autocomplete Dropdown --- */
+.autocomplete-dropdown {
+    display: none;
+    position: fixed;
+    z-index: 1060;
+    min-width: 380px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.ac-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.1s;
+}
+
+.ac-item:last-child {
+    border-bottom: none;
+}
+
+.ac-item:hover,
+.ac-item.ac-active {
+    background: #eff6ff;
+}
+
+.ac-item.ac-empty {
+    color: #94a3b8;
+    cursor: default;
+    font-style: italic;
+}
+
+.ac-item.ac-empty:hover {
+    background: transparent;
+}
+
+.ac-kode {
+    font-weight: 600;
+    color: #1d4ed8;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+    min-width: 80px;
+}
+
+.ac-nama {
+    color: #475569;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Edit row autocomplete */
+.kode-perkiraan-cell {
+    position: relative;
+}
+
+.ac-edit-dropdown {
+    position: fixed;
+    z-index: 1060;
+    min-width: 380px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+@media (max-width: 767.98px) {
+    .trx-summary {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .trx-summary-items {
+        flex-direction: column;
+    }
+
+    .trx-summary-item {
+        min-width: auto;
+    }
+
+    .trx-summary-action {
+        justify-content: flex-end;
+    }
+}

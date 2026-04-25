@@ -77,7 +77,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('addModalPejabat', [PejabatController::class, 'addModal'])->name('addModalPejabat');
 
     Route::get('transJurnal', [TransaksiController::class, 'index'])->name('transJurnal');
-    Route::post('transJurnalSearch', [TransaksiController::class, 'search'])->name('transJurnalSearch');
+    Route::get('transJurnalSearch', [TransaksiController::class, 'search'])->name('transJurnalSearch');
     Route::get('addTransJurnal', [TransaksiController::class, 'create'])->name('addTransJurnal');
     Route::get('addTransJurnalDetail', [TransaksiController::class, 'addModalDetail'])->name('addTransJurnalDetail');
     Route::post('submitTransJurnal', [TransaksiController::class, 'store'])->name('submitTransJurnal');

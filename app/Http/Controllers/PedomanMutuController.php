@@ -94,7 +94,8 @@ class PedomanMutuController extends Controller
         $request->validate([
             'no_dokumen' => 'required',
             'nama_dokumen' => 'required',
-            'tipe_dokumen' => 'required'
+            'tipe_dokumen' => 'required',
+            'file_dokumen' => 'nullable|mimes:png,jpg,jpeg,pdf|max:10000',
         ]);
 
         $pedomanMutu->no_dokumen = $request->no_dokumen;

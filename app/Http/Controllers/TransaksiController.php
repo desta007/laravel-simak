@@ -84,7 +84,7 @@ class TransaksiController extends Controller
         }
 
         //dd($transaksis->toSql());
-        $results = $transaksis->get();
+        $results = $transaksis->paginate(25)->appends(request()->query());
 
         $title = 'Delete Data!';
         $text = "Apakah anda yakin akan menghapus data?";
@@ -163,7 +163,13 @@ class TransaksiController extends Controller
         }
 
         //dd($transaksis->toSql());
-        $results = $transaksis->get();
+        $results = $transaksis->paginate(25)->appends([
+            'tgl_awal' => $tgl_awal,
+            'tgl_akhir' => $tgl_akhir,
+            'id_cabang' => $id_cabang,
+            'id_proyek' => $id_proyek,
+            'noBukti' => $noBukti,
+        ]);
 
         $title = 'Delete Data!';
         $text = "Apakah anda yakin akan menghapus data?";
@@ -221,11 +227,28 @@ class TransaksiController extends Controller
         $request->validate([
             'id_cabang' => 'required',
             'id_kode_bukti' => 'required',
-            'no_urut_bukti' => 'required',
             'tgl' => 'required'
         ]);
 
-        //$counter = $request->input('counter');
+        // Server-side balance validation
+        $totalDebet = 0;
+        $totalKredit = 0;
+        $jenisList = $request->input('jenis1', []);
+        $jumlahList = $request->input('jumlah1', []);
+
+        foreach ($jenisList as $idx => $jenis) {
+            $jumlah = (float)($jumlahList[$idx] ?? 0);
+            if ($jenis == 'D') {
+                $totalDebet += $jumlah;
+            } elseif ($jenis == 'K') {
+                $totalKredit += $jumlah;
+            }
+        }
+
+        if ($totalDebet !== $totalKredit) {
+            Alert::error('Tidak Balance!', 'Total Debet (' . number_format($totalDebet) . ') tidak sama dengan Total Kredit (' . number_format($totalKredit) . ')');
+            return back()->withInput();
+        }
 
         // detailnya
         $id_kode_perkiraan1 = $request['id_kode_perkiraan1'];
@@ -241,18 +264,34 @@ class TransaksiController extends Controller
             DB::beginTransaction();
 
             // generate no jurnal
-            $month = \Carbon\Carbon::parse($request['tgl'])->format('m');
-            $year = Carbon::parse($request['tgl'])->year;
+            $tgl = Carbon::parse($request['tgl']);
+            $month = $tgl->format('m');
+            $year = $tgl->format('Y');
 
+            // Generate no_urut_jurnal
             $noUrutJurnal = Transaksi::where('id_cabang', $request['id_cabang'])
                 ->where('id_proyek', $request['id_proyek'])
                 ->whereYear('tgl', $year)
                 ->whereMonth('tgl', $month)
                 ->max('no_urut_jurnal');
-            $noUrutJurnal = $noUrutJurnal + 1;
+            $noUrutJurnal = $noUrutJurnal ? $noUrutJurnal + 1 : 1;
 
-            $noBukti = KodeBukti::where('id', $request['id_kode_bukti'])->first();
-            $noBuktiFull = $request['no_urut_bukti'] . '/' . $noBukti['kode'] . '/' . $month . '/' . $year;
+            // Get kode bukti info
+            $noBukti = KodeBukti::findOrFail($request['id_kode_bukti']);
+
+            // SAFELY generate no_urut_bukti with lock to avoid duplication
+            $lockedRows = Transaksi::where('id_cabang', $request['id_cabang'])
+                ->where('id_kode_bukti', $request['id_kode_bukti'])
+                ->whereYear('tgl', $year)
+                ->whereMonth('tgl', $month)
+                ->lockForUpdate()
+                ->get();
+
+            $latestNoUrutBukti = $lockedRows->max('no_urut_bukti');
+            $nextNoUrutBukti = $latestNoUrutBukti ? $latestNoUrutBukti + 1 : 1;
+            $formattedNoUrutBukti = str_pad($nextNoUrutBukti, 4, '0', STR_PAD_LEFT);
+
+            $noBuktiFull = $formattedNoUrutBukti . '/' . $noBukti->kode . '/' . $month . '/' . $year;
 
             $fileName = '';
             if ($request->file_dokumen != '') {
@@ -262,13 +301,14 @@ class TransaksiController extends Controller
                 $request->file('file_dokumen')->storeAs('transaksis', $fileName);
             }
 
+            // Create main transaksi
             $trx = Transaksi::create([
                 'id_cabang' => $request['id_cabang'],
                 'id_proyek' => $request['id_proyek'],
                 'id_kode_bukti' => $request['id_kode_bukti'],
                 'tgl' => $request['tgl'],
                 'no_bukti' => $noBuktiFull,
-                'no_urut_bukti' => $request['no_urut_bukti'],
+                'no_urut_bukti' => $nextNoUrutBukti,
                 'keterangan' => $request['keterangan'],
                 'no_urut_jurnal' => $noUrutJurnal,
                 'file_dokumen' => $fileName
@@ -277,7 +317,6 @@ class TransaksiController extends Controller
             // save transaksi detail
             $id_trx = $trx->id;
 
-            // foreach ($id_kode_perkiraan1 as $kode_acc) {
             for ($i = 0; $i < count($id_kode_perkiraan1); $i++) {
                 TransaksiDetail::create([
                     'id_transaksi' => $id_trx,
@@ -296,6 +335,8 @@ class TransaksiController extends Controller
             return redirect()->route('transJurnal');
         } catch (\Exception $e) {
             DB::rollback();
+
+            \Log::error('Transaksi Store Error: ' . $e->getMessage());
 
             Alert::error('Gagal', 'Transaksi gagal disimpan, silahkan periksa kembali inputan anda');
             return redirect()->route('addTransJurnal');
