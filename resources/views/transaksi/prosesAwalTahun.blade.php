@@ -129,7 +129,7 @@
                                     </thead>
                                     <tbody>
                                         @forelse ($histories as $index => $history)
-                                            <tr>
+                                            <tr class="history-row" @if($index >= 5) style="display: none;" @endif>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $history->cabang_nama ?? '-' }}</td>
                                                 <td>
@@ -168,6 +168,13 @@
                                 </table>
                             </div>
                         </div>
+                        @if(count($histories) > 5)
+                            <div class="card-footer text-center py-2">
+                                <a href="javascript:void(0)" id="btnToggleHistory" class="text-primary" style="font-size: 0.85rem;">
+                                    <i class="fas fa-chevron-down mr-1"></i> Tampilkan lainnya (<span id="hiddenCount">{{ count($histories) - 5 }}</span> lagi)
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -288,6 +295,21 @@
                         });
                     }
                 });
+            });
+
+            // Toggle history rows
+            var expanded = false;
+            $('#btnToggleHistory').click(function() {
+                expanded = !expanded;
+                if (expanded) {
+                    $('.history-row').show();
+                    $(this).html('<i class="fas fa-chevron-up mr-1"></i> Sembunyikan');
+                } else {
+                    $('.history-row').each(function(idx) {
+                        if (idx >= 5) $(this).hide();
+                    });
+                    $(this).html('<i class="fas fa-chevron-down mr-1"></i> Tampilkan lainnya (<span id="hiddenCount">{{ count($histories) - 5 }}</span> lagi)');
+                }
             });
         });
     </script>

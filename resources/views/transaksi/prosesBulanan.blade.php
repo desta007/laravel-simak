@@ -23,7 +23,7 @@
             {{-- Info Box --}}
             <div class="alert alert-info alert-dismissible fade show" role="alert">
                 <i class="fas fa-info-circle mr-2"></i>
-                <strong>Informasi:</strong> Proses data bulanan akan menghitung saldo setiap akun berdasarkan transaksi jurnal pada periode yang dipilih, kemudian menyimpan hasilnya ke tabel saldo akun.
+                <strong>Informasi:</strong> Proses data bulanan akan menghitung saldo setiap akun berdasarkan transaksi jurnal pada periode yang dipilih, kemudian menyimpan hasilnya ke tabel saldo akun. Anda dapat memilih range bulan untuk memproses beberapa bulan sekaligus.
                 <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
             </div>
 
@@ -79,9 +79,9 @@
                                         <i class="fas fa-calendar-alt"></i> Periode
                                     </div>
                                     <div class="row">
-                                        <div class="col-6 form-group mb-3">
-                                            <label for="bulan">Bulan <span class="text-danger">*</span></label>
-                                            <select name="bulan" class="form-control select2" id="bulan" style="width: 100%;">
+                                        <div class="col-4 form-group mb-3">
+                                            <label for="bulan_awal">Bulan Awal <span class="text-danger">*</span></label>
+                                            <select name="bulan_awal" class="form-control select2" id="bulan_awal" style="width: 100%;">
                                                 <option value="" selected>- Pilih -</option>
                                                 @foreach (range(1, 12) as $month)
                                                     <option value="{{ $month }}">
@@ -89,11 +89,25 @@
                                                     </option>
                                                 @endforeach
                                             </select>
-                                            @error('bulan')
+                                            @error('bulan_awal')
                                                 <small class="text-danger">{{ $message }}</small>
                                             @enderror
                                         </div>
-                                        <div class="col-6 form-group mb-3">
+                                        <div class="col-4 form-group mb-3">
+                                            <label for="bulan_akhir">Bulan Akhir <span class="text-danger">*</span></label>
+                                            <select name="bulan_akhir" class="form-control select2" id="bulan_akhir" style="width: 100%;">
+                                                <option value="" selected>- Pilih -</option>
+                                                @foreach (range(1, 12) as $month)
+                                                    <option value="{{ $month }}">
+                                                        {{ date('F', mktime(0, 0, 0, $month, 1)) }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('bulan_akhir')
+                                                <small class="text-danger">{{ $message }}</small>
+                                            @enderror
+                                        </div>
+                                        <div class="col-4 form-group mb-3">
                                             <label for="tahun">Tahun</label>
                                             <select name="tahun" class="form-control select2" id="tahun" style="width: 100%;">
                                                 @foreach (range(date('Y') - 5, date('Y') + 5) as $year)
@@ -128,7 +142,7 @@
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive">
-                                <table class="table table-hover mb-0">
+                                <table class="table table-hover mb-0" id="historyTable">
                                     <thead>
                                         <tr>
                                             <th style="width: 40px">No</th>
@@ -141,7 +155,7 @@
                                     </thead>
                                     <tbody>
                                         @forelse ($histories as $index => $history)
-                                            <tr>
+                                            <tr class="history-row" @if($index >= 5) style="display: none;" @endif>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $history->cabang_nama ?? '-' }}</td>
                                                 <td>
@@ -180,6 +194,13 @@
                                 </table>
                             </div>
                         </div>
+                        @if(count($histories) > 5)
+                            <div class="card-footer text-center py-2">
+                                <a href="javascript:void(0)" id="btnToggleHistory" class="text-primary" style="font-size: 0.85rem;">
+                                    <i class="fas fa-chevron-down mr-1"></i> Tampilkan lainnya (<span id="hiddenCount">{{ count($histories) - 5 }}</span> lagi)
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -236,6 +257,16 @@
                 }, 50);
             }
 
+            // Auto-sync bulan_akhir when bulan_awal changes
+            $('#bulan_awal').change(function() {
+                var val = $(this).val();
+                var akhirVal = $('#bulan_akhir').val();
+                // If bulan_akhir is empty or less than bulan_awal, set it to same
+                if (!akhirVal || parseInt(akhirVal) < parseInt(val)) {
+                    $('#bulan_akhir').val(val).trigger('change.select2');
+                }
+            });
+
             // Submit handler
             $('#myForm').on('submit', function(event) {
                 event.preventDefault();
@@ -246,16 +277,31 @@
                     Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Cabang terlebih dahulu' });
                     return false;
                 }
-                if (!$('#bulan').val()) {
+                if (!$('#bulan_awal').val()) {
                     resetBtn();
-                    Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Bulan terlebih dahulu' });
+                    Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Bulan Awal terlebih dahulu' });
+                    return false;
+                }
+                if (!$('#bulan_akhir').val()) {
+                    resetBtn();
+                    Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Bulan Akhir terlebih dahulu' });
+                    return false;
+                }
+                if (parseInt($('#bulan_akhir').val()) < parseInt($('#bulan_awal').val())) {
+                    resetBtn();
+                    Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Bulan Akhir tidak boleh lebih kecil dari Bulan Awal' });
                     return false;
                 }
 
                 var cabangText = $('#id_cabang option:selected').text().trim();
                 var proyekText = $('#id_proyek option:selected').text().trim();
-                var bulanText = $('#bulan option:selected').text().trim();
+                var bulanAwalText = $('#bulan_awal option:selected').text().trim();
+                var bulanAkhirText = $('#bulan_akhir option:selected').text().trim();
                 var tahunText = $('#tahun option:selected').text().trim();
+
+                var periodeText = bulanAwalText === bulanAkhirText
+                    ? bulanAwalText + ' ' + tahunText
+                    : bulanAwalText + ' s/d ' + bulanAkhirText + ' ' + tahunText;
 
                 resetBtn();
                 Swal.fire({
@@ -265,7 +311,7 @@
                         '<table class="table table-sm table-borderless mb-0">' +
                         '<tr><td class="font-weight-bold" style="width:80px">Cabang</td><td>: ' + cabangText + '</td></tr>' +
                         '<tr><td class="font-weight-bold">Proyek</td><td>: ' + proyekText + '</td></tr>' +
-                        '<tr><td class="font-weight-bold">Periode</td><td>: ' + bulanText + ' ' + tahunText + '</td></tr>' +
+                        '<tr><td class="font-weight-bold">Periode</td><td>: ' + periodeText + '</td></tr>' +
                         '</table></div>',
                     icon: 'question',
                     showCancelButton: true,
@@ -298,6 +344,21 @@
                         });
                     }
                 });
+            });
+
+            // Toggle history rows
+            var expanded = false;
+            $('#btnToggleHistory').click(function() {
+                expanded = !expanded;
+                if (expanded) {
+                    $('.history-row').show();
+                    $(this).html('<i class="fas fa-chevron-up mr-1"></i> Sembunyikan');
+                } else {
+                    $('.history-row').each(function(idx) {
+                        if (idx >= 5) $(this).hide();
+                    });
+                    $(this).html('<i class="fas fa-chevron-down mr-1"></i> Tampilkan lainnya (<span id="hiddenCount">{{ count($histories) - 5 }}</span> lagi)');
+                }
             });
         });
     </script>

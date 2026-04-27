@@ -23,8 +23,8 @@ class StoreDataRequest extends FormRequest
     {
         return [
             'id_cabang' => 'required',
-            'bulan' => 'required',
-            // Add more validation rules as needed
+            'bulan_awal' => 'required|integer|min:1|max:12',
+            'bulan_akhir' => 'required|integer|min:1|max:12|gte:bulan_awal',
         ];
     }
 }

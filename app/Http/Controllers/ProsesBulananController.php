@@ -90,15 +90,9 @@ class ProsesBulananController extends Controller
 
         $id_cabang = $request->input('id_cabang');
         $id_proyek = $request->input('id_proyek');
-        $bulan = $request->input('bulan');
+        $bulanAwal = (int) $request->input('bulan_awal');
+        $bulanAkhir = (int) $request->input('bulan_akhir');
         $tahun = $request->input('tahun');
-        $startDate = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
-
-        // Construct the end date for the given month and year
-        $endDate = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth();
-
-        // $transaksis = Transaksi::query();
-        // $transaksis->whereBetween('tgl', array($tgl_awal, $tgl_akhir));
 
         // get nama cabang dan proyek
         $getCabang = Cabang::where('id', $id_cabang)->first();
@@ -113,6 +107,12 @@ class ProsesBulananController extends Controller
 
         try {
             DB::beginTransaction();
+
+            // Loop through each month in the range
+            for ($bulan = $bulanAwal; $bulan <= $bulanAkhir; $bulan++) {
+
+            $startDate = Carbon::createFromDate($tahun, $bulan, 1)->startOfMonth();
+            $endDate = Carbon::createFromDate($tahun, $bulan, 1)->endOfMonth();
 
             // get semua akun by cabang dan proyek
             $kodePerkiraans = KodePerkiraan::where('id_cabang', $id_cabang)
@@ -682,10 +682,15 @@ class ProsesBulananController extends Controller
                 }
             }
 
+            } // end for loop bulan range
+
             // Commit the transaction if all operations are successful
             DB::commit();
 
-            Alert::success('Berhasil', 'Proses data di cabang ' . $namaCabang . ' ' . $namaProyek . ' bulan ' . $bulan . ' tahun ' . $tahun . ' berhasil');
+            $periodeText = $bulanAwal == $bulanAkhir
+                ? 'bulan ' . $bulanAwal
+                : 'bulan ' . $bulanAwal . ' s/d ' . $bulanAkhir;
+            Alert::success('Berhasil', 'Proses data di cabang ' . $namaCabang . ' ' . $namaProyek . ' ' . $periodeText . ' tahun ' . $tahun . ' berhasil');
             return redirect()->route('prosesBulanan');
         } catch (\Exception $e) {
             DB::rollback();
