@@ -168,6 +168,14 @@
             padding: 28px 32px 8px;
         }
 
+        .login-logos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
         .login-logo {
             width: 64px;
             height: 64px;
@@ -175,7 +183,6 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 16px;
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.15);
             overflow: hidden;
             background: #ffffff;
@@ -431,8 +438,13 @@
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <div class="login-logo">
-                    <img src="{{ asset('storage/ptsam.jpg') }}" alt="Logo">
+                <div class="login-logos">
+                    <div class="login-logo">
+                        <img src="{{ asset('storage/ptsam.jpg') }}" alt="PT SAM Logo">
+                    </div>
+                    <div class="login-logo">
+                        <img src="{{ asset('storage/cvnimo.jpg') }}" alt="CV NIMO Logo">
+                    </div>
                 </div>
                 <h1>SIMAK</h1>
                 <p>Sistem Informasi Akuntansi Keuangan</p>

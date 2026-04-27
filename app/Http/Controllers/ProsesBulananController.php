@@ -44,7 +44,44 @@ class ProsesBulananController extends Controller
                 ->orderBy('proyeks.created_at', 'desc')->get();
         }
 
-        return view('transaksi.prosesBulanan', compact('cabangs', 'proyeks'));
+        // History: get recent proses data grouped by cabang, proyek, bulan, tahun
+        $historyQuery = DB::table('saldo_akuns')
+            ->join('kode_perkiraans', 'saldo_akuns.id_kode_perkiraan', '=', 'kode_perkiraans.id')
+            ->leftJoin('cabangs', 'kode_perkiraans.id_cabang', '=', 'cabangs.id')
+            ->leftJoin('proyeks', 'kode_perkiraans.id_proyek', '=', 'proyeks.id')
+            ->where('saldo_akuns.is_saldo_awal', 0)
+            ->select(
+                'kode_perkiraans.id_cabang',
+                'kode_perkiraans.id_proyek',
+                'saldo_akuns.bulan',
+                'saldo_akuns.tahun',
+                'cabangs.nama as cabang_nama',
+                'proyeks.nama as proyek_nama',
+                DB::raw('COUNT(saldo_akuns.id) as jumlah_akun'),
+                DB::raw('MAX(saldo_akuns.updated_at) as last_processed')
+            )
+            ->groupBy(
+                'kode_perkiraans.id_cabang',
+                'kode_perkiraans.id_proyek',
+                'saldo_akuns.bulan',
+                'saldo_akuns.tahun',
+                'cabangs.nama',
+                'proyeks.nama'
+            );
+
+        // Filter by user group
+        if ($id_group_user == 2) {
+            $historyQuery->where('kode_perkiraans.id_cabang', $id_cabang);
+        } elseif ($id_group_user == 3) {
+            $id_user = auth()->user()->id;
+            $historyQuery->whereIn('kode_perkiraans.id_proyek', function ($sub) use ($id_user) {
+                $sub->select('id_proyek')->from('user_proyeks')->where('id_user', $id_user);
+            });
+        }
+
+        $histories = $historyQuery->orderByDesc('last_processed')->limit(15)->get();
+
+        return view('transaksi.prosesBulanan', compact('cabangs', 'proyeks', 'histories'));
     }
 
     public function proses(StoreDataRequest $request)

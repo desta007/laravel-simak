@@ -112,8 +112,13 @@
         <!-- Preloader -->
         <div class="custom-preloader flex-column justify-content-center align-items-center">
             <div class="preloader-content">
-                <div class="preloader-logo">
-                    <img src="{{ asset('storage/ptsam.jpg') }}" alt="SIMAK Logo">
+                <div class="preloader-logos">
+                    <div class="preloader-logo">
+                        <img src="{{ asset('storage/ptsam.jpg') }}" alt="PT SAM Logo">
+                    </div>
+                    <div class="preloader-logo">
+                        <img src="{{ asset('storage/cvnimo.jpg') }}" alt="CV NIMO Logo">
+                    </div>
                 </div>
                 <div class="preloader-text">SIMAK</div>
                 <div class="preloader-bar">
@@ -181,8 +186,13 @@
                 div.style.display = 'flex';
                 div.innerHTML =
                     '<div class="preloader-content">' +
-                        '<div class="preloader-logo">' +
-                            '<img src="{{ asset("storage/ptsam.jpg") }}" alt="SIMAK Logo">' +
+                        '<div class="preloader-logos">' +
+                            '<div class="preloader-logo">' +
+                                '<img src="{{ asset("storage/ptsam.jpg") }}" alt="PT SAM Logo">' +
+                            '</div>' +
+                            '<div class="preloader-logo">' +
+                                '<img src="{{ asset("storage/cvnimo.jpg") }}" alt="CV NIMO Logo">' +
+                            '</div>' +
                         '</div>' +
                         '<div class="preloader-text">SIMAK</div>' +
                         '<div class="preloader-bar">' +
