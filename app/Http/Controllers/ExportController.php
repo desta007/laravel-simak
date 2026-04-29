@@ -2049,8 +2049,12 @@ class ExportController extends Controller
             ));
         }
 
+        // Generate nama file dinamis
+        $bulanFormatted = str_pad($bulan, 2, '0', STR_PAD_LEFT);
+        $namaFileNeraca = 'Neraca_' . $bulanFormatted . '_' . $tahun;
+
         if ($excel != '') {
-            return Excel::download(new ExportNeraca($dataExcel), 'laporan_neraca.xlsx');
+            return Excel::download(new ExportNeraca($dataExcel), $namaFileNeraca . '.xlsx');
         }
         // modif 17-10-2024 utk excel. dikomen lagi, msh error
         /*if ($excel != '') {
@@ -2175,7 +2179,7 @@ class ExportController extends Controller
                 'listData31x',
                 'listData32x'
             ));
-            return $pdf->download('laporan_neraca.pdf');
+            return $pdf->download($namaFileNeraca . '.pdf');
         }
 
         // ------------------------------------------------------------------------------------------------------
@@ -3300,8 +3304,13 @@ class ExportController extends Controller
             ));
         }
 
+        // Generate nama file dinamis
+        $bulan1Formatted = str_pad($bulan1, 2, '0', STR_PAD_LEFT);
+        $bulan2Formatted = str_pad($bulan2, 2, '0', STR_PAD_LEFT);
+        $namaFileLabaRugi = 'LabaRugi_' . $bulan1Formatted . '_sd_' . $bulan2Formatted . '_' . $tahun;
+
         if ($excel != '') {
-            return Excel::download(new ExportLabaRugi($dataExcel), 'laporan_labarugi.xlsx');
+            return Excel::download(new ExportLabaRugi($dataExcel), $namaFileLabaRugi . '.xlsx');
             // return view('report.labaRugiExcel', compact(
             //     'bulan1',
             //     'bulan2',
@@ -3367,7 +3376,7 @@ class ExportController extends Controller
                 'listData80x',
                 'listData83x',
             ));
-            return $pdf->download('laporan_laba_rugi.pdf');
+            return $pdf->download($namaFileLabaRugi . '.pdf');
         }
 
         // ------------------------------------------------------------------------------------------------------
@@ -3503,6 +3512,11 @@ class ExportController extends Controller
             return "{$prefix} | {$groupName}";
         });
 
+        // Generate nama file dinamis
+        $bulan1Formatted = str_pad($bulan1, 2, '0', STR_PAD_LEFT);
+        $bulan2Formatted = str_pad($bulan2, 2, '0', STR_PAD_LEFT);
+        $namaFileGL = 'GL_' . ($kodePerkiraan != '' ? $kodePerkiraan . '_' : '') . $bulan1Formatted . '_sd_' . $bulan2Formatted . '_' . $tahun;
+
         // 15-11-2024
         if ($print != '') {
             // 02-11-2024 qrcode dari nama pejabat
@@ -3565,7 +3579,7 @@ class ExportController extends Controller
                 'listData',
                 'groupedListData'
             ));
-            return $pdf->download('general_ledger.pdf');
+            return $pdf->download($namaFileGL . '.pdf');
         }
     }
 
