@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CabangController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CatatanMutuController;
 use App\Http\Controllers\ExcelExportController;
 use App\Http\Controllers\ExportController;
@@ -44,9 +45,8 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/', [KodePerkiraanController::class, 'index']);
 
-    Route::get('home', function () {
-        return view('dashboard');
-    });
+    Route::get('home', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('dashboard/getData', [DashboardController::class, 'getData'])->name('dashboard.getData');
 
     Route::resource('cabang', CabangController::class);
     Route::resource('proyek', ProyekController::class);

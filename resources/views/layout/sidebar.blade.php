@@ -15,6 +15,16 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
 
+                <li class="nav-item">
+                    <a href="{{ route('dashboard') }}"
+                        class="nav-link {{ request()->is('home') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>
+                            Dashboard
+                        </p>
+                    </a>
+                </li>
+
                 @if (auth()->user()->id_group_user == 1)
                     <li
                         class="nav-item {{ request()->is('cabang*') || request()->is('proyek*') || request()->is('kodeBukti*') || request()->is('groupAccount*') ? 'menu-open' : '' }}">
