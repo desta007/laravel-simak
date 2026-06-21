@@ -16,6 +16,8 @@ use App\Http\Controllers\ProsesBulananController;
 use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\KladKasBankController;
+use App\Http\Controllers\RekeningBankController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -123,6 +125,26 @@ Route::middleware(['auth'])->group(function () {
     // 17-10-2024
     Route::get('hitungSessionJumlah', [TransaksiController::class, 'hitungSessionByJenis'])->name('hitungSessionJumlah');
     Route::post('saveSessionJumlah', [TransaksiController::class, 'saveSessionByJenis'])->name('saveSessionJumlah');
+
+    // Klad Kas & Bank - Input
+    Route::get('kladKasBank', [KladKasBankController::class, 'index'])->name('kladKasBank');
+    Route::get('kladKasBankSearch', [KladKasBankController::class, 'search'])->name('kladKasBankSearch');
+    Route::get('addKladKasBank', [KladKasBankController::class, 'create'])->name('addKladKasBank');
+    Route::post('submitKladKasBank', [KladKasBankController::class, 'store'])->name('submitKladKasBank');
+    Route::get('kladKasBank/{id}/edit', [KladKasBankController::class, 'edit'])->name('editKladKasBank');
+    Route::put('kladKasBank/{id}', [KladKasBankController::class, 'update'])->name('updateKladKasBank');
+    Route::delete('kladKasBank/{id}/delete', [KladKasBankController::class, 'destroy'])->name('deleteKladKasBank');
+    Route::get('kladKasBank/{id}/voucher', [KladKasBankController::class, 'printVoucher'])->name('printVoucherKladKasBank');
+    Route::get('kladKasBank/{id}/voucherPdf', [KladKasBankController::class, 'exportVoucherPdf'])->name('exportVoucherPdfKladKasBank');
+
+    // Klad Kas & Bank - Report
+    Route::get('laporanKladKasBank', [KladKasBankController::class, 'report'])->name('laporanKladKasBank');
+    Route::post('laporanKladKasBankSearch', [KladKasBankController::class, 'reportSearch'])->name('laporanKladKasBankSearch');
+    Route::post('laporanKladKasBankExport', [KladKasBankController::class, 'reportExport'])->name('laporanKladKasBankExport');
+
+    // Master Rekening Bank
+    Route::resource('rekeningBank', RekeningBankController::class);
+    Route::get('addModalRekeningBank', [RekeningBankController::class, 'addModal'])->name('addModalRekeningBank');
 
     // 24-07-2025
     Route::get('/get-proyeks-by-cabang', [KodePerkiraanController::class, 'getProyeksByCabang'])->name('getProyeksByCabang');

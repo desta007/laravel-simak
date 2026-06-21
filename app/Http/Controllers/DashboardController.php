@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Cabang;
 use App\Models\GroupAccount;
-use App\Models\KodePerkiraan;
 use App\Models\Proyek;
 use App\Models\SaldoAkun;
 use App\Models\Transaksi;
-use App\Models\TransaksiDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -111,7 +109,11 @@ class DashboardController extends Controller
      * Calculate total saldo for a group of accounts up to given month
      * Following the same logic as ReportController::neracaSearch
      */
-    private function hitungSaldoGroup($kodePrefix, $tahun, $bulan, $id_cabang, $id_proyek, $isDebitNormal = true)
+    /**
+     * $includeSaldoAwal = true  -> untuk akun neraca (Aset 1x, Kewajiban 2x, Ekuitas 3x)
+     * $includeSaldoAwal = false -> untuk akun laba/rugi (Pendapatan 4x/7x, Beban 5x/6x/8x)
+     */
+    private function hitungSaldoGroup($kodePrefix, $tahun, $bulan, $id_cabang, $id_proyek, $isDebitNormal = true, $includeSaldoAwal = true)
     {
         $groupAccounts = GroupAccount::where('kode', 'like', $kodePrefix . '%')
             ->orderBy('kode', 'asc')->get();
@@ -119,25 +121,27 @@ class DashboardController extends Controller
         $total = 0;
 
         foreach ($groupAccounts as $groupAcc) {
-            // Saldo awal tahun
-            $query = SaldoAkun::with('kodePerkiraan')
-                ->where('tahun', $tahun)
-                ->where('is_saldo_awal', 1)
-                ->whereHas('kodePerkiraan', function ($q) use ($groupAcc, $id_cabang, $id_proyek) {
-                    $q->where('kode', 'like', $groupAcc->kode . '%');
-                    if ($id_cabang != '')
-                        $q->where('id_cabang', $id_cabang);
-                    if ($id_proyek != 'all')
-                        $q->where('id_proyek', $id_proyek);
-                });
-
-            $saldoAwalList = $query->get();
             $jumlah = 0;
-            foreach ($saldoAwalList as $sa) {
-                if ($isDebitNormal) {
-                    $jumlah += $sa->saldo_debet - $sa->saldo_kredit;
-                } else {
-                    $jumlah += $sa->saldo_kredit - $sa->saldo_debet;
+
+            // Saldo awal tahun (hanya untuk akun neraca)
+            if ($includeSaldoAwal) {
+                $saldoAwalList = SaldoAkun::with('kodePerkiraan')
+                    ->where('tahun', $tahun)
+                    ->where('is_saldo_awal', 1)
+                    ->whereHas('kodePerkiraan', function ($q) use ($groupAcc, $id_cabang, $id_proyek) {
+                        $q->where('kode', 'like', $groupAcc->kode . '%');
+                        if ($id_cabang != '')
+                            $q->where('id_cabang', $id_cabang);
+                        if ($id_proyek != 'all')
+                            $q->where('id_proyek', $id_proyek);
+                    })->get();
+
+                foreach ($saldoAwalList as $sa) {
+                    if ($isDebitNormal) {
+                        $jumlah += $sa->saldo_debet - $sa->saldo_kredit;
+                    } else {
+                        $jumlah += $sa->saldo_kredit - $sa->saldo_debet;
+                    }
                 }
             }
 
@@ -190,26 +194,26 @@ class DashboardController extends Controller
             $totalEkuitas += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $id_cabang, $id_proyek, false);
         }
 
-        // Pendapatan (kode 4x) - kredit normal
+        // Pendapatan (kode 4x) - kredit normal, TANPA saldo awal
         $totalPendapatan = 0;
         foreach (['40', '41', '42', '43', '44', '45', '46', '47', '48', '49'] as $prefix) {
-            $totalPendapatan += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $id_cabang, $id_proyek, false);
+            $totalPendapatan += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $id_cabang, $id_proyek, false, false);
         }
 
-        // Beban (kode 5x, 6x) - debit normal
+        // Beban (kode 5x, 6x) - debit normal, TANPA saldo awal
         $totalBeban = 0;
         foreach (['50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69'] as $prefix) {
-            $totalBeban += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $id_cabang, $id_proyek, true);
+            $totalBeban += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $id_cabang, $id_proyek, true, false);
         }
 
-        // Pendapatan/Beban Lainnya (kode 7x, 8x, 9x)
+        // Pendapatan/Beban Lainnya (kode 7x, 8x, 9x) - TANPA saldo awal
         $totalPendapatanLain = 0;
         foreach (['70', '71', '72', '73', '74', '75', '76', '77', '78', '79'] as $prefix) {
-            $totalPendapatanLain += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $id_cabang, $id_proyek, false);
+            $totalPendapatanLain += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $id_cabang, $id_proyek, false, false);
         }
         $totalBebanLain = 0;
         foreach (['80', '81', '82', '83', '84', '85', '86', '87', '88', '89'] as $prefix) {
-            $totalBebanLain += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $id_cabang, $id_proyek, true);
+            $totalBebanLain += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $id_cabang, $id_proyek, true, false);
         }
 
         $labaRugi = $totalPendapatan + $totalPendapatanLain - $totalBeban - $totalBebanLain;
@@ -348,12 +352,12 @@ class DashboardController extends Controller
 
             $pendapatan = 0;
             foreach (['40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79'] as $prefix) {
-                $pendapatan += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $cabangId, $proyekId, false);
+                $pendapatan += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $cabangId, $proyekId, false, false);
             }
 
             $beban = 0;
             foreach (['50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '80', '81', '82', '83', '84', '85', '86', '87', '88', '89'] as $prefix) {
-                $beban += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $cabangId, $proyekId, true);
+                $beban += $this->hitungSaldoGroup($prefix, $tahun, $bulan, $cabangId, $proyekId, true, false);
             }
 
             $labaRugi = $pendapatan - $beban;

@@ -79,7 +79,8 @@
                             </select>
                         </div>
                         <div class="col-md-2 col-sm-12 mb-2">
-                            <button type="button" id="btnFilter" class="btn btn-primary btn-sm btn-block">
+                            <label class="mb-1 small">&nbsp;</label>
+                            <button type="button" id="btnFilter" class="btn btn-primary btn-block">
                                 <i class="fas fa-search mr-1"></i> Tampilkan
                             </button>
                         </div>
@@ -227,7 +228,7 @@
                                     Transaksi Terbaru
                                 </h3>
                             </div>
-                            <div class="card-body p-0" style="max-height: 350px; overflow: auto;">
+                            <div class="card-body p-0" style="overflow-x: auto;">
                                 <table class="table table-hover table-striped table-sm text-nowrap mb-0 dashboard-sticky-table">
                                     <thead>
                                         <tr>
@@ -277,8 +278,8 @@
 
             if (cabangId) {
                 $.get("{{ route('listProyekByCabang') }}", { id_cabang: cabangId }, function(data) {
-                    $.each(data, function(i, item) {
-                        proyekSelect.append('<option value="' + item.id + '">' + item.no_proyek + ' - ' + item.nama + '</option>');
+                    $.each(data, function(id, nama) {
+                        proyekSelect.append('<option value="' + id + '">' + nama + '</option>');
                     });
                 });
             }

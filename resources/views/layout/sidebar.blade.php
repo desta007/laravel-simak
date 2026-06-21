@@ -27,9 +27,9 @@
 
                 @if (auth()->user()->id_group_user == 1)
                     <li
-                        class="nav-item {{ request()->is('cabang*') || request()->is('proyek*') || request()->is('kodeBukti*') || request()->is('groupAccount*') ? 'menu-open' : '' }}">
+                        class="nav-item {{ request()->is('cabang*') || request()->is('proyek*') || request()->is('kodeBukti*') || request()->is('groupAccount*') || request()->is('rekeningBank*') ? 'menu-open' : '' }}">
                         <a href="#"
-                            class="nav-link {{ request()->is('cabang*') || request()->is('proyek*') || request()->is('kodeBukti*') || request()->is('groupAccount*') ? 'active' : '' }}">
+                            class="nav-link {{ request()->is('cabang*') || request()->is('proyek*') || request()->is('kodeBukti*') || request()->is('groupAccount*') || request()->is('rekeningBank*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-book"></i>
                             <p>
                                 Master
@@ -63,6 +63,13 @@
                                     class="nav-link {{ request()->is('groupAccount*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Group Account</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('rekeningBank.index') }}"
+                                    class="nav-link {{ request()->is('rekeningBank*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Rekening Bank</p>
                                 </a>
                             </li>
                         </ul>
@@ -150,6 +157,15 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('kladKasBank') }}"
+                        class="nav-link {{ request()->is('kladKasBank*') || request()->is('addKladKasBank*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-money-bill-wave"></i>
+                        <p>
+                            Klad Kas & Bank
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="{{ route('prosesBulanan') }}"
                         class="nav-link {{ request()->is('prosesBulanan*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-database"></i>
@@ -171,7 +187,7 @@
                 <li class="nav-header">REPORT</li>
 
                 <li
-                    class="nav-item {{ request()->is('bukuTambahan*') || request()->is('neraca*') || request()->is('labaRugi*') || request()->is('generalLedger*') || request()->is('resumeKeuanganProyek*') ? 'menu-open' : '' }}">
+                    class="nav-item {{ request()->is('bukuTambahan*') || request()->is('neraca*') || request()->is('labaRugi*') || request()->is('generalLedger*') || request()->is('resumeKeuanganProyek*') || request()->is('laporanKladKasBank*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->is('bukuTambahan*') ? 'active' : '' }}">
                         <i class="nav-icon far fa-envelope"></i>
                         <p>
@@ -215,6 +231,13 @@
                                 class="nav-link {{ request()->is('resumeKeuanganProyek*') ? 'active' : '' }}">
                                 <i class="fas fa-chart-line nav-icon"></i>
                                 <p>Resume Lap Keu Proyek</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('laporanKladKasBank') }}"
+                                class="nav-link {{ request()->is('laporanKladKasBank*') ? 'active' : '' }}">
+                                <i class="fas fa-money-check-alt nav-icon"></i>
+                                <p>Laporan Klad Kas/Bank</p>
                             </a>
                         </li>
                     </ul>
