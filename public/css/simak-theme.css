@@ -256,6 +256,11 @@ p { font-size: 13px; }
     color: #ffffff !important;
 }
 
+/* Extra bottom space so last menu item is not clipped vertically */
+.nav-sidebar {
+    padding-bottom: 40px !important;
+}
+
 /* Nav header / section title */
 .nav-sidebar .nav-header {
     color: rgba(255, 255, 255, 0.3) !important;
