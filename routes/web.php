@@ -37,15 +37,13 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
     return view('auth.login');
 });
 
 Route::middleware(['auth'])->group(function () {
-    // Route::get('/', function () {
-    //     return view('dashboard');
-    // });
-
-    Route::get('/', [KodePerkiraanController::class, 'index']);
 
     Route::get('home', [DashboardController::class, 'index'])->name('dashboard');
 
