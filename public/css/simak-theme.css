@@ -1202,3 +1202,107 @@ a:hover {
         justify-content: flex-end;
     }
 }
+
+/* =========================================================
+   Dashboard Filter Card
+   ========================================================= */
+.dash-filter-card .card-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.dash-filter-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6c757d;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.dash-filter-card .form-control-sm {
+    border-radius: 6px;
+    font-size: 0.8rem;
+}
+
+.dash-filter-card .btn-success {
+    border-radius: 6px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-top: 1.15rem;
+}
+
+/* =========================================================
+   Dashboard Stat Cards
+   ========================================================= */
+.dash-stat-card {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    color: #fff;
+    min-height: 130px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dash-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dash-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    opacity: 0.25;
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.dash-stat-content {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+}
+
+.dash-stat-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.9;
+    margin-bottom: 0.25rem;
+}
+
+.dash-stat-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+}
+
+.dash-stat-value small {
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.dash-stat-details {
+    font-size: 0.72rem;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.dash-stat-details i {
+    width: 14px;
+    text-align: center;
+}

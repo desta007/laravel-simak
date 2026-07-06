@@ -48,7 +48,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', [KodePerkiraanController::class, 'index']);
 
     Route::get('home', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('dashboard/getData', [DashboardController::class, 'getData'])->name('dashboard.getData');
 
     Route::resource('cabang', CabangController::class);
     Route::resource('proyek', ProyekController::class);

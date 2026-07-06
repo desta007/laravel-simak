@@ -1,31 +1,15 @@
 @extends('layout.main')
 
 @section('content')
-    <style>
-        .dashboard-sticky-table {
-            border-collapse: separate !important;
-            border-spacing: 0 !important;
-        }
-        .dashboard-sticky-table thead th {
-            position: sticky;
-            top: 0;
-            z-index: 2;
-            background: #e9ecef !important;
-            border-top: none !important;
-            border-bottom: 2px solid #dee2e6 !important;
-            box-shadow: 0 1px 0 #dee2e6;
-        }
-    </style>
-    <!-- Content Header -->
-    <div class="content-header">
+    {{-- Content Header --}}
+    <div class="content-header mb-2">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0">Dashboard</h1>
+                    <h1 class="m-0">DASHBOARD SIMAK</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item active">Dashboard</li>
                     </ol>
                 </div>
@@ -33,469 +17,491 @@
         </div>
     </div>
 
-    <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
 
-            <!-- Filter Bar -->
-            <div class="card card-outline card-primary mb-3">
-                <div class="card-body py-2">
-                    <form id="filterForm" class="row align-items-end">
-                        <div class="col-md-2 col-sm-6 mb-2">
-                            <label class="mb-1 small font-weight-bold">Tahun</label>
-                            <select id="filterTahun" class="form-control form-control-sm">
-                                @foreach ($tahunList as $thn)
-                                    <option value="{{ $thn }}" {{ $thn == $tahun ? 'selected' : '' }}>{{ $thn }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2 col-sm-6 mb-2">
-                            <label class="mb-1 small font-weight-bold">Bulan</label>
-                            <select id="filterBulan" class="form-control form-control-sm">
-                                @php
-                                    $namaBulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-                                @endphp
-                                @for ($i = 1; $i <= 12; $i++)
-                                    <option value="{{ $i }}" {{ $i == $bulan ? 'selected' : '' }}>{{ $namaBulan[$i] }}</option>
+            {{-- ============ RINGKASAN FILTER ============ --}}
+            <div class="card card-outline card-warning dash-filter-card mb-3">
+                <div class="card-header py-2 d-flex align-items-center">
+                    <h3 class="card-title"><i class="fas fa-filter mr-2 text-warning"></i>RINGKASAN FILTER</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body py-3">
+                    <form method="GET" action="{{ route('dashboard') }}" class="row align-items-end">
+                        <div class="col-lg-3 col-md-6 col-12 mb-2">
+                            <label class="dash-filter-label"><i class="fas fa-calendar-alt mr-1"></i>Tahun</label>
+                            <select name="tahun" class="form-control form-control-sm select2bs4">
+                                @for ($y = date('Y'); $y >= 2020; $y--)
+                                    <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>{{ $y }}</option>
                                 @endfor
                             </select>
                         </div>
-                        <div class="col-md-3 col-sm-6 mb-2">
-                            <label class="mb-1 small font-weight-bold">Cabang</label>
-                            <select id="filterCabang" class="form-control form-control-sm" {{ $id_group_user != 1 ? 'disabled' : '' }}>
-                                <option value="">-- Semua Cabang --</option>
+                        <div class="col-lg-3 col-md-6 col-12 mb-2">
+                            <label class="dash-filter-label"><i class="fas fa-building mr-1"></i>Cabang</label>
+                            <select name="id_cabang" class="form-control form-control-sm select2bs4" {{ $id_group_user != 1 ? 'disabled' : '' }}>
+                                <option value="">Semua Cabang</option>
                                 @foreach ($cabangs as $cbg)
-                                    <option value="{{ $cbg->id }}" {{ $id_cabang == $cbg->id ? 'selected' : '' }}>{{ $cbg->kode }} - {{ $cbg->nama }}</option>
+                                    <option value="{{ $cbg->id }}" {{ $filterCabang == $cbg->id ? 'selected' : '' }}>{{ $cbg->nama }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-3 col-sm-6 mb-2">
-                            <label class="mb-1 small font-weight-bold">Proyek</label>
-                            <select id="filterProyek" class="form-control form-control-sm" {{ $id_group_user == 3 ? 'disabled' : '' }}>
-                                <option value="all">-- Semua Proyek --</option>
-                                @foreach ($proyeks as $pry)
-                                    <option value="{{ $pry->id }}" {{ $id_proyek == $pry->id ? 'selected' : '' }}>{{ $pry->no_proyek }} - {{ $pry->nama }}</option>
+                        <div class="col-lg-3 col-md-6 col-12 mb-2">
+                            <label class="dash-filter-label"><i class="fas fa-project-diagram mr-1"></i>Proyek</label>
+                            <select name="id_proyek" class="form-control form-control-sm select2bs4" {{ $id_group_user == 3 ? 'disabled' : '' }}>
+                                <option value="all">Semua Proyek</option>
+                                @foreach ($proyeks as $prj)
+                                    <option value="{{ $prj->id }}" {{ $filterProyek == $prj->id ? 'selected' : '' }}>{{ $prj->nama }}</option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-2 col-sm-12 mb-2">
-                            <label class="mb-1 small">&nbsp;</label>
-                            <button type="button" id="btnFilter" class="btn btn-primary btn-block">
-                                <i class="fas fa-search mr-1"></i> Tampilkan
+                        <div class="col-lg-3 col-md-6 col-12 mb-2">
+                            <button type="submit" class="btn btn-success btn-block">
+                                <i class="fas fa-search mr-1"></i> Terapkan Filter
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Loading Overlay -->
-            <div id="dashboardLoading" style="display:none;">
-                <div class="text-center py-5">
-                    <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
-                    <p class="mt-2 text-muted">Memuat data dashboard...</p>
+            {{-- ============ STAT CARDS ============ --}}
+            <div class="row">
+                {{-- Card 1: Total Proyek --}}
+                <div class="col-lg-3 col-md-6 col-12">
+                    <div class="dash-stat-card bg-gradient-info">
+                        <div class="dash-stat-icon">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div class="dash-stat-content">
+                            <div class="dash-stat-label">TOTAL PROYEK</div>
+                            <div class="dash-stat-value">{{ number_format($totalProyek) }}</div>
+                            <div class="dash-stat-details">
+                                <span><i class="fas fa-building mr-1"></i>Cabang: {{ number_format($totalCabang) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card 2: Total Nilai Transaksi --}}
+                <div class="col-lg-3 col-md-6 col-12">
+                    <div class="dash-stat-card bg-gradient-success">
+                        <div class="dash-stat-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="dash-stat-content">
+                            <div class="dash-stat-label">TOTAL NILAI TRANSAKSI</div>
+                            <div class="dash-stat-value">{{ number_format($totalTransaksi) }} <small>Jurnal</small></div>
+                            <div class="dash-stat-details">
+                                <span><i class="fas fa-arrow-up mr-1 text-white"></i>Debet: Rp {{ number_format($totalDebet, 0, ',', '.') }}</span><br>
+                                <span><i class="fas fa-arrow-down mr-1 text-white"></i>Kredit: Rp {{ number_format($totalKredit, 0, ',', '.') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card 3: Laba / Rugi --}}
+                <div class="col-lg-3 col-md-6 col-12">
+                    <div class="dash-stat-card bg-gradient-warning">
+                        <div class="dash-stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="dash-stat-content">
+                            <div class="dash-stat-label">LABA / RUGI</div>
+                            <div class="dash-stat-value">Rp {{ number_format(abs($labaRugi), 0, ',', '.') }}</div>
+                            <div class="dash-stat-details">
+                                <span><i class="fas fa-plus-circle mr-1"></i>Pendapatan: Rp {{ number_format($pendapatan, 0, ',', '.') }}</span><br>
+                                <span><i class="fas fa-minus-circle mr-1"></i>Beban: Rp {{ number_format($beban, 0, ',', '.') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Card 4: Cash Position --}}
+                <div class="col-lg-3 col-md-6 col-12">
+                    <div class="dash-stat-card bg-gradient-danger">
+                        <div class="dash-stat-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="dash-stat-content">
+                            <div class="dash-stat-label">CASH POSITION</div>
+                            <div class="dash-stat-value">Rp {{ number_format(abs($netCashFlow), 0, ',', '.') }}</div>
+                            <div class="dash-stat-details">
+                                <span><i class="fas fa-arrow-circle-up mr-1"></i>Cash In: Rp {{ number_format($cashIn, 0, ',', '.') }}</span><br>
+                                <span><i class="fas fa-arrow-circle-down mr-1"></i>Cash Out: Rp {{ number_format($cashOut, 0, ',', '.') }}</span><br>
+                                <span><i class="fas fa-exchange-alt mr-1"></i>Net Cash Flow: Rp {{ number_format($netCashFlow, 0, ',', '.') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ============ CHARTS ROW 1 ============ --}}
+            <div class="row">
+                {{-- Chart 1: Nilai Transaksi per Proyek (Top 10) --}}
+                <div class="col-lg-6">
+                    <div class="card card-outline card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-chart-bar mr-2"></i>Nilai Transaksi per Proyek (Top 10)</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chartPerProyek" style="min-height: 300px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Chart 2: Komposisi Proyek per Cabang --}}
+                <div class="col-lg-6">
+                    <div class="card card-outline card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-chart-pie mr-2"></i>Komposisi Proyek per Cabang</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="chartKomposisi" style="min-height: 300px;"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Dashboard Content (hidden until loaded) -->
-            <div id="dashboardContent" style="display:none;">
-
-                <!-- Summary Cards -->
-                <div class="row">
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-info">
-                            <div class="inner">
-                                <h4 id="cardAset" class="mb-0">Rp 0</h4>
-                                <p>Total Aset</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-university"></i>
+            {{-- ============ CHARTS ROW 2 ============ --}}
+            <div class="row">
+                {{-- Chart 3: Tren Transaksi Bulanan --}}
+                <div class="col-lg-6">
+                    <div class="card card-outline card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-chart-area mr-2"></i>Tren Transaksi Bulanan ({{ $tahun }})</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-warning">
-                            <div class="inner">
-                                <h4 id="cardKewajiban" class="mb-0">Rp 0</h4>
-                                <p>Total Kewajiban</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-file-invoice-dollar"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box bg-success">
-                            <div class="inner">
-                                <h4 id="cardEkuitas" class="mb-0">Rp 0</h4>
-                                <p>Total Ekuitas</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-balance-scale"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-6">
-                        <div class="small-box" id="cardLabaRugiBox">
-                            <div class="inner">
-                                <h4 id="cardLabaRugi" class="mb-0">Rp 0</h4>
-                                <p id="cardLabaRugiLabel">Laba/Rugi Bersih</p>
-                            </div>
-                            <div class="icon">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
+                        <div class="card-body">
+                            <canvas id="chartTrenBulanan" style="min-height: 300px;"></canvas>
                         </div>
                     </div>
                 </div>
 
-                <!-- Charts Row -->
-                <div class="row">
-                    <!-- Bar Chart: Pendapatan vs Beban -->
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-chart-bar mr-1"></i>
-                                    Pendapatan vs Beban per Bulan
-                                </h3>
-                            </div>
-                            <div class="card-body">
-                                <div style="position: relative; height: 300px;">
-                                    <canvas id="chartBulanan"></canvas>
-                                </div>
+                {{-- Chart 4: Debet vs Kredit per Cabang --}}
+                <div class="col-lg-6">
+                    <div class="card card-outline card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fas fa-balance-scale mr-2"></i>Debet vs Kredit per Cabang</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Doughnut Chart: Komposisi Aset -->
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-chart-pie mr-1"></i>
-                                    Komposisi Aset
-                                </h3>
-                            </div>
-                            <div class="card-body">
-                                <div style="position: relative; height: 300px;">
-                                    <canvas id="chartKomposisi"></canvas>
-                                </div>
-                                <div id="noAsetData" class="text-center text-muted py-4" style="display:none;">
-                                    <i class="fas fa-info-circle"></i> Tidak ada data aset
-                                </div>
-                            </div>
+                        <div class="card-body">
+                            <canvas id="chartPerCabang" style="min-height: 300px;"></canvas>
                         </div>
                     </div>
                 </div>
-
-                <!-- Tables Row -->
-                <div class="row">
-                    <!-- Tabel Ringkasan per Proyek -->
-                    <div class="col-lg-7" id="tabelProyekWrapper">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-project-diagram mr-1"></i>
-                                    Ringkasan per Proyek
-                                </h3>
-                            </div>
-                            <div class="card-body p-0" style="max-height: 350px; overflow: auto;">
-                                <table class="table table-hover table-striped table-sm text-nowrap mb-0 dashboard-sticky-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Proyek</th>
-                                            <th class="text-right">Aset</th>
-                                            <th class="text-right">Kewajiban</th>
-                                            <th class="text-right">Ekuitas</th>
-                                            <th class="text-right">Laba/Rugi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tabelProyekBody">
-                                        <tr>
-                                            <td colspan="5" class="text-center text-muted">Memuat...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Transaksi Terbaru -->
-                    <div class="col-lg-5">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-history mr-1"></i>
-                                    Transaksi Terbaru
-                                </h3>
-                            </div>
-                            <div class="card-body p-0" style="overflow-x: auto;">
-                                <table class="table table-hover table-striped table-sm text-nowrap mb-0 dashboard-sticky-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Tanggal</th>
-                                            <th>No Bukti</th>
-                                            <th>Keterangan</th>
-                                            <th class="text-right">Debet</th>
-                                            <th class="text-right">Kredit</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tabelTransaksiBody">
-                                        <tr>
-                                            <td colspan="5" class="text-center text-muted">Memuat...</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-            <!-- /#dashboardContent -->
+
+            {{-- ============ DAFTAR PROYEK TABLE ============ --}}
+            <div class="row">
+                <div class="col-12">
+                    <div class="card card-outline card-primary">
+                        <div class="card-header d-flex align-items-center">
+                            <h3 class="card-title"><i class="fas fa-table mr-2"></i>DAFTAR PROYEK</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-hover table-bordered table-sm" id="tblDaftarProyek">
+                                <thead>
+                                    <tr class="bg-dark text-white text-center">
+                                        <th>No</th>
+                                        <th>Proyek</th>
+                                        <th>No WO</th>
+                                        <th>Cabang</th>
+                                        <th>Jml Transaksi</th>
+                                        <th>Debet (Rp)</th>
+                                        <th>Kredit (Rp)</th>
+                                        <th>Selisih (Rp)</th>
+                                        <th>Margin (%)</th>
+                                        <th>Kesehatan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($daftarProyek as $index => $prj)
+                                        @php
+                                            $selisih = $prj->total_debet - $prj->total_kredit;
+                                            $margin = $prj->total_debet > 0 ? ($selisih / $prj->total_debet) * 100 : 0;
+                                            if ($prj->jml_transaksi == 0) {
+                                                $kesehatanClass = 'secondary';
+                                                $kesehatanLabel = 'N/A';
+                                            } elseif (abs($selisih) < 1) {
+                                                $kesehatanClass = 'success';
+                                                $kesehatanLabel = 'Seimbang';
+                                            } elseif (abs($margin) <= 5) {
+                                                $kesehatanClass = 'info';
+                                                $kesehatanLabel = 'Baik';
+                                            } elseif (abs($margin) <= 15) {
+                                                $kesehatanClass = 'warning';
+                                                $kesehatanLabel = 'Perhatian';
+                                            } else {
+                                                $kesehatanClass = 'danger';
+                                                $kesehatanLabel = 'Kritis';
+                                            }
+                                        @endphp
+                                        <tr>
+                                            <td class="text-center">{{ $index + 1 }}</td>
+                                            <td>{{ $prj->proyek_nama }}</td>
+                                            <td>{{ $prj->nomor_wo ?? '-' }}</td>
+                                            <td>{{ $prj->cabang_nama }}</td>
+                                            <td class="text-center">{{ number_format($prj->jml_transaksi) }}</td>
+                                            <td class="text-right">{{ number_format($prj->total_debet, 2, ',', '.') }}</td>
+                                            <td class="text-right">{{ number_format($prj->total_kredit, 2, ',', '.') }}</td>
+                                            <td class="text-right {{ $selisih < 0 ? 'text-danger' : ($selisih > 0 ? 'text-success' : '') }}">
+                                                {{ $selisih < 0 ? '(' : '' }}{{ number_format(abs($selisih), 2, ',', '.') }}{{ $selisih < 0 ? ')' : '' }}
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="text-{{ abs($margin) > 15 ? 'danger' : (abs($margin) > 5 ? 'warning' : 'success') }} font-weight-bold">
+                                                    {{ number_format($margin, 1, ',', '.') }}%
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge badge-{{ $kesehatanClass }} px-2 py-1">
+                                                    {{ $kesehatanLabel }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="10" class="text-center text-muted py-4">
+                                                <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                                Belum ada data proyek
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </section>
 
+    {{-- ============ CHART SCRIPTS ============ --}}
     <script>
-    $(document).ready(function() {
-        var chartBulanan = null;
-        var chartKomposisi = null;
+    $(function () {
+        var chartColors = {
+            blue: 'rgba(59, 130, 246, 0.8)',
+            blueBorder: 'rgba(59, 130, 246, 1)',
+            green: 'rgba(16, 185, 129, 0.8)',
+            greenBorder: 'rgba(16, 185, 129, 1)',
+            orange: 'rgba(245, 158, 11, 0.8)',
+            orangeBorder: 'rgba(245, 158, 11, 1)',
+            red: 'rgba(239, 68, 68, 0.8)',
+            redBorder: 'rgba(239, 68, 68, 1)',
+            purple: 'rgba(139, 92, 246, 0.8)',
+            purpleBorder: 'rgba(139, 92, 246, 1)',
+            cyan: 'rgba(6, 182, 212, 0.8)',
+            cyanBorder: 'rgba(6, 182, 212, 1)',
+            palette: [
+                'rgba(59,130,246,0.8)', 'rgba(16,185,129,0.8)', 'rgba(245,158,11,0.8)',
+                'rgba(239,68,68,0.8)', 'rgba(139,92,246,0.8)', 'rgba(6,182,212,0.8)',
+                'rgba(236,72,153,0.8)', 'rgba(34,197,94,0.8)', 'rgba(251,146,60,0.8)',
+                'rgba(99,102,241,0.8)'
+            ]
+        };
 
-        // Format angka Rupiah
-        function formatRupiah(angka) {
-            if (angka == null || isNaN(angka)) return 'Rp 0';
-            var isNeg = angka < 0;
-            var abs = Math.abs(angka);
-            var formatted = abs.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            return (isNeg ? '(Rp ' + formatted + ')' : 'Rp ' + formatted);
+        function formatRupiah(value) {
+            return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
 
-        // Cascade: cabang -> proyek
-        $('#filterCabang').on('change', function() {
-            var cabangId = $(this).val();
-            var proyekSelect = $('#filterProyek');
-            proyekSelect.html('<option value="all">-- Semua Proyek --</option>');
-
-            if (cabangId) {
-                $.get("{{ route('listProyekByCabang') }}", { id_cabang: cabangId }, function(data) {
-                    $.each(data, function(id, nama) {
-                        proyekSelect.append('<option value="' + id + '">' + nama + '</option>');
-                    });
-                });
-            }
-        });
-
-        // Load data
-        function loadDashboardData() {
-            $('#dashboardLoading').show();
-            $('#dashboardContent').hide();
-
-            $.ajax({
-                url: "{{ route('dashboard.getData') }}",
-                data: {
-                    tahun: $('#filterTahun').val(),
-                    bulan: $('#filterBulan').val(),
-                    id_cabang: $('#filterCabang').val(),
-                    id_proyek: $('#filterProyek').val()
-                },
-                success: function(res) {
-                    renderSummary(res.summary);
-                    renderChartBulanan(res.chartBulanan);
-                    renderChartKomposisi(res.chartKomposisi);
-                    renderTabelProyek(res.tabelProyek);
-                    renderTransaksiTerbaru(res.transaksiTerbaru);
-
-                    $('#dashboardLoading').hide();
-                    $('#dashboardContent').show();
-                },
-                error: function() {
-                    $('#dashboardLoading').hide();
-                    Swal.fire('Error', 'Gagal memuat data dashboard', 'error');
-                }
-            });
-        }
-
-        function renderSummary(data) {
-            $('#cardAset').text(formatRupiah(data.totalAset));
-            $('#cardKewajiban').text(formatRupiah(data.totalKewajiban));
-            $('#cardEkuitas').text(formatRupiah(data.totalEkuitas));
-            $('#cardLabaRugi').text(formatRupiah(data.labaRugi));
-
-            var box = $('#cardLabaRugiBox');
-            box.removeClass('bg-danger bg-primary');
-            if (data.labaRugi >= 0) {
-                box.addClass('bg-primary');
-                $('#cardLabaRugiLabel').text('Laba Bersih');
-            } else {
-                box.addClass('bg-danger');
-                $('#cardLabaRugiLabel').text('Rugi Bersih');
-            }
-        }
-
-        function renderChartBulanan(data) {
-            var ctx = document.getElementById('chartBulanan').getContext('2d');
-
-            if (chartBulanan) {
-                chartBulanan.destroy();
-            }
-
-            chartBulanan = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: data.labels,
-                    datasets: [
-                        {
-                            label: 'Pendapatan',
-                            backgroundColor: 'rgba(40, 167, 69, 0.7)',
-                            borderColor: 'rgba(40, 167, 69, 1)',
-                            borderWidth: 1,
-                            data: data.pendapatan
-                        },
-                        {
-                            label: 'Beban',
-                            backgroundColor: 'rgba(220, 53, 69, 0.7)',
-                            borderColor: 'rgba(220, 53, 69, 1)',
-                            borderWidth: 1,
-                            data: data.beban
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                callback: function(value) {
-                                    if (value >= 1000000000) return (value / 1000000000).toFixed(1) + ' M';
-                                    if (value >= 1000000) return (value / 1000000).toFixed(0) + ' Jt';
-                                    if (value >= 1000) return (value / 1000).toFixed(0) + ' Rb';
-                                    return value;
-                                }
-                            }
-                        }]
+        // === Chart 1: Nilai Transaksi per Proyek ===
+        var trxPerProyek = {!! json_encode($trxPerProyek) !!};
+        new Chart(document.getElementById('chartPerProyek').getContext('2d'), {
+            type: 'horizontalBar',
+            data: {
+                labels: trxPerProyek.map(function(d) {
+                    return d.proyek_nama.length > 25 ? d.proyek_nama.substring(0, 25) + '...' : d.proyek_nama;
+                }),
+                datasets: [
+                    {
+                        label: 'Debet',
+                        backgroundColor: chartColors.blue,
+                        borderColor: chartColors.blueBorder,
+                        borderWidth: 1,
+                        data: trxPerProyek.map(function(d) { return parseFloat(d.total_debet); })
                     },
-                    tooltips: {
-                        callbacks: {
-                            label: function(item, chart) {
-                                var label = chart.datasets[item.datasetIndex].label || '';
-                                return label + ': ' + formatRupiah(item.yLabel);
-                            }
-                        }
+                    {
+                        label: 'Kredit',
+                        backgroundColor: chartColors.green,
+                        borderColor: chartColors.greenBorder,
+                        borderWidth: 1,
+                        data: trxPerProyek.map(function(d) { return parseFloat(d.total_kredit); })
                     }
-                }
-            });
-        }
-
-        function renderChartKomposisi(data) {
-            var ctx = document.getElementById('chartKomposisi').getContext('2d');
-
-            if (chartKomposisi) {
-                chartKomposisi.destroy();
-            }
-
-            if (!data.labels || data.labels.length === 0) {
-                $('#chartKomposisi').hide();
-                $('#noAsetData').show();
-                return;
-            }
-            $('#chartKomposisi').show();
-            $('#noAsetData').hide();
-
-            var colors = [
-                '#007bff', '#28a745', '#ffc107', '#dc3545',
-                '#17a2b8', '#6f42c1', '#fd7e14', '#20c997'
-            ];
-
-            chartKomposisi = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: data.labels,
-                    datasets: [{
-                        data: data.data,
-                        backgroundColor: colors.slice(0, data.labels.length),
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            callback: function(v) { return formatRupiah(v); }
+                        }
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    legend: {
-                        position: 'bottom',
-                        labels: { fontSize: 11 }
-                    },
-                    tooltips: {
-                        callbacks: {
-                            label: function(item, chart) {
-                                var label = chart.labels[item.index] || '';
-                                var value = chart.datasets[0].data[item.index];
-                                return label + ': ' + formatRupiah(value);
-                            }
+                tooltips: {
+                    callbacks: {
+                        label: function(t, d) {
+                            return d.datasets[t.datasetIndex].label + ': ' + formatRupiah(t.xLabel);
                         }
                     }
                 }
-            });
-        }
-
-        function renderTabelProyek(data) {
-            var tbody = $('#tabelProyekBody');
-            tbody.empty();
-
-            if (!data || data.length === 0) {
-                tbody.html('<tr><td colspan="5" class="text-center text-muted">Tidak ada data proyek</td></tr>');
-                return;
             }
-
-            $.each(data, function(i, row) {
-                var labaClass = row.labaRugi >= 0 ? 'text-success' : 'text-danger';
-                tbody.append(
-                    '<tr>' +
-                        '<td>' + row.nama_proyek + '</td>' +
-                        '<td class="text-right">' + formatRupiah(row.aset) + '</td>' +
-                        '<td class="text-right">' + formatRupiah(row.kewajiban) + '</td>' +
-                        '<td class="text-right">' + formatRupiah(row.ekuitas) + '</td>' +
-                        '<td class="text-right ' + labaClass + ' font-weight-bold">' + formatRupiah(row.labaRugi) + '</td>' +
-                    '</tr>'
-                );
-            });
-        }
-
-        function renderTransaksiTerbaru(data) {
-            var tbody = $('#tabelTransaksiBody');
-            tbody.empty();
-
-            if (!data || data.length === 0) {
-                tbody.html('<tr><td colspan="5" class="text-center text-muted">Belum ada transaksi</td></tr>');
-                return;
-            }
-
-            $.each(data, function(i, row) {
-                var ket = row.keterangan || '-';
-                if (ket.length > 30) ket = ket.substring(0, 30) + '...';
-                tbody.append(
-                    '<tr>' +
-                        '<td>' + row.tgl + '</td>' +
-                        '<td>' + row.no_bukti + '</td>' +
-                        '<td>' + ket + '</td>' +
-                        '<td class="text-right">' + formatRupiah(row.debet) + '</td>' +
-                        '<td class="text-right">' + formatRupiah(row.kredit) + '</td>' +
-                    '</tr>'
-                );
-            });
-        }
-
-        // Event: filter button
-        $('#btnFilter').on('click', function() {
-            loadDashboardData();
         });
 
-        // Hide proyek table for role Proyek
-        @if ($id_group_user == 3)
-            $('#tabelProyekWrapper').hide();
-        @endif
+        // === Chart 2: Komposisi Proyek per Cabang ===
+        var proyekPerCabang = {!! json_encode($proyekPerCabang) !!};
+        new Chart(document.getElementById('chartKomposisi').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: proyekPerCabang.map(function(d) { return d.cabang_nama; }),
+                datasets: [{
+                    data: proyekPerCabang.map(function(d) { return d.jumlah; }),
+                    backgroundColor: chartColors.palette.slice(0, proyekPerCabang.length),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: { position: 'bottom' },
+                tooltips: {
+                    callbacks: {
+                        label: function(t, d) {
+                            var label = d.labels[t.index];
+                            var value = d.datasets[0].data[t.index];
+                            var total = d.datasets[0].data.reduce(function(a, b) { return a + b; }, 0);
+                            var pct = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                            return label + ': ' + value + ' proyek (' + pct + '%)';
+                        }
+                    }
+                }
+            }
+        });
 
-        // Initial load
-        loadDashboardData();
+        // === Chart 3: Tren Transaksi Bulanan ===
+        new Chart(document.getElementById('chartTrenBulanan').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {!! json_encode($chartLabels) !!},
+                datasets: [
+                    {
+                        label: 'Debet',
+                        borderColor: chartColors.blueBorder,
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        pointBackgroundColor: chartColors.blueBorder,
+                        pointRadius: 4,
+                        fill: true,
+                        data: {!! json_encode($chartDebet) !!}
+                    },
+                    {
+                        label: 'Kredit',
+                        borderColor: chartColors.greenBorder,
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        pointBackgroundColor: chartColors.greenBorder,
+                        pointRadius: 4,
+                        fill: true,
+                        data: {!! json_encode($chartKredit) !!}
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            callback: function(v) { return formatRupiah(v); }
+                        }
+                    }]
+                },
+                tooltips: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(t, d) {
+                            return d.datasets[t.datasetIndex].label + ': ' + formatRupiah(t.yLabel);
+                        }
+                    }
+                }
+            }
+        });
+
+        // === Chart 4: Debet vs Kredit per Cabang ===
+        var dkPerCabang = {!! json_encode($debetKreditPerCabang) !!};
+        new Chart(document.getElementById('chartPerCabang').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: dkPerCabang.map(function(d) { return d.cabang_nama; }),
+                datasets: [
+                    {
+                        label: 'Debet',
+                        backgroundColor: chartColors.blue,
+                        borderColor: chartColors.blueBorder,
+                        borderWidth: 1,
+                        data: dkPerCabang.map(function(d) { return parseFloat(d.total_debet); })
+                    },
+                    {
+                        label: 'Kredit',
+                        backgroundColor: chartColors.green,
+                        borderColor: chartColors.greenBorder,
+                        borderWidth: 1,
+                        data: dkPerCabang.map(function(d) { return parseFloat(d.total_kredit); })
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            callback: function(v) { return formatRupiah(v); }
+                        }
+                    }]
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(t, d) {
+                            return d.datasets[t.datasetIndex].label + ': ' + formatRupiah(t.yLabel);
+                        }
+                    }
+                }
+            }
+        });
+
+        // DataTable for project list
+        $('#tblDaftarProyek').DataTable({
+            responsive: true,
+            autoWidth: false,
+            pageLength: 10,
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                infoEmpty: "Tidak ada data",
+                paginate: { previous: "Sebelumnya", next: "Berikutnya" }
+            }
+        });
     });
     </script>
 @endsection
