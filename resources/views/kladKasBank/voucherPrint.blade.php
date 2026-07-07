@@ -9,8 +9,9 @@
         }
         .voucher-container { max-width: 900px; margin: 15px auto; border: 2px solid #000; padding: 22px 26px; background: #fff; color: #000; font-family: "Times New Roman", Times, serif; }
         .vh-top { display: flex; justify-content: space-between; align-items: flex-start; }
-        .vh-company { font-weight: bold; font-size: 20px; line-height: 1.1; text-transform: uppercase; }
+        .vh-company { display: flex; align-items: center; gap: 12px; font-weight: bold; font-size: 20px; line-height: 1.1; text-transform: uppercase; }
         .vh-company small { display: block; font-size: 11px; font-weight: normal; text-transform: none; }
+        .vh-logo { width: 62px; height: 62px; object-fit: contain; }
         .vh-no { font-size: 13px; text-align: right; }
         .vh-no b { border-bottom: 1px dotted #000; padding: 0 6px; }
         .v-rule { border: 0; border-top: 3px solid #000; margin: 8px 0 4px; }
@@ -64,13 +65,15 @@
                 $rekLine = trim(($klad->kodebukti->kode ?? '') . ' ' . ($klad->rekeningBank->nomor_rekening ?? ''));
                 $tglFmt = \Carbon\Carbon::parse($klad->tgl)->format('d-M-Y');
                 $kota = optional($klad->cabang)->kota;
+                $logoFile = $klad->id_cabang == 3 ? 'cvnimo.jpg' : 'ptsam.jpg';
             @endphp
 
             <div class="voucher-container">
                 {{-- Kop --}}
                 <div class="vh-top">
                     <div class="vh-company">
-                        {{ $klad->cabang->nama ?? 'PERUSAHAAN' }}
+                        <img src="{{ asset('storage/' . $logoFile) }}" class="vh-logo" alt="Logo">
+                        <span>{{ $klad->cabang->nama ?? 'PERUSAHAAN' }}</span>
                     </div>
                     <div class="vh-no">
                         NO. <b>{{ $klad->no_bukti }}</b>

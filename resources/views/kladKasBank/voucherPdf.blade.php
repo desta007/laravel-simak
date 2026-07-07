@@ -40,13 +40,20 @@
         $rekLine = trim(($klad->kodebukti->kode ?? '') . ' ' . ($klad->rekeningBank->nomor_rekening ?? ''));
         $tglFmt = \Carbon\Carbon::parse($klad->tgl)->format('d-M-Y');
         $kota = optional($klad->cabang)->kota;
+        $logoFile = $klad->id_cabang == 3 ? 'cvnimo.jpg' : 'ptsam.jpg';
+        $logoPath = storage_path('app/public/' . $logoFile);
     @endphp
 
     <div class="voucher-container">
         <table class="vh-top">
             <tr>
-                <td class="vh-company">{{ $klad->cabang->nama ?? 'PERUSAHAAN' }}</td>
-                <td class="vh-no">NO. <b>{{ $klad->no_bukti }}</b></td>
+                <td class="vh-company" style="width: 70px;">
+                    @if (file_exists($logoPath))
+                        <img src="{{ $logoPath }}" width="60" height="60" style="vertical-align: middle;">
+                    @endif
+                </td>
+                <td class="vh-company" style="vertical-align: middle;">{{ $klad->cabang->nama ?? 'PERUSAHAAN' }}</td>
+                <td class="vh-no" style="vertical-align: middle;">NO. <b>{{ $klad->no_bukti }}</b></td>
             </tr>
         </table>
         <hr class="v-rule">
