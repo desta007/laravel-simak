@@ -128,20 +128,9 @@
 
                                         @forelse ($results as $klad)
                                             @php
-                                                // Hitung total dari detail (exclude entry kas_bank)
-                                                $totalNominal = $klad->details
-                                                    ->where('kategori', '!=', 'kas_bank')
-                                                    ->sum('jumlah');
-
-                                                // Pengeluaran: Kredit ada nilai, Debet 0
-                                                // Penerimaan: Debet ada nilai, Kredit 0
-                                                if ($klad->jenis_transaksi == 'pengeluaran') {
-                                                    $jum_D = 0;
-                                                    $jum_K = $totalNominal;
-                                                } else {
-                                                    $jum_D = $totalNominal;
-                                                    $jum_K = 0;
-                                                }
+                                                // Jurnal langsung: total Debet & Kredit (seimbang)
+                                                $jum_D = $klad->details->where('jenis', 'D')->sum('jumlah');
+                                                $jum_K = $klad->details->where('jenis', 'K')->sum('jumlah');
 
                                                 $subtotal_D += $jum_D;
                                                 $subtotal_K += $jum_K;
@@ -169,6 +158,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="trx-cell-main">{{ $klad->no_bukti }}</div>
+                                                    <div class="trx-cell-sub"><span class="badge badge-dark">{{ $klad->kode_voucher }}</span></div>
                                                 </td>
                                                 <td class="text-center">
                                                     <span class="badge {{ $jenisClass }}">{{ $jenisLabel }}</span>

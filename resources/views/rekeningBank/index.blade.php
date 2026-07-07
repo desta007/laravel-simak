@@ -40,6 +40,7 @@
                                         <th>Cabang</th>
                                         <th>Nama Bank</th>
                                         <th>Kode Bank</th>
+                                        <th>Jenis</th>
                                         <th>No Rekening</th>
                                         <th>Nama Rekening</th>
                                         <th>Cabang Bank</th>
@@ -54,6 +55,13 @@
                                             <td>{{ $rek->cabang->nama ?? '-' }}</td>
                                             <td>{{ $rek->nama_bank }}</td>
                                             <td>{{ $rek->kode_bank }}</td>
+                                            <td>
+                                                @if ($rek->jenis_rekening === 'induk')
+                                                    <span class="badge badge-primary">Induk (PST)</span>
+                                                @else
+                                                    <span class="badge badge-info">Operasional (OPR)</span>
+                                                @endif
+                                            </td>
                                             <td>{{ $rek->nomor_rekening }}</td>
                                             <td>{{ $rek->nama_rekening }}</td>
                                             <td>{{ $rek->cabang_bank ?? '-' }}</td>

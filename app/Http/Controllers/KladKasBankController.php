@@ -236,7 +236,7 @@ class KladKasBankController extends Controller
     }
 
     /**
-     * Store new klad entry (multi-proyek)
+     * Store new klad entry (multi-proyek, jurnal langsung D/K)
      */
     public function store(Request $request)
     {
@@ -244,21 +244,20 @@ class KladKasBankController extends Controller
             'id_cabang' => 'required',
             'jenis_data' => 'required|in:kas,bank',
             'jenis_transaksi' => 'required|in:pengeluaran,penerimaan',
-            'id_kode_perkiraan_kas_bank' => 'required',
             'tgl' => 'required',
             'proyeks' => 'required|array|min:1',
         ]);
 
         $jenisData = $request->input('jenis_data');
         $jenisTransaksi = $request->input('jenis_transaksi');
-        $idKodePerkiraanKasBank = $request->input('id_kode_perkiraan_kas_bank');
         $proyeksData = $request->input('proyeks');
-        $isPengeluaran = ($jenisTransaksi === 'pengeluaran');
 
         try {
             DB::beginTransaction();
 
-            // Determine kode_bukti automatically
+            // Determine kode_bukti & segmen automatically
+            $rekeningBank = null;
+            $segmen = null;
             if ($jenisData === 'bank') {
                 $request->validate(['id_rekening_bank' => 'required']);
                 $rekeningBank = RekeningBank::findOrFail($request->input('id_rekening_bank'));
@@ -266,6 +265,7 @@ class KladKasBankController extends Controller
                 if (!$kodeBukti) {
                     throw new \Exception('Kode Bukti untuk bank ' . $rekeningBank->kode_bank . ' tidak ditemukan. Silahkan tambahkan di Master Kode Bukti.');
                 }
+                $segmen = $rekeningBank->segmen_bukti; // OPR / PST
                 $idKodeBukti = $kodeBukti->id;
             } else {
                 $kodeBukti = KodeBukti::where('kode', 'KAS')->first();
@@ -276,10 +276,8 @@ class KladKasBankController extends Controller
             }
 
             $tgl = Carbon::parse($request->input('tgl'));
-            $month = $tgl->format('m');
-            $year = $tgl->format('Y');
 
-            // Handle file upload once
+            // Handle file upload once (dipakai bersama semua proyek section)
             $fileName = '';
             if ($request->hasFile('file_dokumen')) {
                 $extension = $request->file('file_dokumen')->getClientOriginalExtension();
@@ -287,14 +285,10 @@ class KladKasBankController extends Controller
                 $request->file('file_dokumen')->storeAs('klad_kas_banks', $fileName);
             }
 
-            // Lock for no_urut_bukti generation
-            $lockedRows = KladKasBank::where('id_cabang', $request->input('id_cabang'))
-                ->where('id_kode_bukti', $idKodeBukti)
-                ->whereYear('tgl', $year)
-                ->whereMonth('tgl', $month)
-                ->lockForUpdate()
-                ->get();
-
+            // Lock & hitung no_urut berikutnya (urutan terpisah per tipe voucher)
+            $lockedRows = $this->latestNoUrutQuery(
+                $request->input('id_cabang'), $jenisData, $jenisTransaksi, $idKodeBukti, $rekeningBank, $tgl
+            )->lockForUpdate()->get();
             $latestNoUrutBukti = $lockedRows->max('no_urut_bukti');
             $nextNoUrutBukti = $latestNoUrutBukti ? $latestNoUrutBukti + 1 : 1;
 
@@ -302,12 +296,13 @@ class KladKasBankController extends Controller
 
             foreach ($proyeksData as $proyekSection) {
                 $idProyek = $proyekSection['id_proyek'] ?? 0;
-                $details = $proyekSection['details'] ?? [];
+                $rows = $this->parseJournalRows($proyekSection['details'] ?? []);
 
-                if (empty($details)) continue;
+                if (count($rows['entries']) < 1) continue;
 
-                $formattedNoUrutBukti = str_pad($nextNoUrutBukti, 4, '0', STR_PAD_LEFT);
-                $noBuktiFull = $formattedNoUrutBukti . '/' . $kodeBukti->kode . '/' . $month . '/' . $year;
+                $this->assertBalanced($rows, 'Proyek section');
+
+                $noBuktiFull = $this->buildNoBukti($nextNoUrutBukti, $kodeBukti->kode, $segmen, $tgl);
 
                 $klad = KladKasBank::create([
                     'id_cabang' => $request->input('id_cabang'),
@@ -316,24 +311,26 @@ class KladKasBankController extends Controller
                     'jenis_transaksi' => $jenisTransaksi,
                     'id_rekening_bank' => $jenisData === 'bank' ? $request->input('id_rekening_bank') : null,
                     'id_kode_bukti' => $idKodeBukti,
-                    'id_kode_perkiraan_kas_bank' => $idKodePerkiraanKasBank,
+                    'id_kode_perkiraan_kas_bank' => null,
                     'tgl' => $request->input('tgl'),
                     'no_bukti' => $noBuktiFull,
                     'no_urut_bukti' => $nextNoUrutBukti,
                     'keterangan' => $request->input('keterangan'),
                     'pihak_terkait' => $request->input('pihak_terkait'),
+                    'alamat' => $request->input('alamat'),
+                    'berupa' => $request->input('berupa'),
+                    'catatan' => $request->input('catatan'),
                     'file_dokumen' => $fileName,
                 ]);
 
-                // Save detail entries with categories
-                $this->saveDetailEntries($klad, $isPengeluaran, $details, $proyekSection, $idKodePerkiraanKasBank);
+                $this->saveJournalEntries($klad, $rows['entries']);
 
                 $nextNoUrutBukti++;
                 $createdCount++;
             }
 
             if ($createdCount === 0) {
-                throw new \Exception('Tidak ada data proyek yang valid untuk disimpan');
+                throw new \Exception('Tidak ada data jurnal yang valid untuk disimpan');
             }
 
             DB::commit();
@@ -351,120 +348,98 @@ class KladKasBankController extends Controller
     }
 
     /**
-     * Save detail entries with categories
+     * Query dasar untuk mencari no_urut_bukti terakhir.
+     * Urutan terpisah per (cabang, jenis, jenis_transaksi, kode_bukti, segmen, bulan, tahun).
      */
-    private function saveDetailEntries($klad, $isPengeluaran, $details, $proyekSection, $idKodePerkiraanKasBank)
+    private function latestNoUrutQuery($idCabang, $jenisData, $jenisTransaksi, $idKodeBukti, $rekeningBank, Carbon $tgl)
     {
-        $detailJenis = $isPengeluaran ? 'D' : 'K';
-        $kasBankJenis = $isPengeluaran ? 'K' : 'D';
-        $ppnJenis = $detailJenis;
-        $biayaLainJenis = $detailJenis;
-        $potonganJenis = $isPengeluaran ? 'K' : 'D';
+        $query = KladKasBank::where('id_cabang', $idCabang)
+            ->where('jenis', $jenisData)
+            ->where('jenis_transaksi', $jenisTransaksi)
+            ->where('id_kode_bukti', $idKodeBukti)
+            ->whereYear('tgl', $tgl->format('Y'))
+            ->whereMonth('tgl', $tgl->format('m'));
 
-        $dpp = 0;
+        // Bank: pisahkan urutan berdasarkan segmen (induk/operasional) via rekening.
+        if ($jenisData === 'bank' && $rekeningBank) {
+            $segmenRekIds = RekeningBank::where('kode_bank', $rekeningBank->kode_bank)
+                ->where('jenis_rekening', $rekeningBank->jenis_rekening)
+                ->pluck('id');
+            $query->whereIn('id_rekening_bank', $segmenRekIds);
+        }
 
-        // 1. Detail biaya/pendapatan items
+        return $query;
+    }
+
+    /**
+     * Bangun nomor bukti.
+     * Bank: 001/BNI/OPR/mm/yy ; Kas: 001/KAS/mm/yy
+     */
+    private function buildNoBukti($noUrut, $kodeBuktiKode, $segmen, Carbon $tgl): string
+    {
+        $no3 = str_pad($noUrut, 3, '0', STR_PAD_LEFT);
+        $mm = $tgl->format('m');
+        $yy = $tgl->format('y');
+
+        if ($segmen) {
+            return $no3 . '/' . $kodeBuktiKode . '/' . $segmen . '/' . $mm . '/' . $yy;
+        }
+        return $no3 . '/' . $kodeBuktiKode . '/' . $mm . '/' . $yy;
+    }
+
+    /**
+     * Parse baris jurnal dari input form. Return entries + total D/K.
+     */
+    private function parseJournalRows($details): array
+    {
+        $entries = [];
+        $totalD = 0;
+        $totalK = 0;
+
         foreach ($details as $detail) {
-            $nilai = (float)str_replace([',', '.'], ['', ''], $detail['nilai'] ?? 0);
-            if ($nilai <= 0) continue;
-            KladKasBankDetail::create([
-                'id_klad_kas_bank' => $klad->id,
+            $nilai = (float) preg_replace('/[^\d]/', '', (string) ($detail['nilai'] ?? '0'));
+            if (empty($detail['id_kode_perkiraan']) || $nilai <= 0) continue;
+
+            $jenis = (($detail['jenis'] ?? 'D') === 'K') ? 'K' : 'D';
+            $entries[] = [
                 'id_kode_perkiraan' => $detail['id_kode_perkiraan'],
-                'jenis' => $detailJenis,
-                'kategori' => 'detail',
+                'jenis' => $jenis,
                 'jumlah' => $nilai,
-            ]);
-            $dpp += $nilai;
+            ];
+            $jenis === 'D' ? $totalD += $nilai : $totalK += $nilai;
         }
 
-        $subtotal = $dpp;
+        return ['entries' => $entries, 'totalD' => $totalD, 'totalK' => $totalK];
+    }
 
-        // 2. PPN
-        $ppnNilai = (float)str_replace([',', '.'], ['', ''], $proyekSection['ppn_nilai'] ?? 0);
-        if ($ppnNilai > 0 && !empty($proyekSection['ppn_id_kode_perkiraan'])) {
-            KladKasBankDetail::create([
-                'id_klad_kas_bank' => $klad->id,
-                'id_kode_perkiraan' => $proyekSection['ppn_id_kode_perkiraan'],
-                'jenis' => $ppnJenis,
-                'kategori' => 'ppn',
-                'jumlah' => $ppnNilai,
-            ]);
-            $subtotal += $ppnNilai;
+    /**
+     * Pastikan jurnal seimbang (total Debet == total Kredit) dan minimal 2 baris.
+     */
+    private function assertBalanced(array $rows, string $label): void
+    {
+        if (count($rows['entries']) < 2) {
+            throw new \Exception($label . ': Minimal 2 baris jurnal (Debet & Kredit) harus diisi.');
         }
-
-        // 3. Biaya Lain
-        $biayaLainNilai = (float)str_replace([',', '.'], ['', ''], $proyekSection['biaya_lain_nilai'] ?? 0);
-        if ($biayaLainNilai > 0 && !empty($proyekSection['biaya_lain_id_kode_perkiraan'])) {
-            KladKasBankDetail::create([
-                'id_klad_kas_bank' => $klad->id,
-                'id_kode_perkiraan' => $proyekSection['biaya_lain_id_kode_perkiraan'],
-                'jenis' => $biayaLainJenis,
-                'kategori' => 'biaya_lain',
-                'jumlah' => $biayaLainNilai,
-            ]);
-            $subtotal += $biayaLainNilai;
+        if (round($rows['totalD']) != round($rows['totalK'])) {
+            throw new \Exception(
+                $label . ': Jurnal tidak seimbang. Debet ' . number_format($rows['totalD']) .
+                ' ≠ Kredit ' . number_format($rows['totalK']) . '.'
+            );
         }
+    }
 
-        // 4. PPh (potongan)
-        $pphNilai = (float)str_replace([',', '.'], ['', ''], $proyekSection['pph_nilai'] ?? 0);
-        if ($pphNilai > 0 && !empty($proyekSection['pph_id_kode_perkiraan'])) {
+    /**
+     * Simpan baris-baris jurnal.
+     */
+    private function saveJournalEntries($klad, array $entries): void
+    {
+        foreach ($entries as $entry) {
             KladKasBankDetail::create([
                 'id_klad_kas_bank' => $klad->id,
-                'id_kode_perkiraan' => $proyekSection['pph_id_kode_perkiraan'],
-                'jenis' => $potonganJenis,
-                'kategori' => 'pph',
-                'jumlah' => $pphNilai,
-            ]);
-            $subtotal -= $pphNilai;
-        }
-
-        // 5. Potongan Uang Muka
-        $potUmNilai = (float)str_replace([',', '.'], ['', ''], $proyekSection['pot_um_nilai'] ?? 0);
-        if ($potUmNilai > 0 && !empty($proyekSection['pot_um_id_kode_perkiraan'])) {
-            KladKasBankDetail::create([
-                'id_klad_kas_bank' => $klad->id,
-                'id_kode_perkiraan' => $proyekSection['pot_um_id_kode_perkiraan'],
-                'jenis' => $potonganJenis,
-                'kategori' => 'pot_um',
-                'jumlah' => $potUmNilai,
-            ]);
-            $subtotal -= $potUmNilai;
-        }
-
-        // 6. Potongan Retensi
-        $potRetensiNilai = (float)str_replace([',', '.'], ['', ''], $proyekSection['pot_retensi_nilai'] ?? 0);
-        if ($potRetensiNilai > 0 && !empty($proyekSection['pot_retensi_id_kode_perkiraan'])) {
-            KladKasBankDetail::create([
-                'id_klad_kas_bank' => $klad->id,
-                'id_kode_perkiraan' => $proyekSection['pot_retensi_id_kode_perkiraan'],
-                'jenis' => $potonganJenis,
-                'kategori' => 'pot_retensi',
-                'jumlah' => $potRetensiNilai,
-            ]);
-            $subtotal -= $potRetensiNilai;
-        }
-
-        // 7. Potongan Lain
-        $potLainNilai = (float)str_replace([',', '.'], ['', ''], $proyekSection['pot_lain_nilai'] ?? 0);
-        if ($potLainNilai > 0 && !empty($proyekSection['pot_lain_id_kode_perkiraan'])) {
-            KladKasBankDetail::create([
-                'id_klad_kas_bank' => $klad->id,
-                'id_kode_perkiraan' => $proyekSection['pot_lain_id_kode_perkiraan'],
-                'jenis' => $potonganJenis,
-                'kategori' => 'pot_lain',
-                'jumlah' => $potLainNilai,
-            ]);
-            $subtotal -= $potLainNilai;
-        }
-
-        // 8. Kas/Bank entry (net amount = subtotal)
-        if ($subtotal > 0) {
-            KladKasBankDetail::create([
-                'id_klad_kas_bank' => $klad->id,
-                'id_kode_perkiraan' => $idKodePerkiraanKasBank,
-                'jenis' => $kasBankJenis,
-                'kategori' => 'kas_bank',
-                'jumlah' => $subtotal,
+                'id_kode_perkiraan' => $entry['id_kode_perkiraan'],
+                'jenis' => $entry['jenis'],
+                'kategori' => null,
+                'jumlah' => $entry['jumlah'],
             ]);
         }
     }
@@ -496,20 +471,6 @@ class KladKasBankController extends Controller
                 ->orderBy('proyeks.created_at', 'desc')->get();
         }
 
-        // Parse details by category
-        $businessData = [
-            'jenis_transaksi' => $klad->jenis_transaksi,
-            'jenis_data' => $klad->jenis,
-            'kas_bank_detail' => $klad->details->where('kategori', 'kas_bank')->first(),
-            'ppn' => $klad->details->where('kategori', 'ppn')->first(),
-            'pph' => $klad->details->where('kategori', 'pph')->first(),
-            'pot_um' => $klad->details->where('kategori', 'pot_um')->first(),
-            'pot_retensi' => $klad->details->where('kategori', 'pot_retensi')->first(),
-            'pot_lain' => $klad->details->where('kategori', 'pot_lain')->first(),
-            'biaya_lain' => $klad->details->where('kategori', 'biaya_lain')->first(),
-            'detail_items' => $klad->details->where('kategori', 'detail')->values(),
-        ];
-
         $rekeningBanks = RekeningBank::where('is_active', true)->orderBy('nama_bank')->get();
 
         return view('kladKasBank.kladKasBankEdit', [
@@ -518,7 +479,6 @@ class KladKasBankController extends Controller
             'rekeningBanks' => $rekeningBanks,
             'id_group_user' => $id_group_user,
             'klad' => $klad,
-            'businessData' => $businessData,
         ]);
     }
 
@@ -532,33 +492,28 @@ class KladKasBankController extends Controller
         $request->validate([
             'jenis_data' => 'required|in:kas,bank',
             'jenis_transaksi' => 'required|in:pengeluaran,penerimaan',
-            'id_kode_perkiraan_kas_bank' => 'required',
             'tgl' => 'required',
             'proyeks' => 'required|array|min:1',
         ]);
 
         $jenisData = $request->input('jenis_data');
         $jenisTransaksi = $request->input('jenis_transaksi');
-        $idKodePerkiraanKasBank = $request->input('id_kode_perkiraan_kas_bank');
         $proyeksData = $request->input('proyeks');
-        $isPengeluaran = ($jenisTransaksi === 'pengeluaran');
 
         $proyekSection = $proyeksData[0] ?? null;
         if (!$proyekSection) {
-            Alert::error('Error', 'Data proyek tidak ditemukan');
-            return back()->withInput();
-        }
-
-        $details = $proyekSection['details'] ?? [];
-        if (empty($details)) {
-            Alert::error('Error', 'Detail biaya harus diisi');
+            Alert::error('Error', 'Data jurnal tidak ditemukan');
             return back()->withInput();
         }
 
         try {
             DB::beginTransaction();
 
-            // Determine kode_bukti automatically
+            $rows = $this->parseJournalRows($proyekSection['details'] ?? []);
+            $this->assertBalanced($rows, 'Jurnal');
+
+            // Determine kode_bukti & segmen automatically
+            $segmen = null;
             if ($jenisData === 'bank') {
                 $request->validate(['id_rekening_bank' => 'required']);
                 $rekeningBank = RekeningBank::findOrFail($request->input('id_rekening_bank'));
@@ -566,6 +521,7 @@ class KladKasBankController extends Controller
                 if (!$kodeBukti) {
                     throw new \Exception('Kode Bukti untuk bank ' . $rekeningBank->kode_bank . ' tidak ditemukan.');
                 }
+                $segmen = $rekeningBank->segmen_bukti;
                 $idKodeBukti = $kodeBukti->id;
             } else {
                 $kodeBukti = KodeBukti::where('kode', 'KAS')->first();
@@ -575,22 +531,24 @@ class KladKasBankController extends Controller
                 $idKodeBukti = $kodeBukti->id;
             }
 
-            $month = Carbon::parse($request->input('tgl'))->format('m');
-            $year = Carbon::parse($request->input('tgl'))->year;
+            $tgl = Carbon::parse($request->input('tgl'));
 
             // Update header
             $klad->tgl = $request->input('tgl');
             $klad->keterangan = $request->input('keterangan');
             $klad->pihak_terkait = $request->input('pihak_terkait');
+            $klad->alamat = $request->input('alamat');
+            $klad->berupa = $request->input('berupa');
+            $klad->catatan = $request->input('catatan');
             $klad->jenis = $jenisData;
             $klad->jenis_transaksi = $jenisTransaksi;
             $klad->id_kode_bukti = $idKodeBukti;
-            $klad->id_kode_perkiraan_kas_bank = $idKodePerkiraanKasBank;
+            $klad->id_kode_perkiraan_kas_bank = null;
             $klad->id_rekening_bank = $jenisData === 'bank' ? $request->input('id_rekening_bank') : null;
             $klad->id_proyek = $proyekSection['id_proyek'] ?? $klad->id_proyek;
 
-            // Regenerate no_bukti
-            $klad->no_bukti = str_pad($klad->no_urut_bukti, 4, '0', STR_PAD_LEFT) . '/' . $kodeBukti->kode . '/' . $month . '/' . $year;
+            // Regenerate no_bukti (no_urut tetap)
+            $klad->no_bukti = $this->buildNoBukti($klad->no_urut_bukti, $kodeBukti->kode, $segmen, $tgl);
 
             if ($request->hasFile('file_dokumen')) {
                 if ($klad->file_dokumen != '') {
@@ -606,7 +564,7 @@ class KladKasBankController extends Controller
 
             // Delete old details and save new ones
             KladKasBankDetail::where('id_klad_kas_bank', $id)->delete();
-            $this->saveDetailEntries($klad, $isPengeluaran, $details, $proyekSection, $idKodePerkiraanKasBank);
+            $this->saveJournalEntries($klad, $rows['entries']);
 
             DB::commit();
 
@@ -656,10 +614,9 @@ class KladKasBankController extends Controller
     {
         $klad = KladKasBank::with(['details.kodePerkiraan', 'kodebukti', 'cabang', 'proyek', 'rekeningBank'])->findOrFail($id);
 
-        // Pengeluaran: Debet=0, Kredit=total. Penerimaan: Debet=total, Kredit=0
-        $totalNominal = $klad->details->where('kategori', '!=', 'kas_bank')->sum('jumlah');
-        $jum_D = $klad->jenis_transaksi == 'penerimaan' ? $totalNominal : 0;
-        $jum_K = $klad->jenis_transaksi == 'pengeluaran' ? $totalNominal : 0;
+        // Jurnal langsung: total Debet & Kredit dari baris jurnal (seimbang).
+        $jum_D = $klad->details->where('jenis', 'D')->sum('jumlah');
+        $jum_K = $klad->details->where('jenis', 'K')->sum('jumlah');
 
         return view('kladKasBank.voucherPrint', compact('klad', 'jum_D', 'jum_K'));
     }
@@ -671,10 +628,9 @@ class KladKasBankController extends Controller
     {
         $klad = KladKasBank::with(['details.kodePerkiraan', 'kodebukti', 'cabang', 'proyek', 'rekeningBank'])->findOrFail($id);
 
-        // Pengeluaran: Debet=0, Kredit=total. Penerimaan: Debet=total, Kredit=0
-        $totalNominal = $klad->details->where('kategori', '!=', 'kas_bank')->sum('jumlah');
-        $jum_D = $klad->jenis_transaksi == 'penerimaan' ? $totalNominal : 0;
-        $jum_K = $klad->jenis_transaksi == 'pengeluaran' ? $totalNominal : 0;
+        // Jurnal langsung: total Debet & Kredit dari baris jurnal (seimbang).
+        $jum_D = $klad->details->where('jenis', 'D')->sum('jumlah');
+        $jum_K = $klad->details->where('jenis', 'K')->sum('jumlah');
 
         $pdf = Pdf::loadView('kladKasBank.voucherPdf', compact('klad', 'jum_D', 'jum_K'))
             ->setPaper('a4');

@@ -54,9 +54,8 @@
 
                 @foreach ($results as $klad)
                     @php
-                        $totalNominal = $klad->details->where('kategori', '!=', 'kas_bank')->sum('jumlah');
-                        $jum_D = $klad->jenis_transaksi == 'penerimaan' ? $totalNominal : 0;
-                        $jum_K = $klad->jenis_transaksi == 'pengeluaran' ? $totalNominal : 0;
+                        $jum_D = $klad->details->where('jenis', 'D')->sum('jumlah');
+                        $jum_K = $klad->details->where('jenis', 'K')->sum('jumlah');
                         $totalDebet += $jum_D;
                         $totalKredit += $jum_K;
                     @endphp

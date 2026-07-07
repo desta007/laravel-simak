@@ -1,104 +1,126 @@
+<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <title>Voucher {{ $klad->kode_voucher }} - {{ $klad->no_bukti }}</title>
     <style>
-        body { font-family: sans-serif; font-size: 11px; }
-        .voucher-container { border: 2px solid #333; padding: 20px; }
-        .voucher-header { text-align: center; margin-bottom: 15px; border-bottom: 2px solid #333; padding-bottom: 12px; }
-        .voucher-header h2 { margin: 0; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-        .voucher-header p { margin: 3px 0; font-size: 12px; }
-        .voucher-info { margin-bottom: 12px; }
-        .voucher-info table { width: 100%; }
-        .voucher-info td { padding: 2px 4px; font-size: 11px; }
-        .voucher-info .label { font-weight: bold; width: 100px; }
-        .voucher-detail table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-        .voucher-detail th, .voucher-detail td { border: 1px solid #333; padding: 5px 8px; font-size: 10px; }
-        .voucher-detail th { background-color: #f0f0f0; text-align: center; font-weight: bold; }
+        * { box-sizing: border-box; }
+        body { font-family: "DejaVu Serif", "Times New Roman", serif; font-size: 12px; color: #000; margin: 0; }
+        .voucher-container { border: 2px solid #000; padding: 18px 20px; }
+        .vh-top { width: 100%; border-collapse: collapse; }
+        .vh-top td { vertical-align: top; }
+        .vh-company { font-weight: bold; font-size: 18px; text-transform: uppercase; }
+        .vh-no { font-size: 12px; text-align: right; }
+        .vh-no b { border-bottom: 1px dotted #000; padding: 0 5px; }
+        .v-rule { border: 0; border-top: 3px solid #000; margin: 6px 0 2px; }
+        .v-title { text-align: center; margin: 8px 0 2px; }
+        .v-title h2 { margin: 0; font-size: 18px; font-weight: bold; letter-spacing: 1px; }
+        .v-rek { font-size: 13px; font-weight: bold; text-align: center; }
+        .v-code { text-align: center; font-size: 11px; color: #333; margin-bottom: 6px; }
+        table.v-info { width: 100%; font-size: 12px; margin: 8px 0; border-collapse: collapse; }
+        table.v-info td { padding: 2px 3px; vertical-align: top; }
+        table.v-info .lbl { width: 160px; font-weight: bold; }
+        table.v-info .sep { width: 10px; }
+        table.v-detail { width: 100%; border-collapse: collapse; margin: 6px 0; }
+        table.v-detail th, table.v-detail td { border: 1px solid #000; padding: 5px 6px; font-size: 11px; }
+        table.v-detail th { text-align: center; font-weight: bold; }
         .text-right { text-align: right; }
         .text-center { text-align: center; }
-        .voucher-signatures table { width: 100%; margin-top: 25px; }
-        .voucher-signatures td { text-align: center; padding: 4px; width: 33.33%; vertical-align: top; }
-        .sign-line { border-bottom: 1px solid #333; width: 130px; margin: 50px auto 4px; }
-        .sign-label { font-size: 10px; font-weight: bold; margin-bottom: 4px; }
+        .v-terbilang { font-style: italic; font-weight: bold; }
+        table.v-sign { width: 100%; border-collapse: collapse; margin-top: 4px; }
+        table.v-sign td { border: 1px solid #000; text-align: center; vertical-align: top; font-size: 11px; font-weight: bold; height: 70px; padding-top: 3px; }
+        .v-footer { margin-top: 8px; text-align: right; font-size: 12px; }
+        .v-footer .ttd { margin-top: 50px; font-weight: bold; }
     </style>
-    <title>Voucher {{ ucfirst($klad->jenis_transaksi) }} {{ ucfirst($klad->jenis) }} - {{ $klad->no_bukti }}</title>
 </head>
 <body>
+    @php
+        $isPengeluaran = $klad->jenis_transaksi === 'pengeluaran';
+        $total = $isPengeluaran ? $jum_K : $jum_D;
+        $rekLine = trim(($klad->kodebukti->kode ?? '') . ' ' . ($klad->rekeningBank->nomor_rekening ?? ''));
+        $tglFmt = \Carbon\Carbon::parse($klad->tgl)->format('d-M-Y');
+        $kota = optional($klad->cabang)->kota;
+    @endphp
+
     <div class="voucher-container">
-        <div class="voucher-header">
-            @if ($klad->cabang)
-                <p><strong>{{ $klad->cabang->nama }}</strong></p>
-            @endif
-            <h2>VOUCHER {{ strtoupper($klad->jenis_transaksi) }} {{ strtoupper($klad->jenis) }}</h2>
-        </div>
+        <table class="vh-top">
+            <tr>
+                <td class="vh-company">{{ $klad->cabang->nama ?? 'PERUSAHAAN' }}</td>
+                <td class="vh-no">NO. <b>{{ $klad->no_bukti }}</b></td>
+            </tr>
+        </table>
+        <hr class="v-rule">
 
-        <div class="voucher-info">
-            <table>
-                <tr>
-                    <td class="label">No. Voucher</td>
-                    <td>: {{ $klad->no_bukti }}</td>
-                    <td class="label" style="text-align: right;">Tanggal</td>
-                    <td style="text-align: right;">: {{ \Carbon\Carbon::parse($klad->tgl)->format('d/m/Y') }}</td>
+        <div class="v-title"><h2>{{ $klad->judul_voucher }}</h2></div>
+        @if ($rekLine)
+            <div class="v-rek">{{ $rekLine }}</div>
+        @endif
+        <div class="v-code">Kode Voucher: {{ $klad->kode_voucher }}</div>
+
+        @if ($isPengeluaran)
+            <table class="v-info">
+                <tr><td class="lbl">DIBAYARKAN KEPADA</td><td class="sep">:</td><td>{{ $klad->pihak_terkait }}</td></tr>
+                <tr><td class="lbl">ALAMAT</td><td class="sep">:</td><td>{{ $klad->alamat }}</td></tr>
+                <tr><td class="lbl">BANYAKNYA</td><td class="sep">:</td><td>Rp. {{ number_format($total, 0, ',', '.') }}</td></tr>
+                <tr><td class="lbl">TERBILANG</td><td class="sep">:</td><td class="v-terbilang"># {{ \App\Helpers\Terbilang::convert($total) }} Rupiah #</td></tr>
+                <tr><td class="lbl">BERUPA</td><td class="sep">:</td>
+                    <td>{{ $klad->berupa ?: 'TUNAI / CHEQUE / ONLINE' }} &nbsp; TGL : {{ $tglFmt }}@if ($rekLine) &nbsp; BANK : {{ $rekLine }}@endif</td>
                 </tr>
-                <tr>
-                    <td class="label">Cabang</td>
-                    <td>: {{ $klad->cabang->nama ?? '-' }}</td>
-                    <td class="label" style="text-align: right;">Proyek</td>
-                    <td style="text-align: right;">: {{ $klad->id_proyek == 0 ? 'Non Proyek' : ($klad->proyek->nama ?? '-') }}</td>
-                </tr>
+            </table>
+        @else
+            <table class="v-info">
                 @if ($klad->pihak_terkait)
-                <tr>
-                    <td class="label">{{ $klad->jenis_transaksi === 'pengeluaran' ? 'Dibayarkan Kepada' : 'Diterima Dari' }}</td>
-                    <td colspan="3">: {{ $klad->pihak_terkait }}</td>
-                </tr>
+                    <tr><td class="lbl">DITERIMA DARI</td><td class="sep">:</td><td>{{ $klad->pihak_terkait }}</td></tr>
                 @endif
-                <tr>
-                    <td class="label">Keterangan</td>
-                    <td colspan="3">: {{ $klad->keterangan }}</td>
-                </tr>
+                <tr><td class="lbl">TANGGAL</td><td class="sep">:</td><td>{{ $tglFmt }}</td></tr>
             </table>
-        </div>
+        @endif
 
-        <div class="voucher-detail">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 30px;">No</th>
-                        <th style="width: 80px;">Kode Perkiraan</th>
-                        <th>Nama Perkiraan</th>
-                        <th style="width: 110px;">Debet</th>
-                        <th style="width: 110px;">Kredit</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php $no = 1; @endphp
-                    @foreach ($klad->details->where('kategori', '!=', 'kas_bank') as $detail)
-                        <tr>
-                            <td class="text-center">{{ $no++ }}</td>
-                            <td class="text-center">{{ $detail->kodePerkiraan->kode ?? '-' }}</td>
-                            <td>{{ $detail->kodePerkiraan->nama ?? '-' }}</td>
-                            <td class="text-right">{{ $klad->jenis_transaksi == 'penerimaan' ? number_format($detail->jumlah) : '' }}</td>
-                            <td class="text-right">{{ $klad->jenis_transaksi == 'pengeluaran' ? number_format($detail->jumlah) : '' }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" style="text-align: center; font-weight: bold;">TOTAL</td>
-                        <td class="text-right" style="font-weight: bold;">{{ number_format($jum_D) }}</td>
-                        <td class="text-right" style="font-weight: bold;">{{ number_format($jum_K) }}</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-
-        <div class="voucher-signatures">
-            <table>
+        <table class="v-detail">
+            <thead>
                 <tr>
-                    <td><div class="sign-label">Dibuat oleh,</div><div class="sign-line"></div><div style="font-size: 9px;">(..........................)</div></td>
-                    <td><div class="sign-label">Diperiksa oleh,</div><div class="sign-line"></div><div style="font-size: 9px;">(..........................)</div></td>
-                    <td><div class="sign-label">Disetujui oleh,</div><div class="sign-line"></div><div style="font-size: 9px;">(..........................)</div></td>
+                    <th style="width: 140px;">{{ $isPengeluaran ? 'PERKIRAAN LAWAN' : 'PERKIRAAN NO.' }}</th>
+                    <th>KETERANGAN</th>
+                    <th style="width: 150px;">JUMLAH (Rp)</th>
+                    <th style="width: 110px;">CATATAN</th>
                 </tr>
-            </table>
+            </thead>
+            <tbody>
+                @if ($klad->keterangan)
+                    <tr><td></td><td colspan="3"><b>{{ $klad->keterangan }}</b></td></tr>
+                @endif
+                @foreach ($klad->details as $i => $detail)
+                    <tr>
+                        <td class="text-center">{{ $detail->kodePerkiraan->kode ?? '-' }} <b>{{ $detail->jenis }}</b></td>
+                        <td>{{ $detail->kodePerkiraan->nama ?? '-' }}</td>
+                        <td class="text-right">{{ number_format($detail->jumlah, 0, ',', '.') }}</td>
+                        <td>{{ $i === 0 ? $klad->catatan : '' }}</td>
+                    </tr>
+                @endforeach
+                <tr>
+                    <td colspan="2" class="v-terbilang">Terbilang : # {{ \App\Helpers\Terbilang::convert($total) }} Rupiah #</td>
+                    <td class="text-right"><b>{{ number_format($total, 0, ',', '.') }}</b></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="v-sign">
+            <tr>
+                <td>Dibuat</td>
+                <td>Diperiksa</td>
+                <td>Disetujui</td>
+                @if ($isPengeluaran)<td>Dibayar</td>@endif
+                <td>Dibukukan</td>
+            </tr>
+        </table>
+
+        <div class="v-footer">
+            {{ $kota ? $kota . ', ' : '' }}{{ $tglFmt }}<br>
+            Tanda Tangan Penerima,
+            <div class="ttd">
+                @if ($klad->pihak_terkait){{ $klad->pihak_terkait }}@else( ................................ )@endif
+            </div>
         </div>
     </div>
 </body>

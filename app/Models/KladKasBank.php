@@ -23,9 +23,32 @@ class KladKasBank extends Model
         'no_bukti',
         'no_urut_bukti',
         'pihak_terkait',
+        'alamat',
+        'berupa',
+        'catatan',
         'keterangan',
         'file_dokumen',
     ];
+
+    /**
+     * Kode voucher: VIB/VOB/VIK/VOK
+     * Inflow=penerimaan, Outflow=pengeluaran; Bank/Kas.
+     */
+    public function getKodeVoucherAttribute(): string
+    {
+        $arah = $this->jenis_transaksi === 'penerimaan' ? 'I' : 'O';
+        $media = $this->jenis === 'bank' ? 'B' : 'K';
+        return 'V' . $arah . $media;
+    }
+
+    /**
+     * Judul voucher: BUKTI PENERIMAAN/PENGELUARAN BANK/KAS
+     */
+    public function getJudulVoucherAttribute(): string
+    {
+        $arah = $this->jenis_transaksi === 'penerimaan' ? 'PENERIMAAN' : 'PENGELUARAN';
+        return 'BUKTI ' . $arah . ' ' . strtoupper($this->jenis);
+    }
 
     public function cabang(): BelongsTo
     {

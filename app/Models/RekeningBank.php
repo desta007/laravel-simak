@@ -14,6 +14,7 @@ class RekeningBank extends Model
         'id_cabang',
         'nama_bank',
         'kode_bank',
+        'jenis_rekening',
         'nomor_rekening',
         'nama_rekening',
         'cabang_bank',
@@ -28,5 +29,13 @@ class RekeningBank extends Model
     public function cabang(): BelongsTo
     {
         return $this->belongsTo(Cabang::class, 'id_cabang', 'id');
+    }
+
+    /**
+     * Segmen kode bukti: induk -> PST, operasional -> OPR
+     */
+    public function getSegmenBuktiAttribute(): string
+    {
+        return $this->jenis_rekening === 'induk' ? 'PST' : 'OPR';
     }
 }

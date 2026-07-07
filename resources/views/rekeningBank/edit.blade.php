@@ -59,6 +59,14 @@
                                             <small class="text-muted">Kode harus sesuai dengan Kode Bukti yang ada (misal: BNI, BRI, BJB, dll)</small>
                                         </div>
                                         <div class="form-group">
+                                            <label for="jenis_rekening">Jenis Rekening <span class="text-danger">*</span></label>
+                                            <select name="jenis_rekening" class="form-control" id="jenis_rekening">
+                                                <option value="operasional" {{ $rekeningBank->jenis_rekening === 'operasional' ? 'selected' : '' }}>Operasional (OPR)</option>
+                                                <option value="induk" {{ $rekeningBank->jenis_rekening === 'induk' ? 'selected' : '' }}>Induk / Pusat (PST)</option>
+                                            </select>
+                                            <small class="text-muted">Induk = PST, Operasional = OPR</small>
+                                        </div>
+                                        <div class="form-group">
                                             <label for="nomor_rekening">Nomor Rekening <span class="text-danger">*</span></label>
                                             <input type="text" name="nomor_rekening" class="form-control" id="nomor_rekening"
                                                 placeholder="Nomor Rekening" value="{{ $rekeningBank->nomor_rekening }}">

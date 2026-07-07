@@ -32,6 +32,14 @@
                                 <small class="text-muted">Kode harus sesuai dengan Kode Bukti yang ada</small>
                             </div>
                             <div class="form-group">
+                                <label for="jenis_rekening">Jenis Rekening <span class="text-danger">*</span></label>
+                                <select name="jenis_rekening" class="form-control" id="jenis_rekening">
+                                    <option value="operasional" selected>Operasional (OPR)</option>
+                                    <option value="induk">Induk / Pusat (PST)</option>
+                                </select>
+                                <small class="text-muted">Menentukan segmen kode bukti: Induk = PST, Operasional = OPR</small>
+                            </div>
+                            <div class="form-group">
                                 <label for="nomor_rekening">Nomor Rekening <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="nomor_rekening" name="nomor_rekening"
                                     placeholder="Nomor Rekening">

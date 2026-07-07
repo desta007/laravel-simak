@@ -41,7 +41,7 @@
                             {{-- Header Form --}}
                             <div class="card-body pb-2">
 
-                                {{-- Row 1: Cabang & Jenis --}}
+                                {{-- Row 1: Pengaturan Transaksi --}}
                                 <div class="trx-form-section">
                                     <div class="trx-form-section-title">
                                         <i class="fas fa-cog"></i> Pengaturan Transaksi
@@ -78,8 +78,10 @@
                                                 @foreach ($rekeningBanks as $rek)
                                                     <option value="{{ $rek->id }}"
                                                         data-kode-bank="{{ $rek->kode_bank }}"
+                                                        data-segmen="{{ $rek->segmen_bukti }}"
                                                         data-cabang="{{ $rek->id_cabang }}">
-                                                        {{ $rek->nama_bank }} - {{ $rek->nomor_rekening }} ({{ $rek->nama_rekening }})
+                                                        {{ $rek->nama_bank }} - {{ $rek->nomor_rekening }}
+                                                        ({{ ucfirst($rek->jenis_rekening) }})
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -87,23 +89,12 @@
                                     </div>
                                 </div>
 
-                                {{-- Row 2: Akun Kas/Bank, Tanggal --}}
+                                {{-- Row 2: Info Voucher --}}
                                 <div class="trx-form-section">
                                     <div class="trx-form-section-title">
-                                        <i class="fas fa-file-alt"></i> Dokumen
+                                        <i class="fas fa-file-alt"></i> Informasi Voucher
                                     </div>
                                     <div class="row">
-                                        <div class="col-12 col-md-4 form-group mb-2">
-                                            <label>Akun Kas/Bank <span class="text-danger">*</span></label>
-                                            <div style="position: relative;">
-                                                <input type="text" class="form-control" id="inp_akun_kas_bank"
-                                                    placeholder="Ketik kode/nama akun kas/bank..." autocomplete="off">
-                                                <input type="hidden" name="id_kode_perkiraan_kas_bank"
-                                                    id="id_kode_perkiraan_kas_bank" value="">
-                                                <div class="autocomplete-dropdown" id="acKasBankDropdown"></div>
-                                            </div>
-                                            <small class="text-muted" id="kasBankLabel">-</small>
-                                        </div>
                                         <div class="col-12 col-md-3 form-group mb-2">
                                             <label for="tgl">Tanggal <span class="text-danger">*</span></label>
                                             <input type="date" name="tgl" class="form-control" id="tgl"
@@ -114,19 +105,38 @@
                                             <input type="text" name="pihak_terkait" class="form-control"
                                                 id="pihak_terkait" placeholder="Nama penerima/pembayar...">
                                         </div>
+                                        <div class="col-12 col-md-4 form-group mb-2">
+                                            <label for="berupa">Berupa</label>
+                                            <select name="berupa" class="form-control" id="berupa">
+                                                <option value="TRANSFER" selected>TRANSFER</option>
+                                                <option value="TUNAI">TUNAI</option>
+                                                <option value="CHEQUE">CHEQUE</option>
+                                                <option value="ONLINE">ONLINE</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12 col-md-12 form-group mb-2">
+                                            <label for="alamat">Alamat</label>
+                                            <input type="text" name="alamat" class="form-control" id="alamat"
+                                                placeholder="Alamat penerima/pembayar (opsional)...">
+                                        </div>
                                     </div>
                                 </div>
 
-                                {{-- Row 3: Keterangan & Lampiran --}}
+                                {{-- Row 3: Keterangan, Catatan & Lampiran --}}
                                 <div class="trx-form-section mb-0">
                                     <div class="trx-form-section-title">
                                         <i class="fas fa-info-circle"></i> Keterangan & Lampiran
                                     </div>
                                     <div class="row">
-                                        <div class="col-12 col-md-8 form-group mb-2">
+                                        <div class="col-12 col-md-5 form-group mb-2">
                                             <label for="keterangan">Keterangan</label>
                                             <textarea name="keterangan" id="keterangan" cols="30" rows="2" class="form-control"
                                                 placeholder="Keterangan transaksi..."></textarea>
+                                        </div>
+                                        <div class="col-12 col-md-3 form-group mb-2">
+                                            <label for="catatan">Catatan</label>
+                                            <input type="text" name="catatan" class="form-control" id="catatan"
+                                                placeholder="Mis. Bukti2 terlampir...">
                                         </div>
                                         <div class="col-12 col-md-4 form-group mb-2">
                                             <label for="file_dokumen">File Dokumen</label>
@@ -150,12 +160,12 @@
                                     <div class="trx-detail-header">
                                         <div class="trx-detail-header-left">
                                             <i class="fas fa-project-diagram"></i>
-                                            <span class="proyek-section-title">Detail Proyek #1</span>
+                                            <span class="proyek-section-title">Jurnal #1</span>
                                         </div>
                                         <div>
                                             <button type="button" class="btn btn-sm btn-danger btn-remove-proyek"
-                                                style="display: none;" title="Hapus section proyek ini">
-                                                <i class="fas fa-times mr-1"></i> Hapus Proyek
+                                                style="display: none;" title="Hapus jurnal ini">
+                                                <i class="fas fa-times mr-1"></i> Hapus Jurnal
                                             </button>
                                         </div>
                                     </div>
@@ -178,16 +188,17 @@
                                             </div>
                                         </div>
 
-                                        {{-- Detail Biaya Table --}}
-                                        <label class="font-weight-bold mb-2"><i class="fas fa-list mr-1"></i> Detail
-                                            Biaya</label>
+                                        {{-- Tabel Jurnal --}}
+                                        <label class="font-weight-bold mb-2"><i class="fas fa-list mr-1"></i> Baris Jurnal
+                                            (Debet / Kredit)</label>
                                         <table class="table table-bordered table-sm mb-2 detail-table">
                                             <thead class="bg-light">
                                                 <tr>
                                                     <th style="width: 40px" class="text-center">No</th>
                                                     <th style="min-width: 200px">Kode Perkiraan</th>
                                                     <th>Nama Perkiraan</th>
-                                                    <th style="width: 180px" class="text-right">Nilai</th>
+                                                    <th style="width: 110px" class="text-center">Posisi</th>
+                                                    <th style="width: 170px" class="text-right">Jumlah</th>
                                                     <th style="width: 60px" class="text-center">Aksi</th>
                                                 </tr>
                                             </thead>
@@ -210,6 +221,12 @@
                                                         <span class="inp-nama-label text-muted">-</span>
                                                     </td>
                                                     <td>
+                                                        <select class="form-control form-control-sm inp-posisi">
+                                                            <option value="D">Debet</option>
+                                                            <option value="K">Kredit</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
                                                         <input type="text"
                                                             class="form-control form-control-sm text-right inp-nilai"
                                                             placeholder="0" autocomplete="off"
@@ -226,166 +243,20 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="3" class="text-right font-weight-bold">DPP</td>
-                                                    <td class="text-right font-weight-bold dpp-total">0</td>
+                                                    <td colspan="4" class="text-right font-weight-bold">TOTAL</td>
+                                                    <td class="text-right">
+                                                        <span class="font-weight-bold">D: <span class="total-debet">0</span></span><br>
+                                                        <span class="font-weight-bold">K: <span class="total-kredit">0</span></span>
+                                                    </td>
                                                     <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" class="text-right">
+                                                        <span class="balance-indicator badge badge-secondary">Belum ada baris</span>
+                                                    </td>
                                                 </tr>
                                             </tfoot>
                                         </table>
-
-                                        {{-- Pajak & Potongan --}}
-                                        <label class="font-weight-bold mb-2 mt-3"><i class="fas fa-percentage mr-1"></i>
-                                            Pajak & Potongan</label>
-                                        <div class="row">
-                                            {{-- PPN --}}
-                                            <div class="col-md-6 mb-2">
-                                                <div class="input-group input-group-sm">
-                                                    <div class="input-group-prepend" style="min-width: 130px;">
-                                                        <span class="input-group-text w-100">PPN</span>
-                                                    </div>
-                                                    <div style="position: relative; flex: 1;">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm tax-account-input"
-                                                            data-field="ppn" placeholder="Akun PPN..."
-                                                            autocomplete="off">
-                                                        <input type="hidden" name="proyeks[0][ppn_id_kode_perkiraan]"
-                                                            class="tax-account-id" data-field="ppn">
-                                                        <div class="autocomplete-dropdown ac-tax-dropdown"
-                                                            data-field="ppn"></div>
-                                                    </div>
-                                                    <input type="text"
-                                                        class="form-control form-control-sm text-right tax-nilai"
-                                                        name="proyeks[0][ppn_nilai]" data-field="ppn" placeholder="0"
-                                                        style="max-width: 150px;" onkeyup="formatField(this);">
-                                                </div>
-                                            </div>
-                                            {{-- PPh --}}
-                                            <div class="col-md-6 mb-2">
-                                                <div class="input-group input-group-sm">
-                                                    <div class="input-group-prepend" style="min-width: 130px;">
-                                                        <span class="input-group-text w-100">PPh</span>
-                                                    </div>
-                                                    <div style="position: relative; flex: 1;">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm tax-account-input"
-                                                            data-field="pph" placeholder="Akun PPh..."
-                                                            autocomplete="off">
-                                                        <input type="hidden" name="proyeks[0][pph_id_kode_perkiraan]"
-                                                            class="tax-account-id" data-field="pph">
-                                                        <div class="autocomplete-dropdown ac-tax-dropdown"
-                                                            data-field="pph"></div>
-                                                    </div>
-                                                    <input type="text"
-                                                        class="form-control form-control-sm text-right tax-nilai"
-                                                        name="proyeks[0][pph_nilai]" data-field="pph" placeholder="0"
-                                                        style="max-width: 150px;" onkeyup="formatField(this);">
-                                                </div>
-                                            </div>
-                                            {{-- Potongan Uang Muka --}}
-                                            <div class="col-md-6 mb-2">
-                                                <div class="input-group input-group-sm">
-                                                    <div class="input-group-prepend" style="min-width: 130px;">
-                                                        <span class="input-group-text w-100">Pot. Uang Muka</span>
-                                                    </div>
-                                                    <div style="position: relative; flex: 1;">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm tax-account-input"
-                                                            data-field="pot_um" placeholder="Akun..."
-                                                            autocomplete="off">
-                                                        <input type="hidden"
-                                                            name="proyeks[0][pot_um_id_kode_perkiraan]"
-                                                            class="tax-account-id" data-field="pot_um">
-                                                        <div class="autocomplete-dropdown ac-tax-dropdown"
-                                                            data-field="pot_um"></div>
-                                                    </div>
-                                                    <input type="text"
-                                                        class="form-control form-control-sm text-right tax-nilai"
-                                                        name="proyeks[0][pot_um_nilai]" data-field="pot_um"
-                                                        placeholder="0" style="max-width: 150px;"
-                                                        onkeyup="formatField(this);">
-                                                </div>
-                                            </div>
-                                            {{-- Potongan Retensi --}}
-                                            <div class="col-md-6 mb-2">
-                                                <div class="input-group input-group-sm">
-                                                    <div class="input-group-prepend" style="min-width: 130px;">
-                                                        <span class="input-group-text w-100">Pot. Retensi</span>
-                                                    </div>
-                                                    <div style="position: relative; flex: 1;">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm tax-account-input"
-                                                            data-field="pot_retensi" placeholder="Akun..."
-                                                            autocomplete="off">
-                                                        <input type="hidden"
-                                                            name="proyeks[0][pot_retensi_id_kode_perkiraan]"
-                                                            class="tax-account-id" data-field="pot_retensi">
-                                                        <div class="autocomplete-dropdown ac-tax-dropdown"
-                                                            data-field="pot_retensi"></div>
-                                                    </div>
-                                                    <input type="text"
-                                                        class="form-control form-control-sm text-right tax-nilai"
-                                                        name="proyeks[0][pot_retensi_nilai]" data-field="pot_retensi"
-                                                        placeholder="0" style="max-width: 150px;"
-                                                        onkeyup="formatField(this);">
-                                                </div>
-                                            </div>
-                                            {{-- Potongan Lain --}}
-                                            <div class="col-md-6 mb-2">
-                                                <div class="input-group input-group-sm">
-                                                    <div class="input-group-prepend" style="min-width: 130px;">
-                                                        <span class="input-group-text w-100">Pot. Lain-Lain</span>
-                                                    </div>
-                                                    <div style="position: relative; flex: 1;">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm tax-account-input"
-                                                            data-field="pot_lain" placeholder="Akun..."
-                                                            autocomplete="off">
-                                                        <input type="hidden"
-                                                            name="proyeks[0][pot_lain_id_kode_perkiraan]"
-                                                            class="tax-account-id" data-field="pot_lain">
-                                                        <div class="autocomplete-dropdown ac-tax-dropdown"
-                                                            data-field="pot_lain"></div>
-                                                    </div>
-                                                    <input type="text"
-                                                        class="form-control form-control-sm text-right tax-nilai"
-                                                        name="proyeks[0][pot_lain_nilai]" data-field="pot_lain"
-                                                        placeholder="0" style="max-width: 150px;"
-                                                        onkeyup="formatField(this);">
-                                                </div>
-                                            </div>
-                                            {{-- Biaya Lain --}}
-                                            <div class="col-md-6 mb-2">
-                                                <div class="input-group input-group-sm">
-                                                    <div class="input-group-prepend" style="min-width: 130px;">
-                                                        <span class="input-group-text w-100">Biaya Lain-Lain</span>
-                                                    </div>
-                                                    <div style="position: relative; flex: 1;">
-                                                        <input type="text"
-                                                            class="form-control form-control-sm tax-account-input"
-                                                            data-field="biaya_lain" placeholder="Akun..."
-                                                            autocomplete="off">
-                                                        <input type="hidden"
-                                                            name="proyeks[0][biaya_lain_id_kode_perkiraan]"
-                                                            class="tax-account-id" data-field="biaya_lain">
-                                                        <div class="autocomplete-dropdown ac-tax-dropdown"
-                                                            data-field="biaya_lain"></div>
-                                                    </div>
-                                                    <input type="text"
-                                                        class="form-control form-control-sm text-right tax-nilai"
-                                                        name="proyeks[0][biaya_lain_nilai]" data-field="biaya_lain"
-                                                        placeholder="0" style="max-width: 150px;"
-                                                        onkeyup="formatField(this);">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{-- Subtotal --}}
-                                        <div class="d-flex justify-content-end mt-2 mb-2">
-                                            <div class="bg-light px-4 py-2 rounded border">
-                                                <strong>SUBTOTAL: </strong>
-                                                <strong class="subtotal-display text-primary" style="font-size: 1.1rem;">0</strong>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -393,23 +264,13 @@
                             {{-- Add Proyek Button --}}
                             <div class="card-body pt-0 pb-2">
                                 <button type="button" class="btn btn-outline-primary btn-block" id="btnTambahProyek">
-                                    <i class="fas fa-plus mr-1"></i> Tambah Proyek
+                                    <i class="fas fa-plus mr-1"></i> Tambah Jurnal (Proyek Lain)
                                 </button>
                             </div>
 
-                            {{-- Summary & Submit --}}
+                            {{-- Submit --}}
                             <div class="trx-summary">
-                                <div class="trx-summary-items">
-                                    <div class="trx-summary-item">
-                                        <div class="trx-summary-label">
-                                            <i class="fas fa-calculator mr-1"></i>
-                                            Total Nilai (Kas/Bank)
-                                        </div>
-                                        <div class="trx-summary-value text-primary" id="grandTotal"
-                                            style="font-size: 1.2rem;">0</div>
-                                    </div>
-                                </div>
-                                <div class="trx-summary-action">
+                                <div class="trx-summary-action ml-auto">
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-paper-plane mr-1"></i> Submit Data
                                     </button>
@@ -430,26 +291,16 @@
             bsCustomFileInput.init();
             $('.select2').select2({ theme: 'bootstrap4' });
 
-            // Initialize rekening bank visibility
             toggleRekeningBank();
 
-            // Jenis data change -> toggle rekening bank
             $('#jenis_data').change(function() {
                 toggleRekeningBank();
-                // Clear akun kas/bank
-                $('#inp_akun_kas_bank').val('');
-                $('#id_kode_perkiraan_kas_bank').val('');
-                $('#kasBankLabel').text('-');
-                // Clear rekening bank
                 $('#id_rekening_bank').val('').trigger('change');
             });
 
-            // Jenis transaksi change -> update label
             $('#jenis_transaksi').change(function() {
                 updatePihakTerkaitLabel();
-                recalcAllSubtotals();
             });
-
             updatePihakTerkaitLabel();
 
             // Cabang change -> load proyek for all sections
@@ -474,10 +325,6 @@
                 }
             });
 
-            // Tgl change (no urut auto generated server-side)
-            $('#tgl').change(function() { });
-
-            // Tambah proyek
             $('#btnTambahProyek').click(function() { addProyekSection(); });
 
             // Submit form
@@ -494,7 +341,6 @@
             $('#myForm').submit(function(event) {
                 event.preventDefault();
 
-                // Validate
                 if (!$('#id_cabang').val()) {
                     resetSubmitBtn();
                     Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Cabang terlebih dahulu' });
@@ -505,23 +351,28 @@
                     Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Rekening Bank terlebih dahulu' });
                     return false;
                 }
-                if (!$('#id_kode_perkiraan_kas_bank').val()) {
-                    resetSubmitBtn();
-                    Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Akun Kas/Bank terlebih dahulu' });
-                    return false;
-                }
 
-                // Check each proyek has at least 1 detail
+                // Validate each section: min 2 rows & balanced
                 var valid = true;
+                var msg = '';
                 $('.proyek-section').each(function() {
-                    if ($(this).find('.detail-rows tr').length === 0) {
+                    var title = $(this).find('.proyek-section-title').text();
+                    var rowCount = $(this).find('.detail-rows tr').length;
+                    if (rowCount < 2) {
+                        valid = false; msg = title + ': Minimal 2 baris jurnal (Debet & Kredit)'; return false;
+                    }
+                    var totals = sectionTotals($(this));
+                    if (Math.round(totals.d) !== Math.round(totals.k)) {
                         valid = false;
-                        var title = $(this).find('.proyek-section-title').text();
-                        Swal.fire({ icon: 'warning', title: 'Perhatian', text: title + ': Minimal 1 detail biaya harus diisi' });
+                        msg = title + ': Jurnal tidak seimbang (D ' + addCommas(totals.d.toString()) + ' ≠ K ' + addCommas(totals.k.toString()) + ')';
                         return false;
                     }
                 });
-                if (!valid) { resetSubmitBtn(); return false; }
+                if (!valid) {
+                    resetSubmitBtn();
+                    Swal.fire({ icon: 'warning', title: 'Perhatian', text: msg });
+                    return false;
+                }
 
                 resetSubmitBtn();
                 Swal.fire({
@@ -554,64 +405,11 @@
             }
         }
 
-        // ===== Akun Kas/Bank Autocomplete =====
-        var acKbTimer = null;
-        $('#inp_akun_kas_bank').on('input', function() {
-            var q = $(this).val().trim();
-            clearTimeout(acKbTimer);
-            if (q.length < 1) { $('#acKasBankDropdown').hide().empty(); return; }
-
-            acKbTimer = setTimeout(function() {
-                var jenis = $('#jenis_data').val();
-                // Filter: kas = 100,101; bank = 11*
-                $.ajax({
-                    url: "{{ route('ajaxSearchKodePerkiraan') }}",
-                    type: "GET",
-                    dataType: 'json',
-                    data: { q: q, id_cabang: $('#id_cabang').val() },
-                    success: function(data) {
-                        var dropdown = $('#acKasBankDropdown');
-                        dropdown.empty();
-                        var filtered = data.filter(function(item) {
-                            if (jenis === 'kas') {
-                                return item.kode === '100' || item.kode === '101' ||
-                                       item.kode.indexOf('100.') === 0 || item.kode.indexOf('101.') === 0;
-                            } else {
-                                return item.kode.indexOf('11') === 0;
-                            }
-                        });
-                        if (filtered.length === 0) {
-                            dropdown.append('<div class="ac-item ac-empty">Tidak ada akun kas/bank ditemukan</div>');
-                        } else {
-                            $.each(filtered, function(i, item) {
-                                var el = $('<div class="ac-item" data-id="' + item.id + '" data-kode="' + item.kode + '" data-nama="' + item.nama + '"></div>');
-                                el.html('<span class="ac-kode">' + item.kode + '</span><span class="ac-nama">' + item.nama + '</span>');
-                                dropdown.append(el);
-                            });
-                        }
-                        positionDropdown($('#inp_akun_kas_bank'), dropdown);
-                        dropdown.show();
-                    }
-                });
-            }, 300);
-        });
-
-        $(document).on('click', '#acKasBankDropdown .ac-item:not(.ac-empty)', function() {
-            var id = $(this).data('id');
-            var kode = $(this).data('kode');
-            var nama = $(this).data('nama');
-            $('#inp_akun_kas_bank').val(kode + ' - ' + nama);
-            $('#id_kode_perkiraan_kas_bank').val(id);
-            $('#kasBankLabel').text(nama);
-            $('#acKasBankDropdown').hide().empty();
-        });
-
-        // ===== Detail Biaya Autocomplete =====
+        // ===== Kode Perkiraan Autocomplete (baris jurnal) =====
         var acDetailTimer = null;
 
         $(document).on('input', '.inp-kode-perkiraan', function() {
             var input = $(this);
-            var section = input.closest('.proyek-section');
             var dropdown = input.siblings('.ac-detail-dropdown');
             var q = input.val().trim();
             clearTimeout(acDetailTimer);
@@ -644,9 +442,9 @@
 
         $(document).on('click', '.ac-detail-dropdown .ac-item:not(.ac-empty)', function() {
             var row = $(this).closest('tr');
-            var id = $(this).data('id');
             var kode = $(this).data('kode');
             var nama = $(this).data('nama');
+            var id = $(this).data('id');
             row.find('.inp-kode-perkiraan').val(kode);
             row.find('.inp-kode-perkiraan-id').val(id);
             row.find('.inp-kode-perkiraan-nama').val(nama);
@@ -655,54 +453,7 @@
             row.find('.inp-nilai').focus();
         });
 
-        // ===== Tax Account Autocomplete =====
-        var acTaxTimer = null;
-
-        $(document).on('input', '.tax-account-input', function() {
-            var input = $(this);
-            var dropdown = input.siblings('.ac-tax-dropdown');
-            var q = input.val().trim();
-            clearTimeout(acTaxTimer);
-
-            if (q.length < 2) { dropdown.hide().empty(); return; }
-
-            acTaxTimer = setTimeout(function() {
-                $.ajax({
-                    url: "{{ route('ajaxSearchKodePerkiraan') }}",
-                    type: "GET",
-                    dataType: 'json',
-                    data: { q: q, id_cabang: $('#id_cabang').val() },
-                    success: function(data) {
-                        dropdown.empty();
-                        if (data.length === 0) {
-                            dropdown.append('<div class="ac-item ac-empty">Tidak ada data</div>');
-                        } else {
-                            $.each(data, function(i, item) {
-                                var el = $('<div class="ac-item" data-id="' + item.id + '" data-kode="' + item.kode + '" data-nama="' + item.nama + '"></div>');
-                                el.html('<span class="ac-kode">' + item.kode + '</span><span class="ac-nama">' + item.nama + '</span>');
-                                dropdown.append(el);
-                            });
-                        }
-                        positionDropdown(input, dropdown);
-                        dropdown.show();
-                    }
-                });
-            }, 300);
-        });
-
-        $(document).on('click', '.ac-tax-dropdown .ac-item:not(.ac-empty)', function() {
-            var container = $(this).closest('.input-group');
-            var field = $(this).closest('.ac-tax-dropdown').data('field');
-            var id = $(this).data('id');
-            var kode = $(this).data('kode');
-            var nama = $(this).data('nama');
-            container.find('.tax-account-input').val(kode + ' - ' + nama);
-            container.find('.tax-account-id[data-field="' + field + '"]').val(id);
-            $(this).closest('.ac-tax-dropdown').hide().empty();
-            container.find('.tax-nilai').focus();
-        });
-
-        // ===== Add Detail Row =====
+        // ===== Add Journal Row =====
         $(document).on('click', '.btn-add-detail', function() {
             addDetailRow($(this).closest('.proyek-section'));
         });
@@ -720,6 +471,7 @@
             var id = inputRow.find('.inp-kode-perkiraan-id').val();
             var kode = inputRow.find('.inp-kode-perkiraan').val();
             var nama = inputRow.find('.inp-kode-perkiraan-nama').val();
+            var posisi = inputRow.find('.inp-posisi').val();
             var nilaiStr = inputRow.find('.inp-nilai').val().replace(/[^\d]/g, '') || '0';
             var nilai = parseInt(nilaiStr) || 0;
 
@@ -734,15 +486,19 @@
 
             var tbody = section.find('.detail-rows');
             var rowNum = tbody.find('tr').length + 1;
+            var posisiLabel = posisi === 'K' ? 'Kredit' : 'Debet';
+            var posisiBadge = posisi === 'K' ? 'badge-warning' : 'badge-info';
 
             var html = '<tr>' +
                 '<td class="text-center">' + rowNum + '</td>' +
                 '<td>' +
                     '<input type="hidden" name="proyeks[' + idx + '][details][' + (rowNum - 1) + '][id_kode_perkiraan]" value="' + id + '">' +
-                    '<input type="hidden" name="proyeks[' + idx + '][details][' + (rowNum - 1) + '][nilai]" class="detail-nilai-hidden" value="' + nilai + '">' +
+                    '<input type="hidden" name="proyeks[' + idx + '][details][' + (rowNum - 1) + '][jenis]" value="' + posisi + '">' +
+                    '<input type="hidden" name="proyeks[' + idx + '][details][' + (rowNum - 1) + '][nilai]" class="detail-nilai-hidden" data-posisi="' + posisi + '" value="' + nilai + '">' +
                     kode +
                 '</td>' +
                 '<td>' + nama + '</td>' +
+                '<td class="text-center"><span class="badge ' + posisiBadge + '">' + posisiLabel + '</span></td>' +
                 '<td class="text-right">' + addCommas(nilai.toString()) + '</td>' +
                 '<td class="text-center">' +
                     '<button type="button" class="btn btn-sm btn-danger btn-delete-detail" title="Hapus"><i class="fas fa-trash fa-xs"></i></button>' +
@@ -762,7 +518,7 @@
             recalcSection(section);
         }
 
-        // ===== Delete Detail Row =====
+        // ===== Delete Journal Row =====
         $(document).on('click', '.btn-delete-detail', function() {
             var section = $(this).closest('.proyek-section');
             $(this).closest('tr').remove();
@@ -774,7 +530,6 @@
             var idx = section.data('index');
             section.find('.detail-rows tr').each(function(i) {
                 $(this).find('td:first').text(i + 1);
-                // Update name attributes
                 $(this).find('input[name*="[details]"]').each(function() {
                     var name = $(this).attr('name');
                     name = name.replace(/\[details\]\[\d+\]/, '[details][' + i + ']');
@@ -783,44 +538,40 @@
             });
         }
 
-        // ===== Recalculate Section =====
-        $(document).on('keyup change', '.tax-nilai', function() {
-            recalcSection($(this).closest('.proyek-section'));
-        });
-
-        function recalcSection(section) {
-            // DPP = sum of detail values
-            var dpp = 0;
+        // ===== Recalculate Section (Total D & K + balance) =====
+        function sectionTotals(section) {
+            var d = 0, k = 0;
             section.find('.detail-rows .detail-nilai-hidden').each(function() {
-                dpp += parseInt($(this).val()) || 0;
+                var v = parseInt($(this).val()) || 0;
+                if ($(this).data('posisi') === 'K') { k += v; } else { d += v; }
             });
-            section.find('.dpp-total').text(addCommas(dpp.toString()));
-
-            // Get tax/potongan values
-            var ppn = parseInt(section.find('.tax-nilai[data-field="ppn"]').val().replace(/[^\d]/g, '')) || 0;
-            var pph = parseInt(section.find('.tax-nilai[data-field="pph"]').val().replace(/[^\d]/g, '')) || 0;
-            var potUm = parseInt(section.find('.tax-nilai[data-field="pot_um"]').val().replace(/[^\d]/g, '')) || 0;
-            var potRetensi = parseInt(section.find('.tax-nilai[data-field="pot_retensi"]').val().replace(/[^\d]/g, '')) || 0;
-            var potLain = parseInt(section.find('.tax-nilai[data-field="pot_lain"]').val().replace(/[^\d]/g, '')) || 0;
-            var biayaLain = parseInt(section.find('.tax-nilai[data-field="biaya_lain"]').val().replace(/[^\d]/g, '')) || 0;
-
-            var subtotal = dpp + ppn - pph - potUm - potRetensi - potLain + biayaLain;
-            section.find('.subtotal-display').text(addCommas(subtotal.toString()));
-
-            recalcGrandTotal();
+            return { d: d, k: k };
         }
 
-        function recalcAllSubtotals() {
-            $('.proyek-section').each(function() {
-                recalcSection($(this));
-            });
+        function recalcSection(section) {
+            var totals = sectionTotals(section);
+            section.find('.total-debet').text(addCommas(totals.d.toString()));
+            section.find('.total-kredit').text(addCommas(totals.k.toString()));
+
+            var $ind = section.find('.balance-indicator');
+            var rowCount = section.find('.detail-rows tr').length;
+            if (rowCount === 0) {
+                $ind.removeClass('badge-success badge-danger').addClass('badge-secondary').text('Belum ada baris');
+            } else if (Math.round(totals.d) === Math.round(totals.k) && totals.d > 0) {
+                $ind.removeClass('badge-secondary badge-danger').addClass('badge-success').html('<i class="fas fa-check mr-1"></i> Seimbang');
+            } else {
+                var selisih = Math.abs(totals.d - totals.k);
+                $ind.removeClass('badge-secondary badge-success').addClass('badge-danger')
+                    .html('<i class="fas fa-exclamation-triangle mr-1"></i> Tidak seimbang (selisih ' + addCommas(selisih.toString()) + ')');
+            }
+
+            recalcGrandTotal();
         }
 
         function recalcGrandTotal() {
             var total = 0;
             $('.proyek-section').each(function() {
-                var text = $(this).find('.subtotal-display').text().replace(/[^\d-]/g, '');
-                total += parseInt(text) || 0;
+                total += sectionTotals($(this)).d;
             });
             $('#grandTotal').text(addCommas(total.toString()));
         }
@@ -831,25 +582,21 @@
             var templateSection = $('.proyek-section:first');
             var clone = templateSection.clone(true);
 
-            // Update index
             clone.attr('data-index', idx);
-            clone.find('.proyek-section-title').text('Detail Proyek #' + (idx + 1));
+            clone.find('.proyek-section-title').text('Jurnal #' + (idx + 1));
             clone.find('.btn-remove-proyek').show();
 
-            // Clear values
             clone.find('.detail-rows').empty();
             clone.find('.inp-kode-perkiraan').val('');
             clone.find('.inp-kode-perkiraan-id').val('');
             clone.find('.inp-kode-perkiraan-nama').val('');
             clone.find('.inp-nama-label').text('-');
             clone.find('.inp-nilai').val('');
-            clone.find('.tax-account-input').val('');
-            clone.find('.tax-account-id').val('');
-            clone.find('.tax-nilai').val('');
-            clone.find('.dpp-total').text('0');
-            clone.find('.subtotal-display').text('0');
+            clone.find('.inp-posisi').val('D');
+            clone.find('.total-debet').text('0');
+            clone.find('.total-kredit').text('0');
+            clone.find('.balance-indicator').removeClass('badge-success badge-danger').addClass('badge-secondary').text('Belum ada baris');
 
-            // Update name attributes
             clone.find('[name]').each(function() {
                 var name = $(this).attr('name');
                 if (name) {
@@ -858,7 +605,6 @@
                 }
             });
 
-            // Re-init select2
             clone.find('.select2-container').remove();
             clone.find('.proyek-select').removeClass('select2-hidden-accessible').removeAttr('data-select2-id aria-hidden tabindex');
             clone.find('.proyek-select option').removeAttr('data-select2-id');
@@ -867,17 +613,14 @@
             clone.find('.select2').select2({ theme: 'bootstrap4' });
 
             proyekSectionCount++;
-
-            // Show remove button on first section if more than 1
             updateRemoveButtons();
         }
 
-        // ===== Remove Proyek Section =====
         $(document).on('click', '.btn-remove-proyek', function() {
             var section = $(this).closest('.proyek-section');
             Swal.fire({
-                title: 'Hapus Proyek?',
-                text: 'Semua detail biaya di section ini akan dihapus.',
+                title: 'Hapus Jurnal?',
+                text: 'Semua baris jurnal di section ini akan dihapus.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Ya, Hapus',
@@ -904,9 +647,7 @@
         function reindexProyekSections() {
             $('.proyek-section').each(function(i) {
                 $(this).attr('data-index', i);
-                $(this).find('.proyek-section-title').text('Detail Proyek #' + (i + 1));
-
-                // Update name attributes
+                $(this).find('.proyek-section-title').text('Jurnal #' + (i + 1));
                 $(this).find('[name]').each(function() {
                     var name = $(this).attr('name');
                     if (name) {
@@ -914,8 +655,6 @@
                         $(this).attr('name', name);
                     }
                 });
-
-                // Re-number detail rows
                 renumberDetailRows($(this));
             });
             proyekSectionCount = $('.proyek-section').length;
@@ -952,21 +691,17 @@
                 c = (((j % 3) === 1) && (j !== 1)) ? b.substr(i - 1, 1) + ',' + c : b.substr(i - 1, 1) + c;
             }
             objek.value = c || '0';
-
-            // Trigger recalc
-            var section = $(objek).closest('.proyek-section');
-            if (section.length) recalcSection(section);
         }
 
         // Close dropdowns on outside click
         $(document).on('click', function(e) {
-            if (!$(e.target).closest('.inp-kode-perkiraan, .ac-detail-dropdown, #inp_akun_kas_bank, #acKasBankDropdown, .tax-account-input, .ac-tax-dropdown').length) {
-                $('.ac-detail-dropdown, #acKasBankDropdown, .ac-tax-dropdown').hide().empty();
+            if (!$(e.target).closest('.inp-kode-perkiraan, .ac-detail-dropdown').length) {
+                $('.ac-detail-dropdown').hide().empty();
             }
         });
 
         $(window).on('scroll', function() {
-            $('.ac-detail-dropdown, #acKasBankDropdown, .ac-tax-dropdown').hide().empty();
+            $('.ac-detail-dropdown').hide().empty();
         });
     </script>
 @endsection

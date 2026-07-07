@@ -44,7 +44,7 @@
                             {{-- Header Form --}}
                             <div class="card-body pb-2">
 
-                                {{-- Row 1: Cabang & Jenis --}}
+                                {{-- Row 1: Pengaturan Transaksi --}}
                                 <div class="trx-form-section">
                                     <div class="trx-form-section-title">
                                         <i class="fas fa-cog"></i> Pengaturan Transaksi
@@ -58,18 +58,18 @@
                                         <div class="col-12 col-md-3 form-group mb-2">
                                             <label>Jenis Transaksi <span class="text-danger">*</span></label>
                                             <select name="jenis_transaksi" class="form-control" id="jenis_transaksi">
-                                                <option value="pengeluaran" {{ $businessData['jenis_transaksi'] === 'pengeluaran' ? 'selected' : '' }}>Pengeluaran</option>
-                                                <option value="penerimaan" {{ $businessData['jenis_transaksi'] === 'penerimaan' ? 'selected' : '' }}>Penerimaan</option>
+                                                <option value="pengeluaran" {{ $klad->jenis_transaksi === 'pengeluaran' ? 'selected' : '' }}>Pengeluaran</option>
+                                                <option value="penerimaan" {{ $klad->jenis_transaksi === 'penerimaan' ? 'selected' : '' }}>Penerimaan</option>
                                             </select>
                                         </div>
                                         <div class="col-12 col-md-3 form-group mb-2">
                                             <label>Jenis <span class="text-danger">*</span></label>
                                             <select name="jenis_data" class="form-control" id="jenis_data">
-                                                <option value="kas" {{ $businessData['jenis_data'] === 'kas' ? 'selected' : '' }}>Kas</option>
-                                                <option value="bank" {{ $businessData['jenis_data'] === 'bank' ? 'selected' : '' }}>Bank</option>
+                                                <option value="kas" {{ $klad->jenis === 'kas' ? 'selected' : '' }}>Kas</option>
+                                                <option value="bank" {{ $klad->jenis === 'bank' ? 'selected' : '' }}>Bank</option>
                                             </select>
                                         </div>
-                                        <div class="col-12 col-md-3 form-group mb-2" id="rekeningBankGroup" style="{{ $businessData['jenis_data'] === 'bank' ? '' : 'display: none;' }}">
+                                        <div class="col-12 col-md-3 form-group mb-2" id="rekeningBankGroup" style="{{ $klad->jenis === 'bank' ? '' : 'display: none;' }}">
                                             <label for="id_rekening_bank">Rekening Bank <span class="text-danger">*</span></label>
                                             <select name="id_rekening_bank" class="form-control select2" id="id_rekening_bank"
                                                 style="width: 100%;">
@@ -77,9 +77,11 @@
                                                 @foreach ($rekeningBanks as $rek)
                                                     <option value="{{ $rek->id }}"
                                                         data-kode-bank="{{ $rek->kode_bank }}"
+                                                        data-segmen="{{ $rek->segmen_bukti }}"
                                                         data-cabang="{{ $rek->id_cabang }}"
                                                         {{ $klad->id_rekening_bank == $rek->id ? 'selected' : '' }}>
-                                                        {{ $rek->nama_bank }} - {{ $rek->nomor_rekening }} ({{ $rek->nama_rekening }})
+                                                        {{ $rek->nama_bank }} - {{ $rek->nomor_rekening }}
+                                                        ({{ ucfirst($rek->jenis_rekening) }})
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -87,53 +89,57 @@
                                     </div>
                                 </div>
 
-                                {{-- Row 2: Akun Kas/Bank, Tanggal --}}
+                                {{-- Row 2: Info Voucher --}}
                                 <div class="trx-form-section">
                                     <div class="trx-form-section-title">
-                                        <i class="fas fa-file-alt"></i> Dokumen
+                                        <i class="fas fa-file-alt"></i> Informasi Voucher
                                     </div>
                                     <div class="row">
-                                        <div class="col-12 col-md-4 form-group mb-2">
-                                            <label>Akun Kas/Bank <span class="text-danger">*</span></label>
-                                            <div style="position: relative;">
-                                                <input type="text" class="form-control" id="inp_akun_kas_bank"
-                                                    placeholder="Ketik kode/nama akun kas/bank..." autocomplete="off"
-                                                    value="{{ $businessData['kas_bank_detail'] ? ($businessData['kas_bank_detail']->kodePerkiraan->kode . ' - ' . $businessData['kas_bank_detail']->kodePerkiraan->nama) : '' }}">
-                                                <input type="hidden" name="id_kode_perkiraan_kas_bank"
-                                                    id="id_kode_perkiraan_kas_bank"
-                                                    value="{{ $businessData['kas_bank_detail'] ? $businessData['kas_bank_detail']->id_kode_perkiraan : '' }}">
-                                                <div class="autocomplete-dropdown" id="acKasBankDropdown"></div>
-                                            </div>
-                                            <small class="text-muted" id="kasBankLabel">
-                                                {{ $businessData['kas_bank_detail'] ? $businessData['kas_bank_detail']->kodePerkiraan->nama : '-' }}
-                                            </small>
-                                        </div>
                                         <div class="col-12 col-md-3 form-group mb-2">
                                             <label for="tgl">Tanggal <span class="text-danger">*</span></label>
                                             <input type="date" name="tgl" class="form-control" id="tgl"
-                                                value="{{ $klad->tgl }}">
+                                                value="{{ \Carbon\Carbon::parse($klad->tgl)->format('Y-m-d') }}">
                                         </div>
                                         <div class="col-12 col-md-5 form-group mb-2">
                                             <label id="labelPihakTerkait">
-                                                {{ $businessData['jenis_transaksi'] === 'pengeluaran' ? 'Dibayarkan Kepada' : 'Diterima Dari' }}
+                                                {{ $klad->jenis_transaksi === 'pengeluaran' ? 'Dibayarkan Kepada' : 'Diterima Dari' }}
                                             </label>
                                             <input type="text" name="pihak_terkait" class="form-control"
                                                 id="pihak_terkait" placeholder="Nama penerima/pembayar..."
                                                 value="{{ $klad->pihak_terkait }}">
                                         </div>
+                                        <div class="col-12 col-md-4 form-group mb-2">
+                                            <label for="berupa">Berupa</label>
+                                            <select name="berupa" class="form-control" id="berupa">
+                                                @foreach (['TRANSFER', 'TUNAI', 'CHEQUE', 'ONLINE'] as $opt)
+                                                    <option value="{{ $opt }}" {{ $klad->berupa === $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-12 col-md-12 form-group mb-2">
+                                            <label for="alamat">Alamat</label>
+                                            <input type="text" name="alamat" class="form-control" id="alamat"
+                                                placeholder="Alamat penerima/pembayar (opsional)..."
+                                                value="{{ $klad->alamat }}">
+                                        </div>
                                     </div>
                                 </div>
 
-                                {{-- Row 3: Keterangan & Lampiran --}}
+                                {{-- Row 3: Keterangan, Catatan & Lampiran --}}
                                 <div class="trx-form-section mb-0">
                                     <div class="trx-form-section-title">
                                         <i class="fas fa-info-circle"></i> Keterangan & Lampiran
                                     </div>
                                     <div class="row">
-                                        <div class="col-12 col-md-8 form-group mb-2">
+                                        <div class="col-12 col-md-5 form-group mb-2">
                                             <label for="keterangan">Keterangan</label>
                                             <textarea name="keterangan" id="keterangan" cols="30" rows="2" class="form-control"
                                                 placeholder="Keterangan transaksi...">{{ $klad->keterangan }}</textarea>
+                                        </div>
+                                        <div class="col-12 col-md-3 form-group mb-2">
+                                            <label for="catatan">Catatan</label>
+                                            <input type="text" name="catatan" class="form-control" id="catatan"
+                                                placeholder="Mis. Bukti2 terlampir..." value="{{ $klad->catatan }}">
                                         </div>
                                         <div class="col-12 col-md-4 form-group mb-2">
                                             <label for="file_dokumen">File Dokumen</label>
@@ -155,13 +161,13 @@
 
                             </div>
 
-                            {{-- Proyek Section (single for edit) --}}
+                            {{-- Journal Section (single for edit) --}}
                             <div id="proyekSectionsContainer">
                                 <div class="proyek-section" data-index="0">
                                     <div class="trx-detail-header">
                                         <div class="trx-detail-header-left">
                                             <i class="fas fa-project-diagram"></i>
-                                            <span class="proyek-section-title">Detail Proyek</span>
+                                            <span class="proyek-section-title">Jurnal</span>
                                         </div>
                                     </div>
 
@@ -184,28 +190,35 @@
                                             </div>
                                         </div>
 
-                                        {{-- Detail Biaya Table --}}
-                                        <label class="font-weight-bold mb-2"><i class="fas fa-list mr-1"></i> Detail Biaya</label>
+                                        {{-- Tabel Jurnal --}}
+                                        <label class="font-weight-bold mb-2"><i class="fas fa-list mr-1"></i> Baris Jurnal
+                                            (Debet / Kredit)</label>
                                         <table class="table table-bordered table-sm mb-2 detail-table">
                                             <thead class="bg-light">
                                                 <tr>
                                                     <th style="width: 40px" class="text-center">No</th>
                                                     <th style="min-width: 200px">Kode Perkiraan</th>
                                                     <th>Nama Perkiraan</th>
-                                                    <th style="width: 180px" class="text-right">Nilai</th>
+                                                    <th style="width: 110px" class="text-center">Posisi</th>
+                                                    <th style="width: 170px" class="text-right">Jumlah</th>
                                                     <th style="width: 60px" class="text-center">Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="detail-rows">
-                                                @foreach ($businessData['detail_items'] as $i => $detail)
+                                                @foreach ($klad->details as $i => $detail)
+                                                    @php $posisi = $detail->jenis === 'K' ? 'K' : 'D'; @endphp
                                                     <tr>
                                                         <td class="text-center">{{ $i + 1 }}</td>
                                                         <td>
                                                             <input type="hidden" name="proyeks[0][details][{{ $i }}][id_kode_perkiraan]" value="{{ $detail->id_kode_perkiraan }}">
-                                                            <input type="hidden" name="proyeks[0][details][{{ $i }}][nilai]" class="detail-nilai-hidden" value="{{ (int)$detail->jumlah }}">
+                                                            <input type="hidden" name="proyeks[0][details][{{ $i }}][jenis]" value="{{ $posisi }}">
+                                                            <input type="hidden" name="proyeks[0][details][{{ $i }}][nilai]" class="detail-nilai-hidden" data-posisi="{{ $posisi }}" value="{{ (int) $detail->jumlah }}">
                                                             {{ $detail->kodePerkiraan->kode ?? '' }}
                                                         </td>
                                                         <td>{{ $detail->kodePerkiraan->nama ?? '' }}</td>
+                                                        <td class="text-center">
+                                                            <span class="badge {{ $posisi === 'K' ? 'badge-warning' : 'badge-info' }}">{{ $posisi === 'K' ? 'Kredit' : 'Debet' }}</span>
+                                                        </td>
                                                         <td class="text-right">{{ number_format($detail->jumlah, 0, ',', ',') }}</td>
                                                         <td class="text-center">
                                                             <button type="button" class="btn btn-sm btn-danger btn-delete-detail" title="Hapus"><i class="fas fa-trash fa-xs"></i></button>
@@ -229,6 +242,12 @@
                                                         <span class="inp-nama-label text-muted">-</span>
                                                     </td>
                                                     <td>
+                                                        <select class="form-control form-control-sm inp-posisi">
+                                                            <option value="D">Debet</option>
+                                                            <option value="K">Kredit</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
                                                         <input type="text" class="form-control form-control-sm text-right inp-nilai"
                                                             placeholder="0" autocomplete="off" onkeyup="formatField(this);">
                                                     </td>
@@ -241,75 +260,27 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="3" class="text-right font-weight-bold">DPP</td>
-                                                    <td class="text-right font-weight-bold dpp-total">0</td>
+                                                    <td colspan="4" class="text-right font-weight-bold">TOTAL</td>
+                                                    <td class="text-right">
+                                                        <span class="font-weight-bold">D: <span class="total-debet">0</span></span><br>
+                                                        <span class="font-weight-bold">K: <span class="total-kredit">0</span></span>
+                                                    </td>
                                                     <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" class="text-right">
+                                                        <span class="balance-indicator badge badge-secondary">Belum ada baris</span>
+                                                    </td>
                                                 </tr>
                                             </tfoot>
                                         </table>
-
-                                        {{-- Pajak & Potongan --}}
-                                        <label class="font-weight-bold mb-2 mt-3"><i class="fas fa-percentage mr-1"></i> Pajak & Potongan</label>
-                                        <div class="row">
-                                            @php
-                                                $taxFields = [
-                                                    'ppn' => ['label' => 'PPN', 'data' => $businessData['ppn']],
-                                                    'pph' => ['label' => 'PPh', 'data' => $businessData['pph']],
-                                                    'pot_um' => ['label' => 'Pot. Uang Muka', 'data' => $businessData['pot_um']],
-                                                    'pot_retensi' => ['label' => 'Pot. Retensi', 'data' => $businessData['pot_retensi']],
-                                                    'pot_lain' => ['label' => 'Pot. Lain-Lain', 'data' => $businessData['pot_lain']],
-                                                    'biaya_lain' => ['label' => 'Biaya Lain-Lain', 'data' => $businessData['biaya_lain']],
-                                                ];
-                                            @endphp
-
-                                            @foreach ($taxFields as $field => $info)
-                                                <div class="col-md-6 mb-2">
-                                                    <div class="input-group input-group-sm">
-                                                        <div class="input-group-prepend" style="min-width: 130px;">
-                                                            <span class="input-group-text w-100">{{ $info['label'] }}</span>
-                                                        </div>
-                                                        <div style="position: relative; flex: 1;">
-                                                            <input type="text" class="form-control form-control-sm tax-account-input"
-                                                                data-field="{{ $field }}" placeholder="Akun..." autocomplete="off"
-                                                                value="{{ $info['data'] ? ($info['data']->kodePerkiraan->kode . ' - ' . $info['data']->kodePerkiraan->nama) : '' }}">
-                                                            <input type="hidden" name="proyeks[0][{{ $field }}_id_kode_perkiraan]"
-                                                                class="tax-account-id" data-field="{{ $field }}"
-                                                                value="{{ $info['data'] ? $info['data']->id_kode_perkiraan : '' }}">
-                                                            <div class="autocomplete-dropdown ac-tax-dropdown" data-field="{{ $field }}"></div>
-                                                        </div>
-                                                        <input type="text" class="form-control form-control-sm text-right tax-nilai"
-                                                            name="proyeks[0][{{ $field }}_nilai]" data-field="{{ $field }}"
-                                                            placeholder="0" style="max-width: 150px;"
-                                                            value="{{ $info['data'] ? number_format($info['data']->jumlah, 0, '', ',') : '' }}"
-                                                            onkeyup="formatField(this);">
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-
-                                        {{-- Subtotal --}}
-                                        <div class="d-flex justify-content-end mt-2 mb-2">
-                                            <div class="bg-light px-4 py-2 rounded border">
-                                                <strong>SUBTOTAL: </strong>
-                                                <strong class="subtotal-display text-primary" style="font-size: 1.1rem;">0</strong>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {{-- Summary & Submit --}}
+                            {{-- Submit --}}
                             <div class="trx-summary">
-                                <div class="trx-summary-items">
-                                    <div class="trx-summary-item">
-                                        <div class="trx-summary-label">
-                                            <i class="fas fa-calculator mr-1"></i>
-                                            Total Nilai (Kas/Bank)
-                                        </div>
-                                        <div class="trx-summary-value text-primary" id="grandTotal" style="font-size: 1.2rem;">0</div>
-                                    </div>
-                                </div>
-                                <div class="trx-summary-action">
+                                <div class="trx-summary-action ml-auto">
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-save mr-1"></i> Update Data
                                     </button>
@@ -333,9 +304,6 @@
 
             $('#jenis_data').change(function() {
                 toggleRekeningBank();
-                $('#inp_akun_kas_bank').val('');
-                $('#id_kode_perkiraan_kas_bank').val('');
-                $('#kasBankLabel').text('-');
                 $('#id_rekening_bank').val('').trigger('change');
             });
 
@@ -361,14 +329,17 @@
                     Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Rekening Bank terlebih dahulu' });
                     return false;
                 }
-                if (!$('#id_kode_perkiraan_kas_bank').val()) {
+
+                var section = $('.proyek-section:first');
+                if (section.find('.detail-rows tr').length < 2) {
                     resetSubmitBtn();
-                    Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Pilih Akun Kas/Bank terlebih dahulu' });
+                    Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Minimal 2 baris jurnal (Debet & Kredit)' });
                     return false;
                 }
-                if ($('.detail-rows tr').length === 0) {
+                var totals = sectionTotals(section);
+                if (Math.round(totals.d) !== Math.round(totals.k)) {
                     resetSubmitBtn();
-                    Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Minimal 1 detail biaya harus diisi' });
+                    Swal.fire({ icon: 'warning', title: 'Perhatian', text: 'Jurnal tidak seimbang (D ' + addCommas(totals.d.toString()) + ' ≠ K ' + addCommas(totals.k.toString()) + ')' });
                     return false;
                 }
 
@@ -403,56 +374,9 @@
             }
         }
 
-        // ===== Akun Kas/Bank Autocomplete =====
-        var acKbTimer = null;
-        $('#inp_akun_kas_bank').on('input', function() {
-            var q = $(this).val().trim();
-            clearTimeout(acKbTimer);
-            if (q.length < 1) { $('#acKasBankDropdown').hide().empty(); return; }
-
-            acKbTimer = setTimeout(function() {
-                var jenis = $('#jenis_data').val();
-                $.ajax({
-                    url: "{{ route('ajaxSearchKodePerkiraan') }}",
-                    type: "GET",
-                    dataType: 'json',
-                    data: { q: q, id_cabang: {{ $klad->id_cabang }} },
-                    success: function(data) {
-                        var dropdown = $('#acKasBankDropdown');
-                        dropdown.empty();
-                        var filtered = data.filter(function(item) {
-                            if (jenis === 'kas') {
-                                return item.kode === '100' || item.kode === '101' ||
-                                       item.kode.indexOf('100.') === 0 || item.kode.indexOf('101.') === 0;
-                            } else {
-                                return item.kode.indexOf('11') === 0;
-                            }
-                        });
-                        if (filtered.length === 0) {
-                            dropdown.append('<div class="ac-item ac-empty">Tidak ada akun kas/bank ditemukan</div>');
-                        } else {
-                            $.each(filtered, function(i, item) {
-                                var el = $('<div class="ac-item" data-id="' + item.id + '" data-kode="' + item.kode + '" data-nama="' + item.nama + '"></div>');
-                                el.html('<span class="ac-kode">' + item.kode + '</span><span class="ac-nama">' + item.nama + '</span>');
-                                dropdown.append(el);
-                            });
-                        }
-                        positionDropdown($('#inp_akun_kas_bank'), dropdown);
-                        dropdown.show();
-                    }
-                });
-            }, 300);
-        });
-
-        $(document).on('click', '#acKasBankDropdown .ac-item:not(.ac-empty)', function() {
-            $('#inp_akun_kas_bank').val($(this).data('kode') + ' - ' + $(this).data('nama'));
-            $('#id_kode_perkiraan_kas_bank').val($(this).data('id'));
-            $('#kasBankLabel').text($(this).data('nama'));
-            $('#acKasBankDropdown').hide().empty();
-        });
-
-        // ===== Detail Biaya Autocomplete =====
+        // ===== Kode Perkiraan Autocomplete =====
         var acDetailTimer = null;
+        var kladCabang = {{ $klad->id_cabang }};
 
         $(document).on('input', '.inp-kode-perkiraan', function() {
             var input = $(this);
@@ -467,7 +391,7 @@
                     url: "{{ route('ajaxSearchKodePerkiraan') }}",
                     type: "GET",
                     dataType: 'json',
-                    data: { q: q, id_cabang: {{ $klad->id_cabang }} },
+                    data: { q: q, id_cabang: kladCabang },
                     success: function(data) {
                         dropdown.empty();
                         if (data.length === 0) {
@@ -496,51 +420,7 @@
             row.find('.inp-nilai').focus();
         });
 
-        // ===== Tax Account Autocomplete =====
-        var acTaxTimer = null;
-
-        $(document).on('input', '.tax-account-input', function() {
-            var input = $(this);
-            var dropdown = input.siblings('.ac-tax-dropdown');
-            var q = input.val().trim();
-            clearTimeout(acTaxTimer);
-
-            if (q.length < 2) { dropdown.hide().empty(); return; }
-
-            acTaxTimer = setTimeout(function() {
-                $.ajax({
-                    url: "{{ route('ajaxSearchKodePerkiraan') }}",
-                    type: "GET",
-                    dataType: 'json',
-                    data: { q: q, id_cabang: {{ $klad->id_cabang }} },
-                    success: function(data) {
-                        dropdown.empty();
-                        if (data.length === 0) {
-                            dropdown.append('<div class="ac-item ac-empty">Tidak ada data</div>');
-                        } else {
-                            $.each(data, function(i, item) {
-                                var el = $('<div class="ac-item" data-id="' + item.id + '" data-kode="' + item.kode + '" data-nama="' + item.nama + '"></div>');
-                                el.html('<span class="ac-kode">' + item.kode + '</span><span class="ac-nama">' + item.nama + '</span>');
-                                dropdown.append(el);
-                            });
-                        }
-                        positionDropdown(input, dropdown);
-                        dropdown.show();
-                    }
-                });
-            }, 300);
-        });
-
-        $(document).on('click', '.ac-tax-dropdown .ac-item:not(.ac-empty)', function() {
-            var container = $(this).closest('.input-group');
-            var field = $(this).closest('.ac-tax-dropdown').data('field');
-            container.find('.tax-account-input').val($(this).data('kode') + ' - ' + $(this).data('nama'));
-            container.find('.tax-account-id[data-field="' + field + '"]').val($(this).data('id'));
-            $(this).closest('.ac-tax-dropdown').hide().empty();
-            container.find('.tax-nilai').focus();
-        });
-
-        // ===== Add Detail Row =====
+        // ===== Add Journal Row =====
         $(document).on('click', '.btn-add-detail', function() {
             addDetailRow($(this).closest('.proyek-section'));
         });
@@ -558,6 +438,7 @@
             var id = inputRow.find('.inp-kode-perkiraan-id').val();
             var kode = inputRow.find('.inp-kode-perkiraan').val();
             var nama = inputRow.find('.inp-kode-perkiraan-nama').val();
+            var posisi = inputRow.find('.inp-posisi').val();
             var nilaiStr = inputRow.find('.inp-nilai').val().replace(/[^\d]/g, '') || '0';
             var nilai = parseInt(nilaiStr) || 0;
 
@@ -572,15 +453,19 @@
 
             var tbody = section.find('.detail-rows');
             var rowNum = tbody.find('tr').length + 1;
+            var posisiLabel = posisi === 'K' ? 'Kredit' : 'Debet';
+            var posisiBadge = posisi === 'K' ? 'badge-warning' : 'badge-info';
 
             var html = '<tr>' +
                 '<td class="text-center">' + rowNum + '</td>' +
                 '<td>' +
                     '<input type="hidden" name="proyeks[' + idx + '][details][' + (rowNum - 1) + '][id_kode_perkiraan]" value="' + id + '">' +
-                    '<input type="hidden" name="proyeks[' + idx + '][details][' + (rowNum - 1) + '][nilai]" class="detail-nilai-hidden" value="' + nilai + '">' +
+                    '<input type="hidden" name="proyeks[' + idx + '][details][' + (rowNum - 1) + '][jenis]" value="' + posisi + '">' +
+                    '<input type="hidden" name="proyeks[' + idx + '][details][' + (rowNum - 1) + '][nilai]" class="detail-nilai-hidden" data-posisi="' + posisi + '" value="' + nilai + '">' +
                     kode +
                 '</td>' +
                 '<td>' + nama + '</td>' +
+                '<td class="text-center"><span class="badge ' + posisiBadge + '">' + posisiLabel + '</span></td>' +
                 '<td class="text-right">' + addCommas(nilai.toString()) + '</td>' +
                 '<td class="text-center">' +
                     '<button type="button" class="btn btn-sm btn-danger btn-delete-detail" title="Hapus"><i class="fas fa-trash fa-xs"></i></button>' +
@@ -599,7 +484,7 @@
             recalcSection(section);
         }
 
-        // ===== Delete Detail Row =====
+        // ===== Delete Journal Row =====
         $(document).on('click', '.btn-delete-detail', function() {
             var section = $(this).closest('.proyek-section');
             $(this).closest('tr').remove();
@@ -608,7 +493,6 @@
         });
 
         function renumberDetailRows(section) {
-            var idx = section.data('index');
             section.find('.detail-rows tr').each(function(i) {
                 $(this).find('td:first').text(i + 1);
                 $(this).find('input[name*="[details]"]').each(function() {
@@ -619,28 +503,34 @@
             });
         }
 
-        // ===== Recalculate =====
-        $(document).on('keyup change', '.tax-nilai', function() {
-            recalcSection($(this).closest('.proyek-section'));
-        });
+        // ===== Recalc totals + balance =====
+        function sectionTotals(section) {
+            var d = 0, k = 0;
+            section.find('.detail-rows .detail-nilai-hidden').each(function() {
+                var v = parseInt($(this).val()) || 0;
+                if ($(this).data('posisi') === 'K') { k += v; } else { d += v; }
+            });
+            return { d: d, k: k };
+        }
 
         function recalcSection(section) {
-            var dpp = 0;
-            section.find('.detail-rows .detail-nilai-hidden').each(function() {
-                dpp += parseInt($(this).val()) || 0;
-            });
-            section.find('.dpp-total').text(addCommas(dpp.toString()));
+            var totals = sectionTotals(section);
+            section.find('.total-debet').text(addCommas(totals.d.toString()));
+            section.find('.total-kredit').text(addCommas(totals.k.toString()));
 
-            var ppn = parseInt(section.find('.tax-nilai[data-field="ppn"]').val().replace(/[^\d]/g, '')) || 0;
-            var pph = parseInt(section.find('.tax-nilai[data-field="pph"]').val().replace(/[^\d]/g, '')) || 0;
-            var potUm = parseInt(section.find('.tax-nilai[data-field="pot_um"]').val().replace(/[^\d]/g, '')) || 0;
-            var potRetensi = parseInt(section.find('.tax-nilai[data-field="pot_retensi"]').val().replace(/[^\d]/g, '')) || 0;
-            var potLain = parseInt(section.find('.tax-nilai[data-field="pot_lain"]').val().replace(/[^\d]/g, '')) || 0;
-            var biayaLain = parseInt(section.find('.tax-nilai[data-field="biaya_lain"]').val().replace(/[^\d]/g, '')) || 0;
+            var $ind = section.find('.balance-indicator');
+            var rowCount = section.find('.detail-rows tr').length;
+            if (rowCount === 0) {
+                $ind.removeClass('badge-success badge-danger').addClass('badge-secondary').text('Belum ada baris');
+            } else if (Math.round(totals.d) === Math.round(totals.k) && totals.d > 0) {
+                $ind.removeClass('badge-secondary badge-danger').addClass('badge-success').html('<i class="fas fa-check mr-1"></i> Seimbang');
+            } else {
+                var selisih = Math.abs(totals.d - totals.k);
+                $ind.removeClass('badge-secondary badge-success').addClass('badge-danger')
+                    .html('<i class="fas fa-exclamation-triangle mr-1"></i> Tidak seimbang (selisih ' + addCommas(selisih.toString()) + ')');
+            }
 
-            var subtotal = dpp + ppn - pph - potUm - potRetensi - potLain + biayaLain;
-            section.find('.subtotal-display').text(addCommas(subtotal.toString()));
-            $('#grandTotal').text(addCommas(subtotal.toString()));
+            $('#grandTotal').text(addCommas(totals.d.toString()));
         }
 
         // ===== Utility =====
@@ -673,18 +563,16 @@
                 c = (((j % 3) === 1) && (j !== 1)) ? b.substr(i - 1, 1) + ',' + c : b.substr(i - 1, 1) + c;
             }
             objek.value = c || '0';
-            var section = $(objek).closest('.proyek-section');
-            if (section.length) recalcSection(section);
         }
 
         $(document).on('click', function(e) {
-            if (!$(e.target).closest('.inp-kode-perkiraan, .ac-detail-dropdown, #inp_akun_kas_bank, #acKasBankDropdown, .tax-account-input, .ac-tax-dropdown').length) {
-                $('.ac-detail-dropdown, #acKasBankDropdown, .ac-tax-dropdown').hide().empty();
+            if (!$(e.target).closest('.inp-kode-perkiraan, .ac-detail-dropdown').length) {
+                $('.ac-detail-dropdown').hide().empty();
             }
         });
 
         $(window).on('scroll', function() {
-            $('.ac-detail-dropdown, #acKasBankDropdown, .ac-tax-dropdown').hide().empty();
+            $('.ac-detail-dropdown').hide().empty();
         });
     </script>
 @endsection
