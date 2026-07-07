@@ -62,7 +62,9 @@ class KladKasBankController extends Controller
         session()->forget('totalAmountD');
 
         $tgl_awal = Carbon::now()->startOfMonth()->toDateString();
-        $tgl_akhir = Carbon::now()->toDateString();
+        // $tgl_akhir = Carbon::now()->toDateString();
+        $tgl_akhir = Carbon::now()->endOfMonth()->toDateString();
+
         $noBukti = '';
         $jenisKlad = 'all';
 
