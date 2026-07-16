@@ -144,6 +144,15 @@
                             </p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('backupDatabase.index') }}"
+                            class="nav-link {{ request()->is('backupDatabase*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-database"></i>
+                            <p>
+                                Backup Database
+                            </p>
+                        </a>
+                    </li>
                 @endif
 
                 <li class="nav-header">TRANSAKSI</li>

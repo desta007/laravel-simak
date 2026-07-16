@@ -17,6 +17,7 @@ use App\Http\Controllers\ProyekController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\KladKasBankController;
+use App\Http\Controllers\BackupDatabaseController;
 use App\Http\Controllers\RekeningBankController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -146,4 +147,10 @@ Route::middleware(['auth'])->group(function () {
     // 24-07-2025
     Route::get('/get-proyeks-by-cabang', [KodePerkiraanController::class, 'getProyeksByCabang'])->name('getProyeksByCabang');
     Route::get('ajaxSearchKodePerkiraan', [KodePerkiraanController::class, 'ajaxSearch'])->name('ajaxSearchKodePerkiraan');
+
+    // Backup Database (admin only)
+    Route::get('backupDatabase', [BackupDatabaseController::class, 'index'])->name('backupDatabase.index');
+    Route::post('backupDatabase', [BackupDatabaseController::class, 'store'])->name('backupDatabase.store');
+    Route::get('backupDatabase/{file}/download', [BackupDatabaseController::class, 'download'])->name('backupDatabase.download');
+    Route::delete('backupDatabase/{file}/delete', [BackupDatabaseController::class, 'destroy'])->name('backupDatabase.destroy');
 });
