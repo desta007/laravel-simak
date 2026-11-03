@@ -722,7 +722,12 @@ class ReportController extends Controller
         // ------------------------------------------------------------------------
 
         // 20. BIAYA LAIN-LAIN (80x)
-        $listGroupAcc80x = GroupAccount::where('kode', 'like', '80%')->orderBy('kode', 'asc')->get();
+        // termasuk 81x & 82x agar laba rugi sama dengan saldo 320 hasil proses bulanan
+        $listGroupAcc80x = GroupAccount::where(function ($query) {
+            $query->where('kode', 'like', '80%')
+                ->orWhere('kode', 'like', '81%')
+                ->orWhere('kode', 'like', '82%');
+        })->orderBy('kode', 'asc')->get();
         $listData80x = array();
         foreach ($listGroupAcc80x as $groupAcc80x) {
 

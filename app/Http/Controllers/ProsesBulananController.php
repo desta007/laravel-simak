@@ -537,8 +537,14 @@ class ProsesBulananController extends Controller
             }
             // ------------------------------------------------------------------------
 
-            // 20. BIAYA LAIN-LAIN (80x)
-            $listGroupAcc80x = GroupAccount::where('kode', 'like', '80%')->orderBy('kode', 'asc')->get();
+            // 20. BIAYA LAIN-LAIN (80x, 81x, 82x)
+            // 81x (Pend./Beban Komprehensif) & 82x (Perubahan P.A.) wajib ikut dihitung,
+            // jika tidak saldo 320 tidak sama dengan laba rugi dan neraca menjadi tidak balance
+            $listGroupAcc80x = GroupAccount::where(function ($query) {
+                $query->where('kode', 'like', '80%')
+                    ->orWhere('kode', 'like', '81%')
+                    ->orWhere('kode', 'like', '82%');
+            })->orderBy('kode', 'asc')->get();
             $subtotal80x = 0;
             foreach ($listGroupAcc80x as $groupAcc80x) {
                 // get saldo tiap bulan
@@ -629,11 +635,13 @@ class ProsesBulananController extends Controller
                 } else {
                     if ($laba_rugi_setelah_pph >= 0) {
                         $saldoAkun320->update([
+                            'saldo_debet' => 0,
                             'saldo_kredit' => abs($laba_rugi_setelah_pph)
                         ]);
                     } else {
                         $saldoAkun320->update([
-                            'saldo_debet' => abs($laba_rugi_setelah_pph)
+                            'saldo_debet' => abs($laba_rugi_setelah_pph),
+                            'saldo_kredit' => 0
                         ]);
                     }
                 }
@@ -672,10 +680,12 @@ class ProsesBulananController extends Controller
                 } else {
                     if ($laba_rugi_setelah_pph >= 0) {
                         $saldoAkun900->update([
-                            'saldo_debet' => abs($laba_rugi_setelah_pph)
+                            'saldo_debet' => abs($laba_rugi_setelah_pph),
+                            'saldo_kredit' => 0
                         ]);
                     } else {
                         $saldoAkun900->update([
+                            'saldo_debet' => 0,
                             'saldo_kredit' => abs($laba_rugi_setelah_pph)
                         ]);
                     }
